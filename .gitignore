@@ -21,19 +21,13 @@ dist
 *.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
-
-# OS
+yarn-error.log*# OS
 .DS_Store
-Thumbs.db
-
-# IDE
+Thumbs.db# IDE
 .vscode
 .idea
 *.swp
-*.swo
-
-# Temporary setup files
+*.swo# Temporary setup files
 *.bat
 cleanup.bat
 create-env.js

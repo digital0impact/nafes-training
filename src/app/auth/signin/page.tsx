@@ -1,42 +1,77 @@
 "use client"
 
-import { useState } from "react"
-import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { createClient } from "@/lib/supabase/client"
+import { signInSchema, type SignInInput } from "@/lib/validations"
 
 export default function SignInPage() {
   const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setError: setFormError,
+  } = useForm<SignInInput>({
+    resolver: zodResolver(signInSchema),
+  })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
-
+  const onSubmit = async (data: SignInInput) => {
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
+      const supabase = createClient()
+      
+      // تسجيل الدخول مباشرة باستخدام Supabase Auth
+      // هذا يحفظ الجلسة تلقائياً في cookies
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
       })
 
-      if (result?.error) {
-        setError("البريد الإلكتروني أو كلمة المرور غير صحيحة")
-      } else if (result?.ok) {
-        router.push("/teacher")
-        router.refresh()
-      } else {
-        setError("حدث خطأ أثناء تسجيل الدخول")
+      if (authError) {
+        setFormError("root", {
+          message: authError.message === "Invalid login credentials" 
+            ? "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+            : authError.message || "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+        })
+        return
       }
+
+      if (!authData.user) {
+        setFormError("root", {
+          message: "حدث خطأ أثناء تسجيل الدخول",
+        })
+        return
+      }
+
+      // التحقق من وجود المستخدم في قاعدة البيانات وإنشاؤه إذا لم يكن موجوداً
+      try {
+        const response = await fetch("/api/auth/sync-user", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId: authData.user.id }),
+        })
+
+        if (!response.ok) {
+          console.error("Failed to sync user data")
+        }
+      } catch (syncError) {
+        console.error("Error syncing user:", syncError)
+        // لا نوقف عملية تسجيل الدخول إذا فشل sync
+      }
+
+      // إعادة التوجيه إلى صفحة المعلمة
+      router.push("/teacher")
+      router.refresh()
     } catch (err) {
-      setError("حدث خطأ أثناء تسجيل الدخول")
-    } finally {
-      setLoading(false)
+      console.error("Sign in error:", err)
+      setFormError("root", {
+        message: "حدث خطأ أثناء تسجيل الدخول",
+      })
     }
   }
 
@@ -122,10 +157,10 @@ export default function SignInPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
-            {error && (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6">
+            {errors.root && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base">
-                {error}
+                {errors.root.message}
               </div>
             )}
 
@@ -139,12 +174,17 @@ export default function SignInPage() {
               <input
                 id="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 sm:py-3.5 text-base border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                {...register("email")}
+                className={`w-full px-4 py-3 sm:py-3.5 text-base border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
+                  errors.email
+                    ? "border-red-300 focus:ring-red-500"
+                    : "border-slate-300"
+                }`}
                 placeholder="example@email.com"
               />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+              )}
             </div>
 
             <div>
@@ -157,20 +197,25 @@ export default function SignInPage() {
               <input
                 id="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 sm:py-3.5 text-base border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                {...register("password")}
+                className={`w-full px-4 py-3 sm:py-3.5 text-base border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
+                  errors.password
+                    ? "border-red-300 focus:ring-red-500"
+                    : "border-slate-300"
+                }`}
                 placeholder="••••••••"
               />
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              )}
             </div>
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isSubmitting}
               className="w-full bg-emerald-500 text-white py-3.5 sm:py-4 text-lg sm:text-base rounded-2xl font-semibold hover:bg-emerald-600 transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {loading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
+              {isSubmitting ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
             </button>
           </form>
 

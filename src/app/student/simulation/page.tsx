@@ -5,10 +5,12 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getQuestionsForModel, testModels, getRelatedOutcomes, type TestModel } from "@/lib/test-models";
 import { type SimulationQuestion } from "@/lib/simulation-questions";
+import { useStudentStore } from "@/store/student-store";
 
 export default function SimulationPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const student = useStudentStore((state) => state.student);
   const modelId = searchParams.get("model");
   
   const [currentModel, setCurrentModel] = useState<TestModel | null>(null);
@@ -17,9 +19,11 @@ export default function SimulationPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [reviewLater, setReviewLater] = useState<Set<string>>(new Set());
   const [timeRemaining, setTimeRemaining] = useState(20 * 60);
+  const [initialTime, setInitialTime] = useState(20 * 60);
   const [isTestComplete, setIsTestComplete] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
+  const [saving, setSaving] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load model and questions
@@ -30,7 +34,9 @@ export default function SimulationPage() {
         setCurrentModel(model);
         const modelQuestions = getQuestionsForModel(modelId);
         setQuestions(modelQuestions);
-        setTimeRemaining(model.duration * 60);
+        const duration = model.duration * 60;
+        setTimeRemaining(duration);
+        setInitialTime(duration);
       } else {
         router.push("/student/simulation/select");
       }
@@ -61,6 +67,7 @@ export default function SimulationPage() {
         clearInterval(timerRef.current);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isTestComplete, showResults]);
 
   // Load saved answer when question changes
@@ -106,11 +113,44 @@ export default function SimulationPage() {
     setReviewLater(newReview);
   };
 
-  const handleFinishTest = () => {
+  const handleFinishTest = async () => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
     setIsTestComplete(true);
+    
+    // حساب النتيجة
+    const score = calculateScore();
+    const timeSpent = initialTime - timeRemaining;
+    
+    // حفظ النتيجة في قاعدة البيانات
+    if (student) {
+      setSaving(true);
+      try {
+        await fetch("/api/training-attempts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nickname: student.nickname,
+            classCode: student.classCode,
+            testModelId: currentModel?.id,
+            testModelTitle: currentModel?.title,
+            answers,
+            score: score.correct,
+            totalQuestions: score.total,
+            percentage: score.percentage,
+            timeSpent,
+          }),
+        });
+      } catch (error) {
+        console.error("Error saving training attempt:", error);
+      } finally {
+        setSaving(false);
+      }
+    }
+    
     setShowResults(true);
   };
 
@@ -148,6 +188,7 @@ export default function SimulationPage() {
   if (showResults) {
     const score = calculateScore();
     const relatedOutcomes = getRelatedOutcomes(currentModel.id);
+    const timeSpent = initialTime - timeRemaining;
     
     return (
       <main className="space-y-6">
@@ -158,6 +199,9 @@ export default function SimulationPage() {
             </div>
             <h1 className="text-4xl font-bold text-slate-900">تم إنهاء الاختبار</h1>
             <p className="mt-2 text-slate-600">{currentModel.title}</p>
+            {saving && (
+              <p className="mt-2 text-sm text-slate-500">جاري حفظ النتيجة...</p>
+            )}
           </div>
         </div>
 
@@ -175,7 +219,7 @@ export default function SimulationPage() {
           <div className="card text-center">
             <p className="text-sm text-slate-500">الوقت المستخدم</p>
             <p className="text-4xl font-bold text-primary-600">
-              {formatTime((currentModel.duration * 60) - timeRemaining)}
+              {formatTime(timeSpent)}
             </p>
           </div>
         </div>

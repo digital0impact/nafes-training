@@ -1,35 +1,24 @@
 "use client"
 
-import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { signUpSchema, type SignUpInput } from "@/lib/validations"
 
 export default function SignUpPage() {
   const router = useRouter()
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setError: setFormError,
+  } = useForm<SignUpInput>({
+    resolver: zodResolver(signUpSchema),
+  })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-
-    if (password !== confirmPassword) {
-      setError("كلمات المرور غير متطابقة")
-      return
-    }
-
-    if (password.length < 6) {
-      setError("كلمة المرور يجب أن تكون 6 أحرف على الأقل")
-      return
-    }
-
-    setLoading(true)
-
+  const onSubmit = async (data: SignUpInput) => {
     try {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
@@ -37,23 +26,25 @@ export default function SignUpPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name,
-          email,
-          password,
+          name: data.name,
+          email: data.email,
+          password: data.password,
         }),
       })
 
-      const data = await response.json()
+      const result = await response.json()
 
       if (!response.ok) {
-        setError(data.error || "حدث خطأ أثناء إنشاء الحساب")
+        setFormError("root", {
+          message: result.error || "حدث خطأ أثناء إنشاء الحساب",
+        })
       } else {
         router.push("/auth/signin?registered=true")
       }
     } catch (err) {
-      setError("حدث خطأ أثناء إنشاء الحساب")
-    } finally {
-      setLoading(false)
+      setFormError("root", {
+        message: "حدث خطأ أثناء إنشاء الحساب",
+      })
     }
   }
 
@@ -139,10 +130,10 @@ export default function SignUpPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {errors.root && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                {error}
+                {errors.root.message}
               </div>
             )}
 
@@ -156,12 +147,17 @@ export default function SignUpPage() {
               <input
                 id="name"
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                {...register("name")}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
+                  errors.name
+                    ? "border-red-300 focus:ring-red-500"
+                    : "border-slate-300"
+                }`}
                 placeholder="أدخلي اسمك الكامل"
               />
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+              )}
             </div>
 
             <div>
@@ -174,12 +170,17 @@ export default function SignUpPage() {
               <input
                 id="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                {...register("email")}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
+                  errors.email
+                    ? "border-red-300 focus:ring-red-500"
+                    : "border-slate-300"
+                }`}
                 placeholder="example@email.com"
               />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+              )}
             </div>
 
             <div>
@@ -192,13 +193,17 @@ export default function SignUpPage() {
               <input
                 id="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                {...register("password")}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
+                  errors.password
+                    ? "border-red-300 focus:ring-red-500"
+                    : "border-slate-300"
+                }`}
                 placeholder="••••••••"
               />
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              )}
             </div>
 
             <div>
@@ -211,21 +216,27 @@ export default function SignUpPage() {
               <input
                 id="confirmPassword"
                 type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                minLength={6}
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                {...register("confirmPassword")}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
+                  errors.confirmPassword
+                    ? "border-red-300 focus:ring-red-500"
+                    : "border-slate-300"
+                }`}
                 placeholder="••••••••"
               />
+              {errors.confirmPassword && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
             </div>
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isSubmitting}
               className="w-full bg-emerald-500 text-white py-3 rounded-2xl font-semibold hover:bg-emerald-600 transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {loading ? "جاري إنشاء الحساب..." : "إنشاء الحساب"}
+              {isSubmitting ? "جاري إنشاء الحساب..." : "إنشاء الحساب"}
             </button>
           </form>
 

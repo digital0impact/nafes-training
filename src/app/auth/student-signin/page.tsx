@@ -1,49 +1,52 @@
 "use client"
 
-import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { PageBackground } from "@/components/layout/page-background"
+import { studentSignInSchema, type StudentSignInInput } from "@/lib/validations"
+import { useStudentStore } from "@/store/student-store"
 
 export default function StudentSignInPage() {
   const router = useRouter()
-  const [studentId, setStudentId] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
+  const setStudent = useStudentStore((state) => state.setStudent)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setError: setFormError,
+  } = useForm<StudentSignInInput>({
+    resolver: zodResolver(studentSignInSchema),
+  })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
-
+  const onSubmit = async (data: StudentSignInInput) => {
     try {
       const response = await fetch("/api/auth/student-signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          studentId,
-          password,
-        }),
+        body: JSON.stringify(data),
       })
 
-      const data = await response.json()
+      const result = await response.json()
 
       if (!response.ok) {
-        setError(data.error || "رقم الطالبة أو كلمة المرور غير صحيحة")
+        setFormError("root", {
+          message: result.error || "الاسم المستعار أو كود الفصل غير صحيح",
+        })
       } else {
-        // حفظ معلومات الطالبة في localStorage
-        localStorage.setItem("student", JSON.stringify(data.student))
+        // حفظ معلومات الطالبة في Zustand store
+        setStudent(result.student)
         router.push("/student")
         router.refresh()
       }
     } catch (err) {
-      setError("حدث خطأ أثناء تسجيل الدخول")
-    } finally {
-      setLoading(false)
+      setFormError("root", {
+        message: "حدث خطأ أثناء تسجيل الدخول",
+      })
     }
   }
 
@@ -70,67 +73,87 @@ export default function StudentSignInPage() {
               تسجيل دخول الطالبة
             </h1>
             <p className="text-sm sm:text-base text-slate-600">
-              أدخلي رقم الطالبة وكلمة المرور للوصول إلى المنصة
+              أدخلي اسمك المستعار وكود الفصل للبدء
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
-            {error && (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6">
+            {errors.root && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base">
-                {error}
+                {errors.root.message}
               </div>
             )}
 
             <div>
               <label
-                htmlFor="studentId"
+                htmlFor="nickname"
                 className="block text-sm font-medium text-slate-700 mb-2"
               >
-                رقم الطالبة
+                الاسم المستعار
               </label>
               <input
-                id="studentId"
+                id="nickname"
                 type="text"
-                value={studentId}
-                onChange={(e) => setStudentId(e.target.value)}
-                required
-                className="w-full px-4 py-3 sm:py-3.5 text-base border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                placeholder="مثال: STU-301"
+                {...register("nickname")}
+                className={`w-full px-4 py-3 sm:py-3.5 text-base border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
+                  errors.nickname
+                    ? "border-red-300 focus:ring-red-500"
+                    : "border-slate-300"
+                }`}
+                placeholder="مثال: سارة"
               />
+              {errors.nickname && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.nickname.message}
+                </p>
+              )}
+              <p className="mt-1 text-xs text-slate-500">
+                يمكنك اختيار أي اسم تريدينه
+              </p>
             </div>
 
             <div>
               <label
-                htmlFor="password"
+                htmlFor="classCode"
                 className="block text-sm font-medium text-slate-700 mb-2"
               >
-                كلمة المرور
+                كود الفصل
               </label>
               <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 sm:py-3.5 text-base border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                placeholder="••••••••"
+                id="classCode"
+                type="text"
+                {...register("classCode")}
+                className={`w-full px-4 py-3 sm:py-3.5 text-base border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
+                  errors.classCode
+                    ? "border-red-300 focus:ring-red-500"
+                    : "border-slate-300"
+                }`}
+                placeholder="مثال: SCI3A"
               />
+              {errors.classCode && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.classCode.message}
+                </p>
+              )}
+              <p className="mt-1 text-xs text-slate-500">
+                احصلي على كود الفصل من معلمتك
+              </p>
             </div>
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isSubmitting}
               className="w-full bg-orange-500 text-white py-3.5 sm:py-4 text-lg sm:text-base rounded-2xl font-semibold hover:bg-orange-600 transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {loading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
+              {isSubmitting ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
             </button>
           </form>
 
           <div className="mt-5 sm:mt-6 text-center">
             <p className="text-sm sm:text-base text-slate-600">
-              ليس لديك حساب؟{" "}
+              لا تحتاجين حساب!{" "}
               <span className="text-slate-500 text-xs sm:text-sm">
-                تواصلي مع معلمتك للحصول على رقم الطالبة وكلمة المرور
+                فقط أدخلي اسمك المستعار وكود الفصل من معلمتك
               </span>
             </p>
           </div>

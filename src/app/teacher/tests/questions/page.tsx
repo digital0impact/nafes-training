@@ -6,7 +6,7 @@ import { simulationQuestions } from "@/lib/simulation-questions";
 import { learningOutcomes } from "@/lib/data";
 import { SectionHeader } from "@/components/ui/section-header";
 import { PageBackground } from "@/components/layout/page-background";
-import { TeacherHeader } from "@/components/teacher/teacher-header";
+import { TeacherHeader } from "@/features/classes/components/teacher-header";
 
 const skillOptions = ["الكل", "علوم الحياة", "العلوم الفيزيائية", "علوم الأرض والفضاء"];
 

@@ -1,7 +1,7 @@
 "use client"
 
-import { useSession } from "next-auth/react"
 import Link from "next/link"
+import { useAuth } from "@/lib/auth-client"
 import { hasFeatureAccess, type SubscriptionPlan } from "@/lib/subscription"
 
 interface PremiumGateProps {
@@ -11,8 +11,8 @@ interface PremiumGateProps {
 }
 
 export function PremiumGate({ feature, children, fallback }: PremiumGateProps) {
-  const { data: session } = useSession()
-  const subscriptionPlan = (session?.user?.subscriptionPlan || "free") as SubscriptionPlan
+  const { user } = useAuth()
+  const subscriptionPlan = (user?.subscriptionPlan || "free") as SubscriptionPlan
 
   if (hasFeatureAccess(subscriptionPlan, feature)) {
     return <>{children}</>
@@ -42,6 +42,14 @@ export function PremiumGate({ feature, children, fallback }: PremiumGateProps) {
     </div>
   )
 }
+
+
+
+
+
+
+
+
 
 
 

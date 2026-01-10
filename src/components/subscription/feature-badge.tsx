@@ -1,7 +1,7 @@
 "use client"
 
-import { useSession } from "next-auth/react"
 import Link from "next/link"
+import { useAuth } from "@/lib/auth-client"
 import { type SubscriptionPlan } from "@/lib/subscription"
 
 interface FeatureBadgeProps {
@@ -10,8 +10,8 @@ interface FeatureBadgeProps {
 }
 
 export function FeatureBadge({ feature, className = "" }: FeatureBadgeProps) {
-  const { data: session } = useSession()
-  const subscriptionPlan = (session?.user?.subscriptionPlan || "free") as SubscriptionPlan
+  const { user } = useAuth()
+  const subscriptionPlan = (user?.subscriptionPlan || "free") as SubscriptionPlan
 
   if (feature === "premium" && subscriptionPlan !== "premium") {
     return (
@@ -27,6 +27,14 @@ export function FeatureBadge({ feature, className = "" }: FeatureBadgeProps) {
 
   return null
 }
+
+
+
+
+
+
+
+
 
 
 

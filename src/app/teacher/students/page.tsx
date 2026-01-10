@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { allowedStudents } from "@/lib/data"
 import { SectionHeader } from "@/components/ui/section-header"
@@ -13,20 +13,46 @@ type Student = {
   classCode: string
 }
 
+type Class = {
+  id: string
+  code: string
+  name: string
+  grade: string
+}
+
 type TabType = "all" | "add" | "import" | "reports"
 
 export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>(allowedStudents)
+  const [classes, setClasses] = useState<Class[]>([])
   const [activeTab, setActiveTab] = useState<TabType>("all")
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isImporting, setIsImporting] = useState(false)
-  const [formData, setFormData] = useState<Student & { password?: string }>({
+  const [formData, setFormData] = useState<Student & { password?: string; classId?: string }>({
     id: "",
     name: "",
     grade: "",
     classCode: "",
-    password: ""
+    password: "",
+    classId: ""
   })
+
+  // جلب الفصول
+  useEffect(() => {
+    fetchClasses()
+  }, [])
+
+  const fetchClasses = async () => {
+    try {
+      const response = await fetch("/api/classes")
+      if (response.ok) {
+        const data = await response.json()
+        setClasses(data.classes || [])
+      }
+    } catch (error) {
+      console.error("Error fetching classes:", error)
+    }
+  }
 
   function handleEdit(student: Student) {
     setEditingId(student.id)
@@ -68,6 +94,7 @@ export default function StudentsPage() {
             name: formData.name,
             grade: formData.grade,
             classCode: formData.classCode,
+            classId: formData.classId || undefined,
             password: formData.password,
           }),
         })
@@ -145,6 +172,7 @@ export default function StudentsPage() {
                     grade,
                     classCode,
                     password: defaultPassword,
+                    classId: undefined, // سيتم البحث عن الفصل باستخدام classCode
                   }),
                 })
 
@@ -395,14 +423,45 @@ export default function StudentsPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-slate-600">رمز الفصل</label>
-                  <input
-                    type="text"
-                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-primary-300 focus:outline-none"
-                    placeholder="مثال: SCI3A"
-                    value={formData.classCode}
-                    onChange={(e) => setFormData({ ...formData, classCode: e.target.value })}
-                  />
+                  <label className="text-sm font-semibold text-slate-600">الفصل</label>
+                  {classes.length > 0 ? (
+                    <select
+                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-primary-300 focus:outline-none"
+                      value={formData.classId || ""}
+                      onChange={(e) => {
+                        const selectedClass = classes.find(c => c.id === e.target.value)
+                        setFormData({ 
+                          ...formData, 
+                          classId: e.target.value,
+                          classCode: selectedClass?.code || "",
+                          grade: selectedClass?.grade || formData.grade
+                        })
+                      }}
+                    >
+                      <option value="">اختر الفصل</option>
+                      {classes.map((classItem) => (
+                        <option key={classItem.id} value={classItem.id}>
+                          {classItem.name} ({classItem.code})
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <div className="mt-2 space-y-2">
+                      <input
+                        type="text"
+                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-primary-300 focus:outline-none"
+                        placeholder="مثال: SCI3A"
+                        value={formData.classCode}
+                        onChange={(e) => setFormData({ ...formData, classCode: e.target.value })}
+                      />
+                      <Link
+                        href="/teacher/classes"
+                        className="block text-xs text-primary-600 hover:text-primary-700"
+                      >
+                        + إنشاء فصل جديد
+                      </Link>
+                    </div>
+                  )}
                 </div>
                 {!editingId && (
                   <div>

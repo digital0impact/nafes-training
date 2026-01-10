@@ -11,11 +11,11 @@ datasource db {
 }
 
 // نموذج المستخدم (المعلم)
+// ملاحظة: كلمة المرور تُدار بواسطة Supabase Auth
 model User {
-  id              String    @id @default(cuid())
+  id              String    @id @default(uuid()) // استخدام UUID من Supabase
   email           String    @unique
   name            String
-  password        String
   role            String    @default("teacher") // teacher, admin
   subscriptionPlan String   @default("free") // free, premium
   createdAt       DateTime  @default(now())
@@ -24,50 +24,13 @@ model User {
   // العلاقات
   testModels      TestModel[]
   activities      Activity[]
-  sessions        Session[]
+  classes         Class[]
   
   @@map("users")
 }
 
-// نموذج جلسة المصادقة
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  @@map("sessions")
-}
-
-// نموذج حساب المصادقة
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-
-  @@unique([provider, providerAccountId])
-  @@map("accounts")
-}
-
-// نموذج طلب التحقق
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-  @@map("verification_tokens")
-}
+// ملاحظة: تم إزالة Session, Account, VerificationToken
+// لأن Supabase Auth يدير المصادقة والجلسات
 
 // نموذج الاختبار
 model TestModel {
@@ -113,16 +76,63 @@ model Activity {
   @@map("activities")
 }
 
+// نموذج الفصل
+model Class {
+  id            String    @id @default(cuid())
+  code          String    @unique // رمز الفصل (مثل SCI3A)
+  name          String    // اسم الفصل (مثل علوم ثالث متوسط أ)
+  grade         String    // الصف (مثل 3/1)
+  userId        String    // المعلم الذي أنشأ الفصل
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // العلاقات
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  students      Student[]
+  trainingAttempts TrainingAttempt[]
+  
+  @@map("classes")
+}
+
 // نموذج الطالبة
 model Student {
   id            String    @id @default(cuid())
   studentId     String    @unique // رقم الطالبة (مثل STU-301)
   name          String
   grade         String    // الصف (مثل 3/1)
-  classCode     String    // رمز الفصل (مثل SCI3A)
+  classCode     String    // رمز الفصل (مثل SCI3A) - للتوافق مع الكود القديم
+  classId       String?   // ربط بالفصل
   password      String    // كلمة مرور للطالبة
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   
+  // العلاقات
+  class         Class?    @relation(fields: [classId], references: [id], onDelete: SetNull)
+  
   @@map("students")
+}
+
+// نموذج محاولة التدريب
+// يحفظ محاولات الطلاب في التدريب (MCQ)
+model TrainingAttempt {
+  id            String    @id @default(cuid())
+  nickname      String    // اسم الطالب المستعار
+  classCode     String    // كود الفصل
+  classId       String?   // ربط بالفصل (اختياري)
+  testModelId   String?   // معرف نموذج الاختبار (إن وجد)
+  testModelTitle String?  // عنوان نموذج الاختبار
+  answers       String    // JSON string: { questionId: answer }
+  score         Int       // عدد الإجابات الصحيحة
+  totalQuestions Int      // إجمالي عدد الأسئلة
+  percentage    Float     // النسبة المئوية
+  timeSpent     Int       // الوقت المستغرق بالثواني
+  completedAt   DateTime  @default(now())
+  
+  // العلاقات
+  class         Class?    @relation(fields: [classId], references: [id], onDelete: SetNull)
+  
+  @@map("training_attempts")
+  @@index([classCode])
+  @@index([classId])
+  @@index([completedAt])
 }

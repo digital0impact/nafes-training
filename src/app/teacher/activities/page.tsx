@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react"
 import type { Activity } from "@/lib/activities"
 import { SectionHeader } from "@/components/ui/section-header"
-import { ActivityTemplateSelector, type ActivityTemplate } from "@/components/activities/activity-template-selector"
-import { TemplateActivityForm } from "@/components/activities/template-activity-form"
+import { ActivityTemplateSelector, type ActivityTemplate } from "@/features/activities/components/activity-template-selector"
+import { TemplateActivityForm } from "@/features/activities/components/template-activity-form"
 import { PageBackground } from "@/components/layout/page-background"
 
 const skillColors: Record<string, string> = {

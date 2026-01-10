@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth-server";
+import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(
@@ -7,9 +7,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await auth();
+    const user = await getCurrentUser();
     
-    if (!session?.user?.id) {
+    if (!user) {
       return NextResponse.json(
         { error: "غير مصرح" },
         { status: 401 }
@@ -19,7 +19,7 @@ export async function GET(
     const testModel = await prisma.testModel.findUnique({
       where: {
         id: params.id,
-        userId: session.user.id, // التأكد من أن النموذج يخص المعلم
+        userId: user.id, // التأكد من أن النموذج يخص المعلم
       },
     });
 
@@ -53,9 +53,9 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await auth();
+    const user = await getCurrentUser();
     
-    if (!session?.user?.id) {
+    if (!user) {
       return NextResponse.json(
         { error: "غير مصرح" },
         { status: 401 }
@@ -66,7 +66,7 @@ export async function DELETE(
     const testModel = await prisma.testModel.findUnique({
       where: {
         id: params.id,
-        userId: session.user.id,
+        userId: user.id,
       },
     });
 

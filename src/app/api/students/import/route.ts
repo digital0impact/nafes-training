@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { auth } from "@/lib/auth-server"
+import { requireTeacher } from "@/lib/auth-server"
 import { prisma } from "@/lib/prisma"
 
 // ملاحظة: هذا API يمكن استخدامه لاستيراد الطالبات من منصة مدرستي
@@ -7,14 +7,7 @@ import { prisma } from "@/lib/prisma"
 
 export async function POST(request: Request) {
   try {
-    const session = await auth()
-
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "غير مصرح لك" },
-        { status: 401 }
-      )
-    }
+    const user = await requireTeacher()
 
     const body = await request.json()
     const { students, source } = body // source: "madrasati" | "manual"
@@ -64,6 +57,14 @@ async function fetchFromMadrasatiAPI() {
   
   return []
 }
+
+
+
+
+
+
+
+
 
 
 

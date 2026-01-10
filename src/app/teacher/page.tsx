@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-client";
 import { students } from "@/lib/data";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { SectionHeader } from "@/components/ui/section-header";
@@ -18,14 +18,14 @@ const weakSkills = [
 type TabType = "overview" | "outcomes" | "tests" | "activities" | "students";
 
 export default function TeacherDashboard() {
-  const { data: session } = useSession();
+  const { user, signOut } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>("overview");
   
-  const subscriptionPlan = (session?.user?.subscriptionPlan || "free") as SubscriptionPlan;
+  const subscriptionPlan = (user?.subscriptionPlan || "free") as SubscriptionPlan;
 
   const handleSignOut = async () => {
-    await signOut({ redirect: false });
+    await signOut();
     router.push("/");
     router.refresh();
   };
@@ -36,9 +36,9 @@ export default function TeacherDashboard() {
         <div className="mb-4 flex items-center justify-between">
           <div>
             <p className="text-sm text-slate-500">لوحة المعلمة</p>
-            {session?.user && (
+            {user && (
               <h1 className="text-2xl font-bold text-slate-900 mt-1">
-                مرحباً، {session.user.name}
+                مرحباً، {user.name}
               </h1>
             )}
           </div>
@@ -122,6 +122,58 @@ export default function TeacherDashboard() {
           </button>
         </div>
       </header>
+
+      {/* Quick Links */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Link
+          href="/teacher/classes"
+          className="card bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200 hover:shadow-md transition-shadow"
+        >
+          <div className="flex items-center gap-4">
+            <div className="rounded-xl bg-emerald-500 p-3">
+              <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-900">إدارة الفصول</h3>
+              <p className="text-sm text-slate-600">أنشئي فصولاً وشاركي رمز الفصل</p>
+            </div>
+          </div>
+        </Link>
+        <Link
+          href="/teacher/students"
+          className="card bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 hover:shadow-md transition-shadow"
+        >
+          <div className="flex items-center gap-4">
+            <div className="rounded-xl bg-blue-500 p-3">
+              <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-900">إدارة الطالبات</h3>
+              <p className="text-sm text-slate-600">أضيفي طالبات وربطيهن بالفصول</p>
+            </div>
+          </div>
+        </Link>
+        <Link
+          href="/teacher/tests"
+          className="card bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 hover:shadow-md transition-shadow"
+        >
+          <div className="flex items-center gap-4">
+            <div className="rounded-xl bg-purple-500 p-3">
+              <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-900">إدارة الاختبارات</h3>
+              <p className="text-sm text-slate-600">أنشئي اختبارات واختاري الأسئلة</p>
+            </div>
+          </div>
+        </Link>
+      </div>
 
       {/* Overview Tab */}
       {activeTab === "overview" && (

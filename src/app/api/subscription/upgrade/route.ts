@@ -1,27 +1,20 @@
 import { NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { requireAuth } from "@/lib/auth-server"
 import { prisma } from "@/lib/prisma"
 
 export async function POST() {
   try {
-    const session = await auth()
-
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "غير مصرح لك" },
-        { status: 401 }
-      )
-    }
+    const user = await requireAuth()
 
     // تحديث الاشتراك إلى premium
-    const user = await prisma.user.update({
-      where: { id: session.user.id },
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
       data: { subscriptionPlan: "premium" },
     })
 
     return NextResponse.json({
       message: "تم ترقية حسابك بنجاح",
-      subscriptionPlan: user.subscriptionPlan,
+      subscriptionPlan: updatedUser.subscriptionPlan,
     })
   } catch (error) {
     console.error("Error upgrading subscription:", error)
@@ -31,6 +24,14 @@ export async function POST() {
     )
   }
 }
+
+
+
+
+
+
+
+
 
 
 

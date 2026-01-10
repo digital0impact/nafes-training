@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth-server";
+import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { canCreateResource, type SubscriptionPlan } from "@/lib/subscription";
 
 export async function GET() {
   try {
-    const session = await auth();
+    const user = await getCurrentUser();
     
-    if (!session?.user?.id) {
+    if (!user) {
       return NextResponse.json(
         { error: "غير مصرح" },
         { status: 401 }
@@ -17,7 +17,7 @@ export async function GET() {
     // جلب النماذج الخاصة بالمعلم فقط
     const testModels = await prisma.testModel.findMany({
       where: {
-        userId: session.user.id,
+        userId: user.id,
       },
       orderBy: {
         createdAt: "desc",
@@ -44,9 +44,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const session = await auth();
+    const user = await getCurrentUser();
     
-    if (!session?.user?.id) {
+    if (!user) {
       return NextResponse.json(
         { error: "غير مصرح" },
         { status: 401 }
@@ -64,9 +64,9 @@ export async function POST(request: Request) {
     }
 
     // التحقق من صلاحيات الاشتراك
-    const subscriptionPlan = (session.user.subscriptionPlan || "free") as SubscriptionPlan;
+    const subscriptionPlan = (user.subscriptionPlan || "free") as SubscriptionPlan;
     const existingTests = await prisma.testModel.count({
-      where: { userId: session.user.id }
+      where: { userId: user.id }
     });
 
     if (!canCreateResource(subscriptionPlan, "test", existingTests)) {
@@ -90,7 +90,7 @@ export async function POST(request: Request) {
         duration: body.duration || 20,
         skill: body.skill,
         testType: body.testType || "normal",
-        userId: session.user.id,
+        userId: user.id,
       },
     });
 

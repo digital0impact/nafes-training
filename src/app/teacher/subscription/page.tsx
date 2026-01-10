@@ -1,27 +1,27 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/lib/auth-client"
 import Link from "next/link"
-import { TeacherHeader } from "@/components/teacher/teacher-header"
+import { TeacherHeader } from "@/features/classes/components/teacher-header"
 import { subscriptionFeatures, getPlanInfo, type SubscriptionPlan } from "@/lib/subscription"
 import { PageBackground } from "@/components/layout/page-background"
 
 export default function SubscriptionPage() {
-  const { data: session, update } = useSession()
+  const { user } = useAuth()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [currentPlan, setCurrentPlan] = useState<SubscriptionPlan>("free")
 
   useEffect(() => {
-    if (session?.user?.subscriptionPlan) {
-      setCurrentPlan(session.user.subscriptionPlan as SubscriptionPlan)
+    if (user?.subscriptionPlan) {
+      setCurrentPlan(user.subscriptionPlan as SubscriptionPlan)
     }
-  }, [session])
+  }, [user])
 
   const handleUpgrade = async () => {
-    if (!session?.user?.id) return
+    if (!user?.id) return
 
     setLoading(true)
     try {
@@ -31,7 +31,8 @@ export default function SubscriptionPage() {
       })
 
       if (response.ok) {
-        await update() // تحديث الجلسة
+        // تحديث بيانات المستخدم
+        router.refresh()
         setCurrentPlan("premium")
         alert("تم ترقية حسابك إلى الخطة المميزة بنجاح!")
       } else {
@@ -46,7 +47,7 @@ export default function SubscriptionPage() {
   }
 
   const handleDowngrade = async () => {
-    if (!session?.user?.id) return
+    if (!user?.id) return
 
     setLoading(true)
     try {
@@ -56,7 +57,8 @@ export default function SubscriptionPage() {
       })
 
       if (response.ok) {
-        await update() // تحديث الجلسة
+        // تحديث بيانات المستخدم
+        router.refresh()
         setCurrentPlan("free")
         alert("تم تغيير حسابك إلى الخطة المجانية")
       } else {

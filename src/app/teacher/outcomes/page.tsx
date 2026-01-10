@@ -5,7 +5,7 @@ import { SectionHeader } from "@/components/ui/section-header"
 import { LearningOutcomeCard } from "@/components/ui/learning-outcome-card"
 import { PageBackground } from "@/components/layout/page-background"
 import { learningOutcomes } from "@/lib/data"
-import { TeacherHeader } from "@/components/teacher/teacher-header"
+import { TeacherHeader } from "@/features/classes/components/teacher-header"
 
 type TabType = "view" | "edit"
 

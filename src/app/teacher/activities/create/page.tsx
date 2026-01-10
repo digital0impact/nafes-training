@@ -1,4 +1,4 @@
-import { ActivityForm } from "@/components/activities/activity-form";
+import { ActivityForm } from "@/features/activities/components/activity-form";
 import { SectionHeader } from "@/components/ui/section-header";
 import Link from "next/link";
 

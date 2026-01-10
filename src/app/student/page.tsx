@@ -1,9 +1,12 @@
+"use client"
+
 import Link from "next/link";
 import { activities, quickSkills } from "@/lib/data";
 import { SectionHeader } from "@/components/ui/section-header";
 import { SkillBadge } from "@/components/ui/skill-badge";
 import { ActivityCard } from "@/components/ui/activity-card";
 import { ProgressCard } from "@/components/ui/progress-card";
+import { StudentAuthGuard, useStudentAuth } from "@/components/student/student-auth-guard";
 
 const quickActions = [
   { label: "محاكاة اختبار نافس", href: "/student/simulation/select", accent: "bg-primary-600" },
@@ -12,13 +15,15 @@ const quickActions = [
   { label: "الأنشطة المقترحة", href: "/student/activities", accent: "bg-rose-500" }
 ];
 
-export default function StudentHome() {
+function StudentHomeContent() {
+  const { student } = useStudentAuth()
+
   return (
     <main className="space-y-10">
       <header className="card bg-primary-600 text-white">
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-sm opacity-80">مرحبا نورة</p>
+            <p className="text-sm opacity-80">مرحبا {student?.nickname || "طالبة"}</p>
             <h1 className="text-3xl font-bold">جاهزتك الحالية: متوسطة</h1>
             <p className="mt-2 text-white/80">
               استمري في التدريب لتحسين مهارات الفيزياء. الأنشطة العلاجية جاهزة
@@ -95,3 +100,10 @@ export default function StudentHome() {
   );
 }
 
+export default function StudentHome() {
+  return (
+    <StudentAuthGuard>
+      <StudentHomeContent />
+    </StudentAuthGuard>
+  );
+}

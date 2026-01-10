@@ -1,27 +1,30 @@
 import { NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server"
 import { prisma } from "@/lib/prisma"
-import bcrypt from "bcryptjs"
+import { signUpSchema } from "@/lib/validations"
 
+/**
+ * API Route لتسجيل المعلم باستخدام Supabase Auth
+ */
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, email, password } = body
-
-    if (!name || !email || !password) {
+    
+    // التحقق من البيانات باستخدام Zod
+    const validationResult = signUpSchema.safeParse(body)
+    
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: "جميع الحقول مطلوبة" },
+        { 
+          error: validationResult.error.errors[0]?.message || "البيانات المدخلة غير صحيحة" 
+        },
         { status: 400 }
       )
     }
 
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: "كلمة المرور يجب أن تكون 6 أحرف على الأقل" },
-        { status: 400 }
-      )
-    }
+    const { name, email, password } = validationResult.data
 
-    // التحقق من وجود المستخدم
+    // التحقق من وجود المستخدم في قاعدة البيانات
     const existingUser = await prisma.user.findUnique({
       where: { email },
     })
@@ -33,15 +36,41 @@ export async function POST(request: Request) {
       )
     }
 
-    // تشفير كلمة المرور
-    const hashedPassword = await bcrypt.hash(password, 10)
+    const supabase = createClient()
 
-    // إنشاء المستخدم
+    // إنشاء المستخدم في Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
+          role: "teacher",
+        },
+      },
+    })
+
+    if (authError) {
+      console.error("Error signing up in Supabase:", authError)
+      return NextResponse.json(
+        { error: authError.message || "حدث خطأ أثناء إنشاء الحساب" },
+        { status: 400 }
+      )
+    }
+
+    if (!authData.user) {
+      return NextResponse.json(
+        { error: "حدث خطأ أثناء إنشاء الحساب" },
+        { status: 500 }
+      )
+    }
+
+    // إنشاء المستخدم في قاعدة البيانات
     const user = await prisma.user.create({
       data: {
+        id: authData.user.id,
         name,
         email,
-        password: hashedPassword,
         role: "teacher",
       },
     })
@@ -65,6 +94,7 @@ export async function POST(request: Request) {
     )
   }
 }
+
 
 
 

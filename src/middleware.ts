@@ -1,37 +1,49 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getToken } from "next-auth/jwt"
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
   
-  // الحصول على token من cookie
-  const token = await getToken({ 
-    req, 
-    secret: process.env.NEXTAUTH_SECRET || "your-secret-key-change-in-production" 
-  })
-  
-  const isAuthenticated = !!token
-
   // حماية صفحات المعلم
   if (pathname.startsWith("/teacher")) {
-    if (!isAuthenticated) {
+    try {
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
+        {
+          cookies: {
+            get(name: string) {
+              return req.cookies.get(name)?.value
+            },
+            set(name: string, value: string, options: CookieOptions) {
+              // لا يمكن تعديل cookies في middleware
+            },
+            remove(name: string, options: CookieOptions) {
+              // لا يمكن حذف cookies في middleware
+            },
+          },
+        }
+      )
+      
+      const { data: { user }, error } = await supabase.auth.getUser()
+      
+      if (error || !user) {
+        return NextResponse.redirect(new URL("/auth/signin", req.url))
+      }
+    } catch (error) {
       return NextResponse.redirect(new URL("/auth/signin", req.url))
     }
   }
 
   // حماية صفحات الطالبة
-  if (pathname.startsWith("/student") && pathname !== "/student") {
-    // التحقق من وجود معلومات الطالبة في cookie أو localStorage
-    // في middleware يمكننا فقط التحقق من cookies
-    const studentCookie = req.cookies.get("student")
-    if (!studentCookie) {
-      // سيتم التحقق في الصفحة نفسها من localStorage
-      // لأن middleware لا يمكنه الوصول إلى localStorage
-    }
+  // ملاحظة: التحقق من localStorage يتم في Client Component
+  // لأن middleware لا يمكنه الوصول إلى localStorage
+  if (pathname.startsWith("/student") && pathname !== "/student" && pathname !== "/auth/student-signin") {
+    // سيتم التحقق في الصفحة نفسها من localStorage
+    // لا يمكن إعادة التوجيه من middleware لأن localStorage غير متاح
   }
 
   // حماية APIs - سيتم التحقق من المصادقة في API routes نفسها
-  // لأن middleware في Edge Runtime قد لا يدعم Prisma
 
   return NextResponse.next()
 }

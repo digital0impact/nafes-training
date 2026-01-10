@@ -1,10 +1,18 @@
 "use client"
 
-import { SessionProvider as NextAuthSessionProvider } from "next-auth/react"
-
+// ملاحظة: تم إزالة NextAuth SessionProvider
+// Supabase Auth يدير الجلسات تلقائياً
 export function SessionProvider({ children }: { children: React.ReactNode }) {
-  return <NextAuthSessionProvider>{children}</NextAuthSessionProvider>
+  return <>{children}</>
 }
+
+
+
+
+
+
+
+
 
 
 

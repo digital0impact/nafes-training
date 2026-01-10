@@ -11,23 +11,48 @@
 
 ### 1. تثبيت الحزم
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
 
 ### 2. إعداد ملف المتغيرات البيئية
 
-أنشئي ملف `.env` في المجلد الرئيسي وأضيفي:
+أنشئي ملف `.env` في المجلد الرئيسي وانسخي محتوى `env.example` ثم أضيفي القيم الصحيحة:
 
 ```env
-DATABASE_URL="file:./prisma/dev.db"
-NEXTAUTH_SECRET="your-super-secret-key-change-this-in-production"
-NEXTAUTH_URL="http://localhost:3000"
+# من Supabase Dashboard > Settings > API
+NEXT_PUBLIC_SUPABASE_URL=https://vatqqurkedwlyuqrfwrr.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=your-key-here
+
+# من Supabase Dashboard > Settings > Database > Connection string > URI
+DATABASE_URL="postgresql://postgres:PASSWORD@db.vatqqurkedwlyuqrfwrr.supabase.co:5432/postgres"
+
+# أي مفتاح عشوائي
+NEXTAUTH_SECRET=any-random-string
+NEXTAUTH_URL=http://localhost:3000
+```
+
+**⚠️ مهم:** استبدلي `PASSWORD` بكلمة مرور قاعدة البيانات من Supabase.
+
+**للتحقق من الإعداد:**
+```bash
+npm run check-url    # التحقق من DATABASE_URL
+npm run check-db     # اختبار الاتصال
 ```
 
 ### 3. إعداد قاعدة البيانات
 ```bash
 npx prisma generate
-npx prisma migrate dev
+npx prisma migrate dev --name init
+```
+
+### 4. التحقق من الاتصال
+```bash
+npm run check-db
+```
+
+### 5. تشغيل التطبيق
+```bash
+npm run dev
 ```
 
 ### 4. تشغيل التطبيق
