@@ -93,7 +93,7 @@ export default function TeacherOutcomesPage() {
       const newPeriod = periodChanges[topicKey]
       const assignedWeek = weekAssignments[topicKey]
 
-      let modifiedItem = { ...item }
+      const modifiedItem = { ...item }
 
       if (newPeriod) {
         modifiedItem.period = newPeriod

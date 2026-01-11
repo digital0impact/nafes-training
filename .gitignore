@@ -28,3 +28,5 @@ Thumbs.db# IDE
 cleanup.bat
 create-env.js
 create-test-user.js
+.vercel
+.env*.local

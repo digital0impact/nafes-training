@@ -55,10 +55,13 @@ function debugEnv() {
     process.exit(1)
   }
   
+  // TypeScript type guard - dbUrlLine is definitely string here
+  const dbUrlString: string = dbUrlLine
+  
   console.log('\n🔍 تحليل DATABASE_URL...\n')
   
   // استخراج DATABASE_URL
-  const dbUrlMatch = dbUrlLine.match(/DATABASE_URL\s*=\s*(.+)/)
+  const dbUrlMatch = dbUrlString.match(/DATABASE_URL\s*=\s*(.+)/)
   if (!dbUrlMatch) {
     console.error('❌ لا يمكن قراءة DATABASE_URL')
     process.exit(1)

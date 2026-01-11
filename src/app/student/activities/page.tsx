@@ -22,7 +22,7 @@ export default function ActivitiesPage() {
             const sharedIds = JSON.parse(saved);
             const sharedSet = new Set(sharedIds);
             // Filter to show only shared activities
-            setActivities(allActivities.filter((a) => sharedSet.has(a.id)));
+            setActivities(allActivities.filter((a: Activity) => sharedSet.has(a.id)));
           } catch (e) {
             console.error("Error loading shared activities", e);
             setActivities([]);

@@ -182,8 +182,8 @@ export default function DebugSignupPage() {
                       أو يمكنك تعطيل تأكيد البريد في Supabase Dashboard:
                     </p>
                     <ul className="text-amber-700 text-sm mt-2 list-disc list-inside">
-                      <li>Settings > Authentication > Email Auth</li>
-                      <li>عطّلي "Enable email confirmations"</li>
+                      <li>Settings &gt; Authentication &gt; Email Auth</li>
+                      <li>عطّلي &quot;Enable email confirmations&quot;</li>
                     </ul>
                   </div>
                 )}

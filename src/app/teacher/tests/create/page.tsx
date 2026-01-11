@@ -42,11 +42,11 @@ export default function CreateTestPage() {
   // إضافة أسئلة من بنك الأسئلة
   function addQuestionsFromBank(questionIds: Set<string>) {
     const newQuestions: Question[] = Array.from(questionIds)
-      .map((qId) => {
+      .flatMap((qId) => {
         const bankQuestion = simulationQuestions.find((q) => q.id === qId);
-        if (!bankQuestion) return null;
+        if (!bankQuestion) return [];
 
-        return {
+        return [{
           id: `bank-${qId}`,
           type: "bank" as const,
           bankQuestionId: qId,
@@ -57,9 +57,8 @@ export default function CreateTestPage() {
           optionD: bankQuestion.choices[3] || "",
           correctAnswer: bankQuestion.correctAnswer,
           points: bankQuestion.points
-        };
-      })
-      .filter((q): q is Question => q !== null);
+        }];
+      });
 
     setQuestions([...questions, ...newQuestions]);
     setSelectedQuestionIds(new Set());

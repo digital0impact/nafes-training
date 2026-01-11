@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import type { Activity } from "@/lib/activities";
+import type { Activity, QuizContent } from "@/lib/activities";
 
 type ActivityPageProps = {
   params: {
@@ -95,8 +95,8 @@ export default function ActivityPage({ params }: ActivityPageProps) {
     }
   };
 
-  const getFinalScore = () => {
-    if (!isMultiQuestion) return 0;
+  const getFinalScore = (): { correct: number; total: number; percentage: number; earnedPoints: number; totalPoints: number } | null => {
+    if (!isMultiQuestion) return null;
     let correct = 0;
     let totalPoints = 0;
     let earnedPoints = 0;
@@ -119,9 +119,16 @@ export default function ActivityPage({ params }: ActivityPageProps) {
     };
   };
 
+  // Type guard to check if content is QuizContent
+  const isQuizContent = (content: any): content is QuizContent => {
+    return content && ('answer' in content || 'question' in content);
+  };
+
   const isCorrect = isMultiQuestion && currentQuestion
     ? currentAnswer === currentQuestion.answer
-    : selectedAnswer === activity?.content?.answer;
+    : activity?.content && isQuizContent(activity.content)
+      ? selectedAnswer === activity.content.answer
+      : false;
 
   if (loading) {
     return (
@@ -232,6 +239,9 @@ export default function ActivityPage({ params }: ActivityPageProps) {
             {/* Final Results */}
             {(() => {
               const score = getFinalScore();
+              if (!score) {
+                return null;
+              }
               return (
                 <>
                   <div className={`card ${score.percentage === 100 ? "bg-emerald-50 border-emerald-200" : score.percentage >= 70 ? "bg-blue-50 border-blue-200" : "bg-amber-50 border-amber-200"}`}>
@@ -346,7 +356,7 @@ export default function ActivityPage({ params }: ActivityPageProps) {
               <h2 className="mb-4 text-lg font-semibold text-slate-900">
                 {isMultiQuestion ? `السؤال ${currentQuestionIndex + 1}` : "السؤال"}
               </h2>
-              {!isMultiQuestion && activity.content?.image && (
+              {!isMultiQuestion && activity.content && isQuizContent(activity.content) && activity.content.image && (
                 <div className="mb-4 overflow-hidden rounded-2xl">
                   <img src={activity.content.image} alt="صورة السؤال" className="w-full object-cover" />
                 </div>
@@ -354,20 +364,22 @@ export default function ActivityPage({ params }: ActivityPageProps) {
               <p className="text-xl leading-relaxed text-slate-700">
                 {isMultiQuestion && currentQuestion
                   ? currentQuestion.question
-                  : activity.content?.question || activity.description}
+                  : (activity.content && isQuizContent(activity.content) && activity.content.question) || activity.description}
               </p>
             </div>
 
             {/* Options */}
             <div className="space-y-3">
-              {(isMultiQuestion && currentQuestion
+              {((isMultiQuestion && currentQuestion
                 ? currentQuestion.options
-                : activity.content?.options || []
-              ).map((option: string, index: number) => {
+                : (activity.content && isQuizContent(activity.content) && activity.content.options) || []
+              )).map((option: string, index: number) => {
                 const isSelected = (isMultiQuestion ? currentAnswer : selectedAnswer) === option;
                 const isAnswer = isMultiQuestion && currentQuestion
                   ? option === currentQuestion.answer
-                  : option === activity.content?.answer;
+                  : activity.content && isQuizContent(activity.content)
+                    ? option === activity.content.answer
+                    : false;
                 const showAnswer = showResult && isAnswer;
 
                 return (
@@ -416,17 +428,20 @@ export default function ActivityPage({ params }: ActivityPageProps) {
             </div>
 
             {/* Hint */}
-            {!isMultiQuestion && activity.content?.hint && !showResult && (
-              <div className="card bg-amber-50 border-amber-200">
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">💡</span>
-                  <div>
-                    <p className="font-semibold text-amber-900">تلميح</p>
-                    <p className="mt-1 text-sm text-amber-800">{activity.content.hint}</p>
+            {(() => {
+              const quizContent = activity.content && isQuizContent(activity.content) ? activity.content : null;
+              return !isMultiQuestion && quizContent?.hint && !showResult && (
+                <div className="card bg-amber-50 border-amber-200">
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">💡</span>
+                    <div>
+                      <p className="font-semibold text-amber-900">تلميح</p>
+                      <p className="mt-1 text-sm text-amber-800">{quizContent.hint}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Result Message */}
             {showResult && (
@@ -441,7 +456,9 @@ export default function ActivityPage({ params }: ActivityPageProps) {
                       <p className="mt-1 text-sm text-rose-800">
                         الإجابة الصحيحة هي: {isMultiQuestion && currentQuestion
                           ? currentQuestion.answer
-                          : activity.content?.answer}
+                          : activity.content && isQuizContent(activity.content)
+                            ? activity.content.answer || ''
+                            : ''}
                       </p>
                     )}
                   </div>

@@ -21,7 +21,7 @@ export default function SelectTestModelPage() {
     const saved = localStorage.getItem("sharedTestModels");
     if (saved) {
       try {
-        const parsed = JSON.parse(saved);
+        const parsed = JSON.parse(saved) as string[];
         const sharedSet = new Set(parsed);
         setSharedModels(sharedSet);
         // Filter to show only shared models (from all models including custom)

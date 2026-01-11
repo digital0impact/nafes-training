@@ -5,7 +5,7 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "outline" | "elevated"
 }
 
-const cardVariants: Record<CardProps["variant"], string> = {
+const cardVariants: Record<NonNullable<CardProps["variant"]>, string> = {
   default: "bg-white border border-slate-200",
   outline: "bg-transparent border-2 border-slate-300",
   elevated: "bg-white shadow-lg",
