@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-client";
@@ -17,12 +17,41 @@ const weakSkills = [
 
 type TabType = "overview" | "outcomes" | "tests" | "activities" | "students";
 
+type DashboardStats = {
+  classesCount: number;
+  studentsCount: number;
+  weeklyAttempts: number;
+};
+
 export default function TeacherDashboard() {
   const { user, signOut } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>("overview");
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
   
   const subscriptionPlan = (user?.subscriptionPlan || "free") as SubscriptionPlan;
+
+  // جلب الإحصائيات
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch("/api/dashboard/stats");
+        if (response.ok) {
+          const data = await response.json();
+          setStats(data);
+        }
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+
+    if (activeTab === "overview") {
+      fetchStats();
+    }
+  }, [activeTab]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -178,6 +207,26 @@ export default function TeacherDashboard() {
       {/* Overview Tab */}
       {activeTab === "overview" && (
         <>
+          {/* Stats Cards - المطلوبة من المتطلبات */}
+          <section className="grid gap-4 md:grid-cols-3">
+            <KpiCard
+              label="عدد الفصول"
+              value={loadingStats ? "..." : stats?.classesCount?.toString() || "0"}
+              hint="إجمالي الفصول المسجلة"
+            />
+            <KpiCard
+              label="عدد الطالبات"
+              value={loadingStats ? "..." : stats?.studentsCount?.toString() || "0"}
+              hint="إجمالي الطالبات المسجلات"
+            />
+            <KpiCard
+              label="المحاولات الأسبوعية"
+              value={loadingStats ? "..." : stats?.weeklyAttempts?.toString() || "0"}
+              hint="عدد المحاولات هذا الأسبوع"
+            />
+          </section>
+
+          {/* Additional Stats Cards */}
           <section className="grid gap-4 md:grid-cols-4">
             <KpiCard
               label="متوسط الصف"

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { requireTeacher } from "@/lib/auth-server"
 import { prisma } from "@/lib/prisma"
 import { createClassSchema } from "@/lib/validations"
+import { generateUniqueClassCode } from "@/lib/utils/class-code-generator"
 
 /**
  * GET - جلب جميع فصول المعلم
@@ -61,16 +62,31 @@ export async function POST(request: Request) {
 
     const { name, grade, code } = validationResult.data
 
-    // التحقق من وجود فصل بنفس الرمز
-    const existingClass = await prisma.class.findUnique({
-      where: { code: code.toUpperCase() },
-    })
+    // توليد رمز الفصل تلقائياً إذا لم يتم إدخاله
+    let classCode = code?.trim().toUpperCase() || ""
+    
+    if (!classCode) {
+      // دالة للتحقق من وجود رمز في قاعدة البيانات
+      const checkCodeExists = async (code: string): Promise<boolean> => {
+        const existing = await prisma.class.findUnique({
+          where: { code },
+        })
+        return !!existing
+      }
+      
+      classCode = await generateUniqueClassCode(name, grade, checkCodeExists)
+    } else {
+      // التحقق من وجود فصل بنفس الرمز إذا تم إدخاله يدوياً
+      const existingClass = await prisma.class.findUnique({
+        where: { code: classCode },
+      })
 
-    if (existingClass) {
-      return NextResponse.json(
-        { error: "رمز الفصل مستخدم بالفعل" },
-        { status: 400 }
-      )
+      if (existingClass) {
+        return NextResponse.json(
+          { error: "رمز الفصل مستخدم بالفعل" },
+          { status: 400 }
+        )
+      }
     }
 
     // إنشاء الفصل
@@ -78,7 +94,7 @@ export async function POST(request: Request) {
       data: {
         name,
         grade,
-        code: code.toUpperCase(),
+        code: classCode,
         userId: user.id,
       },
       include: {

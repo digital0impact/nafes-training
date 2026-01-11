@@ -8,6 +8,7 @@ import Link from "next/link"
 import { TeacherHeader } from "@/features/classes/components/teacher-header"
 import { PageBackground } from "@/components/layout/page-background"
 import { createClassSchema, type CreateClassInput } from "@/lib/validations"
+import { generateClassCode } from "@/lib/utils/class-code-generator"
 
 type Class = {
   id: string
@@ -33,6 +34,7 @@ export default function ClassesPage() {
     formState: { errors, isSubmitting },
     reset,
     setValue,
+    watch,
     setError: setFormError,
   } = useForm<CreateClassInput>({
     resolver: zodResolver(createClassSchema),
@@ -122,6 +124,18 @@ export default function ClassesPage() {
     reset()
     setShowForm(false)
     setEditingId(null)
+  }
+
+  const handleGenerateCode = () => {
+    const name = watch("name") || ""
+    const grade = watch("grade") || ""
+    
+    if (name && grade) {
+      const generatedCode = generateClassCode(name, grade)
+      setValue("code", generatedCode)
+    } else {
+      alert("يرجى إدخال اسم الفصل والصف أولاً")
+    }
   }
 
   const copyClassCode = (code: string) => {
@@ -225,9 +239,19 @@ export default function ClassesPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      رمز الفصل
-                    </label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-slate-700">
+                        رمز الفصل
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleGenerateCode}
+                        className="text-xs text-teal-600 hover:text-teal-700 font-medium"
+                        disabled={!watch("name") || !watch("grade")}
+                      >
+                        توليد تلقائي
+                      </button>
+                    </div>
                     <input
                       type="text"
                       {...register("code")}
@@ -236,11 +260,16 @@ export default function ClassesPage() {
                           ? "border-red-300 focus:ring-red-500"
                           : "border-slate-300"
                       }`}
-                      placeholder="مثال: SCI3A"
+                      placeholder="اتركيه فارغاً للتوليد التلقائي أو أدخلي رمزاً مخصصاً"
                     />
                     {errors.code && (
                       <p className="mt-1 text-sm text-red-600">
                         {errors.code.message}
+                      </p>
+                    )}
+                    {!watch("code") && watch("name") && watch("grade") && (
+                      <p className="mt-1 text-xs text-slate-500">
+                        سيتم توليد رمز تلقائياً عند الحفظ إذا لم تدخلي رمزاً
                       </p>
                     )}
                   </div>

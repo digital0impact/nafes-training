@@ -34,11 +34,31 @@ export function createClient() {
   // التحقق من صحة المفتاح
   if (supabaseAnonKey === 'your-publishable-key-here' || 
       supabaseAnonKey === 'your-key-here' ||
-      supabaseAnonKey.length < 50) {
+      supabaseAnonKey.length < 40) {
+    const errorMsg = supabaseAnonKey === 'your-publishable-key-here' || supabaseAnonKey === 'your-key-here'
+      ? 'مفتاح Supabase غير صحيح - يرجى استبدال القيمة الافتراضية في ملف .env'
+      : supabaseAnonKey.length < 40
+      ? `مفتاح Supabase قصير جداً (${supabaseAnonKey.length} حرف) - المفتاح الصحيح عادة أكثر من 100 حرف`
+      : 'مفتاح Supabase غير صحيح'
+    
+    const helpMsg = supabaseAnonKey.length < 100 && supabaseAnonKey.length >= 40
+      ? '\n⚠️ ملاحظة: المفتاح يبدو قصيراً. تأكدي من نسخ المفتاح كاملاً من Supabase.\n' +
+        '   المفتاح الصحيح يبدأ بـ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9 ويحتوي على 3 أجزاء مفصولة بنقطة (.)\n'
+      : ''
+    
     throw new Error(
-      'Invalid Supabase API key. Please check your .env file:\n' +
-      '- NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY should be a valid Supabase anon/public key\n' +
-      '- Get it from Supabase Dashboard > Settings > API > Project API keys'
+      `❌ ${errorMsg}\n\n` +
+      '📝 الخطوات الصحيحة:\n' +
+      '1. اذهبي إلى Supabase Dashboard: https://app.supabase.com\n' +
+      '2. اختاري مشروعك\n' +
+      '3. اذهبي إلى Settings > API\n' +
+      '4. في قسم "Project API keys" ابحثي عن المفتاح المسمى "anon" أو "public"\n' +
+      '5. اضغطي على أيقونة النسخ (Copy) بجانب المفتاح - لا تنسخي يدوياً\n' +
+      '6. المفتاح الصحيح يبدأ بـ: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\n' +
+      '7. المفتاح يجب أن يكون طويلاً جداً (أكثر من 100 حرف عادة)\n' +
+      '8. الصقي المفتاح كاملاً في ملف .env\n' +
+      helpMsg +
+      '\n💡 نصيحة: استخدمي زر "Copy" في Supabase بدلاً من النسخ اليدوي'
     )
   }
 

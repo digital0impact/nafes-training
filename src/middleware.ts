@@ -7,6 +7,8 @@ export async function middleware(req: NextRequest) {
   // حماية صفحات المعلم
   if (pathname.startsWith("/teacher")) {
     try {
+      const response = NextResponse.next()
+      
       const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
@@ -16,10 +18,20 @@ export async function middleware(req: NextRequest) {
               return req.cookies.get(name)?.value
             },
             set(name: string, value: string, options: CookieOptions) {
-              // لا يمكن تعديل cookies في middleware
+              // حفظ الـ cookies في الـ response
+              response.cookies.set({
+                name,
+                value,
+                ...options,
+              })
             },
             remove(name: string, options: CookieOptions) {
-              // لا يمكن حذف cookies في middleware
+              // حذف الـ cookies من الـ response
+              response.cookies.set({
+                name,
+                value: '',
+                ...options,
+              })
             },
           },
         }
@@ -28,10 +40,18 @@ export async function middleware(req: NextRequest) {
       const { data: { user }, error } = await supabase.auth.getUser()
       
       if (error || !user) {
-        return NextResponse.redirect(new URL("/auth/signin", req.url))
+        const redirectUrl = new URL("/auth/signin", req.url)
+        // إضافة رسالة خطأ في URL
+        redirectUrl.searchParams.set("error", "يجب تسجيل الدخول أولاً")
+        return NextResponse.redirect(redirectUrl)
       }
-    } catch (error) {
-      return NextResponse.redirect(new URL("/auth/signin", req.url))
+      
+      return response
+    } catch (error: any) {
+      console.error("Middleware error:", error)
+      const redirectUrl = new URL("/auth/signin", req.url)
+      redirectUrl.searchParams.set("error", "حدث خطأ في التحقق من المصادقة")
+      return NextResponse.redirect(redirectUrl)
     }
   }
 

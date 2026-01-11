@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function LandingPage() {
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#faf9f7]">
+    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#faf9f7]">
       {/* Decorative Elements - Top Left */}
       <div className="absolute left-0 top-0 flex items-start gap-1 sm:gap-2 opacity-20 sm:opacity-30">
         <div className="flex flex-col gap-1 sm:gap-2">
@@ -86,16 +86,16 @@ export default function LandingPage() {
         {/* Call-to-Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mt-6 sm:mt-8 w-full max-w-md sm:max-w-none">
           <Link
-            href="/teacher"
+            href="/teacher/login"
             className="px-8 sm:px-12 py-3.5 sm:py-4 rounded-2xl bg-emerald-500 text-white text-lg sm:text-xl font-semibold shadow-lg hover:bg-emerald-600 transition-all duration-200 hover:scale-105 text-center"
           >
-            مسار المعلمة
+            دخول معلم
           </Link>
           <Link
-            href="/auth/student-signin"
+            href="/student/join"
             className="px-8 sm:px-12 py-3.5 sm:py-4 rounded-2xl bg-orange-500 text-white text-lg sm:text-xl font-semibold shadow-lg hover:bg-orange-600 transition-all duration-200 hover:scale-105 text-center"
           >
-            مسار الطالبة
+            دخول طالب
           </Link>
         </div>
 
@@ -106,6 +106,33 @@ export default function LandingPage() {
           </p>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="relative z-10 mt-auto border-t border-slate-200 bg-white/80 backdrop-blur-sm">
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+            <div className="text-center sm:text-right">
+              <p className="text-sm text-slate-600">
+                © {new Date().getFullYear()} منصة نافس للتدريب. جميع الحقوق محفوظة.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
+              <Link
+                href="/privacy-policy"
+                className="text-sm font-medium text-slate-600 hover:text-teal-600 transition-colors"
+              >
+                سياسة الخصوصية
+              </Link>
+              <Link
+                href="/contact"
+                className="text-sm font-medium text-slate-600 hover:text-teal-600 transition-colors"
+              >
+                اتصل بنا
+              </Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

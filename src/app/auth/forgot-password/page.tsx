@@ -6,147 +6,55 @@ import Link from "next/link"
 import Image from "next/image"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { createClient } from "@/lib/supabase/client"
-import { signInSchema, type SignInInput } from "@/lib/validations"
+import { forgotPasswordSchema, type ForgotPasswordInput } from "@/lib/validations"
 
-export default function SignInPage() {
+export default function ForgotPasswordPage() {
   const router = useRouter()
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     setError: setFormError,
-  } = useForm<SignInInput>({
-    resolver: zodResolver(signInSchema),
+  } = useForm<ForgotPasswordInput>({
+    resolver: zodResolver(forgotPasswordSchema),
   })
 
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null)
+  const [isLoading, setIsLoading] = React.useState(false)
 
-  // التحقق من وجود رسالة في URL
-  React.useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const error = params.get("error")
-    const registered = params.get("registered")
-    const needsConfirmation = params.get("needsConfirmation")
-    const passwordReset = params.get("passwordReset")
-    
-    if (error) {
-      setFormError("root", { message: error })
-      window.history.replaceState({}, "", window.location.pathname)
-    } else if (registered === "true") {
-      if (needsConfirmation === "true") {
-        setSuccessMessage("تم إنشاء الحساب بنجاح. يرجى تأكيد البريد الإلكتروني من الرسالة المرسلة إليك قبل تسجيل الدخول.")
-      } else {
-        setSuccessMessage("تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.")
-      }
-      window.history.replaceState({}, "", window.location.pathname)
-      // إزالة الرسالة بعد 5 ثواني
-      setTimeout(() => setSuccessMessage(null), 5000)
-    } else if (passwordReset === "true") {
-      setSuccessMessage("تم تحديث كلمة المرور بنجاح! يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.")
-      window.history.replaceState({}, "", window.location.pathname)
-      // إزالة الرسالة بعد 5 ثواني
-      setTimeout(() => setSuccessMessage(null), 5000)
-    }
-  }, [setFormError])
-
-  const onSubmit = async (data: SignInInput) => {
+  const onSubmit = async (data: ForgotPasswordInput) => {
     try {
-      let supabase
-      try {
-        supabase = createClient()
-      } catch (clientError: any) {
-        console.error("Supabase client error:", clientError)
-        setFormError("root", {
-          message: clientError.message || "خطأ في إعدادات Supabase. يرجى التحقق من ملف .env",
-        })
-        return
-      }
-      
-      // تسجيل الدخول مباشرة باستخدام Supabase Auth
-      // هذا يحفظ الجلسة تلقائياً في cookies
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
+      setIsLoading(true)
+      setFormError("root", { message: "" })
+      setSuccessMessage(null)
+
+      const response = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: data.email }),
       })
 
-      if (authError) {
-        console.error("Auth error:", authError)
-        let errorMessage = "البريد الإلكتروني أو كلمة المرور غير صحيحة"
-        
-        if (authError.message.includes("Invalid login credentials")) {
-          errorMessage = "البريد الإلكتروني أو كلمة المرور غير صحيحة"
-        } else if (authError.message.includes("Email not confirmed")) {
-          errorMessage = "يرجى تأكيد البريد الإلكتروني أولاً"
-        } else if (authError.message.includes("User not found")) {
-          errorMessage = "المستخدم غير موجود"
-        } else {
-          errorMessage = authError.message || errorMessage
-        }
-        
+      const result = await response.json()
+
+      if (!response.ok) {
         setFormError("root", {
-          message: errorMessage,
+          message: result.error || "حدث خطأ أثناء إرسال رابط إعادة التعيين",
         })
         return
       }
 
-      if (!authData.user) {
-        console.error("No user data returned")
-        setFormError("root", {
-          message: "حدث خطأ أثناء تسجيل الدخول - لم يتم إرجاع بيانات المستخدم",
-        })
-        return
-      }
-
-      // التحقق من وجود المستخدم في قاعدة البيانات وإنشاؤه إذا لم يكن موجوداً
-      try {
-        const response = await fetch("/api/auth/sync-user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userId: authData.user.id }),
-        })
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}))
-          console.error("Failed to sync user data:", errorData)
-        }
-      } catch (syncError) {
-        console.error("Error syncing user:", syncError)
-        // لا نوقف عملية تسجيل الدخول إذا فشل sync
-      }
-
-      // انتظار قصير لضمان حفظ الـ cookies
-      await new Promise((resolve) => setTimeout(resolve, 100))
-
-      // التحقق من أن الجلسة محفوظة
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        console.error("Session not found after login")
-        setFormError("root", {
-          message: "حدث خطأ في حفظ الجلسة. يرجى المحاولة مرة أخرى.",
-        })
-        return
-      }
-
-      console.log("Login successful, redirecting...")
-
-      // إعادة التوجيه إلى صفحة المعلمة
-      window.location.href = "/teacher"
+      setSuccessMessage(
+        "تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني. يرجى التحقق من صندوق الوارد أو الرسائل غير المرغوب فيها."
+      )
     } catch (err: any) {
-      console.error("Sign in error:", err)
-      let errorMessage = "حدث خطأ أثناء تسجيل الدخول"
-      
-      if (err.message) {
-        errorMessage = err.message
-      } else if (err instanceof Error) {
-        errorMessage = err.message
-      }
-      
+      console.error("Forgot password error:", err)
       setFormError("root", {
-        message: errorMessage,
+        message: "حدث خطأ أثناء إرسال رابط إعادة التعيين. يرجى المحاولة مرة أخرى.",
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -225,10 +133,10 @@ export default function SignInPage() {
         <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 w-full">
           <div className="text-center mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
-              تسجيل الدخول
+              نسيت كلمة المرور؟
             </h1>
             <p className="text-sm sm:text-base text-slate-600">
-              أدخلي بياناتك للوصول إلى المنصة
+              أدخلي بريدك الإلكتروني وسنرسل لك رابطاً لإعادة تعيين كلمة المرور
             </p>
           </div>
 
@@ -267,54 +175,23 @@ export default function SignInPage() {
               )}
             </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-slate-700"
-                >
-                  كلمة المرور
-                </label>
-                <Link
-                  href="/auth/forgot-password"
-                  className="text-sm text-teal-600 hover:text-teal-700 font-medium"
-                >
-                  نسيت كلمة المرور؟
-                </Link>
-              </div>
-              <input
-                id="password"
-                type="password"
-                {...register("password")}
-                className={`w-full px-4 py-3 sm:py-3.5 text-base border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
-                  errors.password
-                    ? "border-red-300 focus:ring-red-500"
-                    : "border-slate-300"
-                }`}
-                placeholder="••••••••"
-              />
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-              )}
-            </div>
-
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isLoading}
               className="w-full bg-emerald-500 text-white py-3.5 sm:py-4 text-lg sm:text-base rounded-2xl font-semibold hover:bg-emerald-600 transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {isSubmitting ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
+              {isSubmitting || isLoading ? "جاري الإرسال..." : "إرسال رابط إعادة التعيين"}
             </button>
           </form>
 
           <div className="mt-5 sm:mt-6 text-center">
             <p className="text-sm sm:text-base text-slate-600">
-              ليس لديك حساب؟{" "}
+              تذكرت كلمة المرور؟{" "}
               <Link
-                href="/auth/signup"
+                href="/auth/signin"
                 className="text-teal-600 hover:text-teal-700 font-medium"
               >
-                إنشاء حساب جديد
+                تسجيل الدخول
               </Link>
             </p>
           </div>
@@ -330,4 +207,3 @@ export default function SignInPage() {
     </main>
   )
 }
-

@@ -35,15 +35,51 @@ export default function SignUpPage() {
       const result = await response.json()
 
       if (!response.ok) {
+        console.error("Signup error:", result)
+        let errorMessage = result.error || "حدث خطأ أثناء إنشاء الحساب"
+        
+        // إذا كان هناك تفاصيل إضافية، أضفها
+        if (result.details && Array.isArray(result.details) && result.details.length > 0) {
+          const detailsMessages = result.details.map((d: any) => d.message).join("، ")
+          if (detailsMessages) {
+            errorMessage = `${errorMessage}: ${detailsMessages}`
+          }
+        }
+        
+        // إذا كان هناك userId في الخطأ، أضيفه للرسالة
+        if (result.userId) {
+          errorMessage += ` (User ID: ${result.userId})`
+        }
+        
         setFormError("root", {
-          message: result.error || "حدث خطأ أثناء إنشاء الحساب",
+          message: errorMessage,
         })
       } else {
-        router.push("/auth/signin?registered=true")
+        // إذا كان يحتاج تأكيد البريد
+        if (result.needsEmailConfirmation) {
+          setFormError("root", {
+            message: "تم إنشاء الحساب بنجاح. يرجى التحقق من بريدك الإلكتروني وتأكيد الحساب قبل تسجيل الدخول.",
+          })
+          // الانتظار قليلاً ثم التوجيه
+          setTimeout(() => {
+            router.push("/auth/signin?registered=true&needsConfirmation=true")
+          }, 3000)
+        } else {
+          router.push("/auth/signin?registered=true")
+        }
       }
-    } catch (err) {
+    } catch (err: any) {
+      console.error("Signup error:", err)
+      let errorMessage = "حدث خطأ أثناء إنشاء الحساب"
+      
+      if (err.message) {
+        errorMessage = err.message
+      } else if (err instanceof Error) {
+        errorMessage = err.message
+      }
+      
       setFormError("root", {
-        message: "حدث خطأ أثناء إنشاء الحساب",
+        message: errorMessage,
       })
     }
   }
