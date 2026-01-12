@@ -6,7 +6,7 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { SkillBadge } from "@/components/ui/skill-badge";
 import { ActivityCard } from "@/components/ui/activity-card";
 import { ProgressCard } from "@/components/ui/progress-card";
-import { StudentAuthGuard, useStudentAuth } from "@/components/student/student-auth-guard";
+import { StudentAuthGuard, useStudentAuth } from "@/components/student";
 
 const quickActions = [
   { label: "محاكاة اختبار نافس", href: "/student/simulation/select", accent: "bg-primary-600" },
