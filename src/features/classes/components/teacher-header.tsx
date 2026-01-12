@@ -1,19 +1,41 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth-client"
 import { type SubscriptionPlan } from "@/lib/subscription"
 
 export function TeacherHeader() {
+  const [mounted, setMounted] = useState(false)
   const { user, signOut } = useAuth()
   const router = useRouter()
   const subscriptionPlan = (user?.subscriptionPlan || "free") as SubscriptionPlan
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleSignOut = async () => {
     await signOut()
     router.push("/")
     router.refresh()
+  }
+
+  // عرض هيكل بسيط أثناء التحميل الأولي
+  if (!mounted) {
+    return (
+      <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 rounded-2xl bg-white p-3 sm:p-4 shadow-sm">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+          <Link href="/teacher" className="text-base sm:text-lg font-bold text-slate-900">
+            لوحة المعلمة
+          </Link>
+          <span className="text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 rounded-lg bg-slate-100 text-slate-500">
+            جاري التحميل...
+          </span>
+        </div>
+      </div>
+    )
   }
 
   return (

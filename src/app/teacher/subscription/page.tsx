@@ -11,16 +11,21 @@ import { subscriptionFeatures, getPlanInfo, type SubscriptionPlan } from "@/lib/
 import { PageBackground } from "@/components/layout/page-background"
 
 export default function SubscriptionPage() {
+  const [mounted, setMounted] = useState(false)
   const { user } = useAuth()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [currentPlan, setCurrentPlan] = useState<SubscriptionPlan>("free")
 
   useEffect(() => {
-    if (user?.subscriptionPlan) {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (mounted && user?.subscriptionPlan) {
       setCurrentPlan(user.subscriptionPlan as SubscriptionPlan)
     }
-  }, [user])
+  }, [user, mounted])
 
   const handleUpgrade = async () => {
     if (!user?.id) return
@@ -75,6 +80,17 @@ export default function SubscriptionPage() {
   }
 
   const currentPlanInfo = getPlanInfo(currentPlan)
+
+  if (!mounted) {
+    return (
+      <main className="relative min-h-screen overflow-hidden bg-[#faf9f7]">
+        <PageBackground />
+        <div className="relative z-10 flex items-center justify-center min-h-screen">
+          <p className="text-slate-600">جاري التحميل...</p>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#faf9f7]">

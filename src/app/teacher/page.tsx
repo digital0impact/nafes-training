@@ -26,6 +26,7 @@ type DashboardStats = {
 };
 
 export default function TeacherDashboard() {
+  const [mounted, setMounted] = useState(false);
   const { user, signOut } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>("overview");
@@ -33,6 +34,11 @@ export default function TeacherDashboard() {
   const [loadingStats, setLoadingStats] = useState(true);
   
   const subscriptionPlan = (user?.subscriptionPlan || "free") as SubscriptionPlan;
+
+  // تفعيل mounted بعد التحميل
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // جلب الإحصائيات
   useEffect(() => {
@@ -50,16 +56,27 @@ export default function TeacherDashboard() {
       }
     };
 
-    if (activeTab === "overview") {
+    if (mounted && activeTab === "overview") {
       fetchStats();
     }
-  }, [activeTab]);
+  }, [activeTab, mounted]);
 
   const handleSignOut = async () => {
     await signOut();
     router.push("/");
     router.refresh();
   };
+
+  // عرض شاشة تحميل أثناء التهيئة
+  if (!mounted) {
+    return (
+      <main className="space-y-10">
+        <div className="card bg-white p-8 text-center">
+          <p className="text-slate-600">جاري تحميل لوحة التحكم...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="space-y-10">

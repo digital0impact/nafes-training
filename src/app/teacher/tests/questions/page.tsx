@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { simulationQuestions } from "@/lib/simulation-questions";
 import { learningOutcomes } from "@/lib/data";
@@ -15,10 +15,15 @@ const skillOptions = ["الكل", "علوم الحياة", "العلوم الف�
 type TabType = "all" | "by-skill" | "by-outcome" | "add";
 
 export default function QuestionsBankPage() {
+  const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("all");
   const [selectedSkill, setSelectedSkill] = useState("الكل");
   const [selectedOutcome, setSelectedOutcome] = useState("الكل");
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Get unique outcomes for filter
   const uniqueOutcomes = useMemo(() => {
@@ -76,6 +81,17 @@ export default function QuestionsBankPage() {
     "العلوم الفيزيائية": "bg-blue-50 text-blue-700 border-blue-200",
     "علوم الأرض والفضاء": "bg-amber-50 text-amber-700 border-amber-200"
   };
+
+  if (!mounted) {
+    return (
+      <main className="relative min-h-screen overflow-hidden bg-[#faf9f7]">
+        <PageBackground />
+        <div className="relative z-10 flex items-center justify-center min-h-screen">
+          <p className="text-slate-600">جاري التحميل...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#faf9f7]">
