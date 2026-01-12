@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from "react"
 import { SectionHeader } from "@/components/ui/section-header"
 import { LearningOutcomeCard } from "@/components/ui/learning-outcome-card"

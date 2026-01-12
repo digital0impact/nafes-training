@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useStudentStore } from "@/store/student-store"
 
@@ -8,13 +8,21 @@ export function useStudentAuth() {
   const router = useRouter()
   const student = useStudentStore((state) => state.student)
   const clearStudent = useStudentStore((state) => state.clearStudent)
-  const loading = !student
+  const [isHydrated, setIsHydrated] = useState(false)
+
+  // انتظار التحميل من localStorage
+  useEffect(() => {
+    useStudentStore.persist.rehydrate()
+    setIsHydrated(true)
+  }, [])
+
+  const loading = !isHydrated
 
   useEffect(() => {
-    if (!student) {
+    if (isHydrated && !student) {
       router.push("/auth/student-signin")
     }
-  }, [student, router])
+  }, [student, router, isHydrated])
 
   const signOut = () => {
     clearStudent()

@@ -1,7 +1,7 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 
 export type User = {
   id: string
@@ -17,9 +17,17 @@ export type User = {
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
+  
+  // إنشاء الـ client مرة واحدة فقط
+  const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
+    // تخطي على الخادم
+    if (typeof window === 'undefined') {
+      setLoading(false)
+      return
+    }
+
     // الحصول على المستخدم الحالي
     supabase.auth.getUser().then(({ data: { user: authUser }, error }) => {
       if (error || !authUser) {
@@ -40,6 +48,9 @@ export function useAuth() {
         })
         .catch(() => setUser(null))
         .finally(() => setLoading(false))
+    }).catch(() => {
+      setUser(null)
+      setLoading(false)
     })
 
     // الاستماع لتغييرات المصادقة
@@ -68,7 +79,11 @@ export function useAuth() {
   }, [supabase])
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    try {
+      await supabase.auth.signOut()
+    } catch (e) {
+      console.error('Sign out error:', e)
+    }
     setUser(null)
   }
 

@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from "react"
 import type { Activity } from "@/lib/activities"
 import { SectionHeader } from "@/components/ui/section-header"

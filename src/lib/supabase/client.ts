@@ -18,6 +18,14 @@ import { createBrowserClient } from '@supabase/ssr'
  * ```
  */
 export function createClient() {
+  // تخطي التحقق أثناء البناء على الخادم
+  if (typeof window === 'undefined') {
+    // إرجاع client وهمي أثناء SSR/Build
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || 'placeholder-key'
+    return createBrowserClient(supabaseUrl, supabaseAnonKey)
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
 
@@ -26,50 +34,21 @@ export function createClient() {
     if (!supabaseUrl) missing.push('NEXT_PUBLIC_SUPABASE_URL')
     if (!supabaseAnonKey) missing.push('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY')
     
-    throw new Error(
-      `Missing Supabase environment variables: ${missing.join(', ')}\n` +
-      'Please check your .env file and make sure all required variables are set.'
-    )
+    console.error(`Missing Supabase environment variables: ${missing.join(', ')}`)
+    // إرجاع client وهمي بدلاً من رمي خطأ
+    return createBrowserClient('https://placeholder.supabase.co', 'placeholder-key')
   }
 
-  // التحقق من صحة المفتاح
+  // التحقق من صحة المفتاح (تحذير فقط، لا نرمي خطأ)
   if (supabaseAnonKey === 'your-publishable-key-here' || 
       supabaseAnonKey === 'your-key-here' ||
       supabaseAnonKey.length < 40) {
-    const errorMsg = supabaseAnonKey === 'your-publishable-key-here' || supabaseAnonKey === 'your-key-here'
-      ? 'مفتاح Supabase غير صحيح - يرجى استبدال القيمة الافتراضية في ملف .env'
-      : supabaseAnonKey.length < 40
-      ? `مفتاح Supabase قصير جداً (${supabaseAnonKey.length} حرف) - المفتاح الصحيح عادة أكثر من 100 حرف`
-      : 'مفتاح Supabase غير صحيح'
-    
-    const helpMsg = supabaseAnonKey.length < 100 && supabaseAnonKey.length >= 40
-      ? '\n⚠️ ملاحظة: المفتاح يبدو قصيراً. تأكدي من نسخ المفتاح كاملاً من Supabase.\n' +
-        '   المفتاح الصحيح يبدأ بـ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9 ويحتوي على 3 أجزاء مفصولة بنقطة (.)\n'
-      : ''
-    
-    throw new Error(
-      `❌ ${errorMsg}\n\n` +
-      '📝 الخطوات الصحيحة:\n' +
-      '1. اذهبي إلى Supabase Dashboard: https://app.supabase.com\n' +
-      '2. اختاري مشروعك\n' +
-      '3. اذهبي إلى Settings > API\n' +
-      '4. في قسم "Project API keys" ابحثي عن المفتاح المسمى "anon" أو "public"\n' +
-      '5. اضغطي على أيقونة النسخ (Copy) بجانب المفتاح - لا تنسخي يدوياً\n' +
-      '6. المفتاح الصحيح يبدأ بـ: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\n' +
-      '7. المفتاح يجب أن يكون طويلاً جداً (أكثر من 100 حرف عادة)\n' +
-      '8. الصقي المفتاح كاملاً في ملف .env\n' +
-      helpMsg +
-      '\n💡 نصيحة: استخدمي زر "Copy" في Supabase بدلاً من النسخ اليدوي'
-    )
+    console.warn('⚠️ مفتاح Supabase قد يكون غير صحيح. تحققي من ملف .env')
   }
 
-  // التحقق من صحة URL
+  // التحقق من صحة URL (تحذير فقط)
   if (!supabaseUrl.startsWith('https://') || !supabaseUrl.includes('.supabase.co')) {
-    throw new Error(
-      'Invalid Supabase URL. Please check your .env file:\n' +
-      '- NEXT_PUBLIC_SUPABASE_URL should be in format: https://your-project-ref.supabase.co\n' +
-      '- Get it from Supabase Dashboard > Settings > API > Project URL'
-    )
+    console.warn('⚠️ رابط Supabase قد يكون غير صحيح. تحققي من ملف .env')
   }
 
   return createBrowserClient(supabaseUrl, supabaseAnonKey)

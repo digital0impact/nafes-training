@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from "react"
 import { PageBackground } from "@/components/layout/page-background"
 import { TeacherHeader } from "@/features/classes/components/teacher-header"

@@ -1,7 +1,7 @@
 "use client"
 
 import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { persist, createJSONStorage } from "zustand/middleware"
 
 type Student = {
   id: string
@@ -27,6 +27,19 @@ export const useStudentStore = create<StudentStore>()(
     }),
     {
       name: "student-storage",
+      storage: createJSONStorage(() => {
+        // التحقق من وجود localStorage (لتجنب أخطاء SSR)
+        if (typeof window !== 'undefined') {
+          return localStorage
+        }
+        // إرجاع storage وهمي للـ SSR
+        return {
+          getItem: () => null,
+          setItem: () => {},
+          removeItem: () => {},
+        }
+      }),
+      skipHydration: true, // تأخير التحميل حتى يكون العميل جاهزاً
     }
   )
 )
