@@ -4,7 +4,6 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { allowedStudents } from "@/lib/data"
 import { SectionHeader } from "@/components/ui/section-header"
 import { PageBackground } from "@/components/layout/page-background"
 
@@ -25,7 +24,7 @@ type Class = {
 type TabType = "all" | "add" | "import" | "reports"
 
 export default function StudentsPage() {
-  const [students, setStudents] = useState<Student[]>(allowedStudents)
+  const [students, setStudents] = useState<Student[]>([])
   const [classes, setClasses] = useState<Class[]>([])
   const [activeTab, setActiveTab] = useState<TabType>("all")
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -39,9 +38,10 @@ export default function StudentsPage() {
     classId: ""
   })
 
-  // جلب الفصول
+  // جلب الفصول والطالبات
   useEffect(() => {
     fetchClasses()
+    fetchStudents()
   }, [])
 
   const fetchClasses = async () => {
@@ -53,6 +53,18 @@ export default function StudentsPage() {
       }
     } catch (error) {
       console.error("Error fetching classes:", error)
+    }
+  }
+
+  const fetchStudents = async () => {
+    try {
+      const response = await fetch("/api/students")
+      if (response.ok) {
+        const data = await response.json()
+        setStudents(data.students || [])
+      }
+    } catch (error) {
+      console.error("Error fetching students:", error)
     }
   }
 
@@ -108,7 +120,7 @@ export default function StudentsPage() {
           return
         }
 
-        setStudents([...students, { ...formData, id: newId }])
+        await fetchStudents()
         alert(`تم إنشاء حساب الطالبة بنجاح!\nرقم الطالبة: ${newId}\nكلمة المرور: ${formData.password}`)
         handleCancel()
         setActiveTab("all")
@@ -118,17 +130,28 @@ export default function StudentsPage() {
       }
     } else {
       // تحديث بيانات الطالبة
-      setStudents(
-        students.map((s) => (s.id === editingId ? { ...formData, id: editingId } : s))
-      )
+      await fetchStudents()
       handleCancel()
       setActiveTab("all")
     }
   }
 
-  function handleDelete(id: string) {
+  async function handleDelete(id: string) {
     if (confirm("هل أنت متأكدة من حذف هذه الطالبة؟")) {
-      setStudents(students.filter((s) => s.id !== id))
+      try {
+        const response = await fetch(`/api/students/${id}`, {
+          method: "DELETE"
+        })
+        
+        if (response.ok) {
+          await fetchStudents()
+        } else {
+          alert("حدث خطأ أثناء حذف الطالبة")
+        }
+      } catch (error) {
+        console.error("Error deleting student:", error)
+        alert("حدث خطأ أثناء حذف الطالبة")
+      }
     }
   }
 
@@ -194,7 +217,7 @@ export default function StudentsPage() {
         }
 
         if (importedStudents.length > 0) {
-          setStudents([...students, ...importedStudents])
+          await fetchStudents()
           alert(`تم استيراد ${importedStudents.length} طالبة بنجاح!\nكلمة المرور الافتراضية للجميع: ${defaultPassword}`)
           setActiveTab("all")
         } else {
@@ -241,14 +264,7 @@ export default function StudentsPage() {
     <main className="relative min-h-screen overflow-hidden bg-[#faf9f7]">
       <PageBackground />
       <div className="relative z-10 space-y-6 p-4 py-8">
-        <header className="card bg-gradient-to-br from-white to-primary-50">
-          <div className="mb-4">
-            <h1 className="text-3xl font-bold text-slate-900">إدارة الطالبات</h1>
-            <p className="mt-2 text-slate-600">
-              أضيفي أو عدّلي بيانات الطالبات المسموح لهن بالدخول إلى المنصة
-            </p>
-          </div>
-          
+        <div className="card bg-gradient-to-br from-white to-primary-50">
           {/* Tabs */}
           <div className="flex gap-2 border-b border-primary-200 overflow-x-auto">
             <button
@@ -298,7 +314,7 @@ export default function StudentsPage() {
               تقارير الطالبات
             </button>
           </div>
-        </header>
+        </div>
 
         {/* All Students Tab */}
         {activeTab === "all" && (

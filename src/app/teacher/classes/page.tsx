@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { TeacherHeader } from "@/features/classes/components/teacher-header"
 import { PageBackground } from "@/components/layout/page-background"
 import { createClassSchema, type CreateClassInput } from "@/lib/validations"
 import { generateClassCode } from "@/lib/utils/class-code-generator"
@@ -162,16 +161,8 @@ export default function ClassesPage() {
     <main className="relative min-h-screen overflow-hidden bg-[#faf9f7]">
       <PageBackground />
       <div className="relative z-10 space-y-6 p-4 py-8">
-        <TeacherHeader />
-
         <div className="card bg-white">
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">إدارة الفصول</h1>
-              <p className="mt-1 text-sm text-slate-600">
-                أنشئي فصولاً وأديري طالباتك
-              </p>
-            </div>
+          <div className="mb-6 flex items-center justify-end">
             <button
               onClick={() => {
                 reset()

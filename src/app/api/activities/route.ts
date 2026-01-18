@@ -1,10 +1,39 @@
 import { NextResponse } from "next/server";
-import { getActivities, addActivity, type Activity } from "@/lib/activities";
+import { requireTeacher } from "@/lib/auth-server";
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const activities = await getActivities();
-    return NextResponse.json({ activities });
+    const user = await requireTeacher();
+    
+    // جلب الأنشطة من قاعدة البيانات فقط
+    const activities = await prisma.activity.findMany({
+      where: {
+        userId: user.id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    
+    // تحويل content من JSON string إلى object
+    const activitiesWithParsedContent = activities.map(activity => {
+      let parsedContent = activity.content;
+      if (typeof activity.content === 'string' && activity.content.trim()) {
+        try {
+          parsedContent = JSON.parse(activity.content);
+        } catch (e) {
+          console.error(`Error parsing content for activity ${activity.id}:`, e);
+          parsedContent = {};
+        }
+      }
+      return {
+        ...activity,
+        content: parsedContent,
+      };
+    });
+    
+    return NextResponse.json({ activities: activitiesWithParsedContent });
   } catch (error) {
     console.error("Failed to fetch activities", error);
     return NextResponse.json(
@@ -16,6 +45,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const user = await requireTeacher();
     const body = await request.json();
     
     // التحقق من البيانات المطلوبة
@@ -26,19 +56,33 @@ export async function POST(request: Request) {
       );
     }
 
-    const newActivity = await addActivity({
-      title: body.title,
-      description: body.description,
-      duration: body.duration,
-      skill: body.skill,
-      targetLevel: body.targetLevel,
-      outcomeLesson: body.outcomeLesson,
-      type: body.type,
-      content: body.content,
-      image: body.image
+    // حفظ النشاط في قاعدة البيانات
+    const newActivity = await prisma.activity.create({
+      data: {
+        title: body.title,
+        description: body.description,
+        duration: body.duration,
+        skill: body.skill,
+        targetLevel: body.targetLevel,
+        outcomeLesson: body.outcomeLesson,
+        type: body.type,
+        content: typeof body.content === 'string' 
+          ? body.content 
+          : JSON.stringify(body.content || {}),
+        image: body.image,
+        userId: user.id,
+      },
     });
 
-    return NextResponse.json(newActivity, { status: 201 });
+    // تحويل content من JSON string إلى object للاستجابة
+    const activityWithParsedContent = {
+      ...newActivity,
+      content: typeof newActivity.content === 'string' 
+        ? JSON.parse(newActivity.content) 
+        : newActivity.content,
+    };
+
+    return NextResponse.json(activityWithParsedContent, { status: 201 });
   } catch (error) {
     console.error("Failed to create activity", error);
     return NextResponse.json(

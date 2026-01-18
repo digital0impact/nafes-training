@@ -47,22 +47,98 @@ export default function TeacherTestsPage() {
 
       {/* Tab Content */}
       {activeTab === "diagnostic" && (
-        <div className="card p-0 overflow-hidden">
-          <iframe
-            src="/teacher/tests/create-diagnostic"
-            className="w-full h-[800px] border-0"
-            title="اختبارات تشخيصية"
-          />
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* إنشاء اختبار جديد */}
+          <div className="card group hover:shadow-lg transition-all cursor-pointer" onClick={() => window.location.href = '/teacher/tests/create-diagnostic'}>
+            <div className="text-center space-y-4">
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-purple-100 group-hover:bg-purple-200 transition">
+                <svg className="h-10 w-10 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">إنشاء اختبار تشخيصي جديد</h3>
+                <p className="mt-2 text-sm text-slate-600">
+                  قومي بإنشاء اختبار تشخيصي مخصص لتقييم مستوى الطالبات
+                </p>
+              </div>
+              <div className="pt-4 border-t border-slate-100">
+                <span className="text-purple-600 font-semibold group-hover:text-purple-700">
+                  ابدئي الآن ←
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* نماذج اختبارات تشخيصية */}
+          <div className="card group hover:shadow-lg transition-all cursor-pointer" onClick={() => window.location.href = '/teacher/tests/diagnostic-models'}>
+            <div className="text-center space-y-4">
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 group-hover:bg-emerald-200 transition">
+                <svg className="h-10 w-10 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">نماذج اختبارات تشخيصية</h3>
+                <p className="mt-2 text-sm text-slate-600">
+                  تصفحي النماذج الجاهزة واختاري المناسب لفصلك
+                </p>
+              </div>
+              <div className="pt-4 border-t border-slate-100">
+                <span className="text-emerald-600 font-semibold group-hover:text-emerald-700">
+                  تصفح النماذج ←
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
       {activeTab === "simulation" && (
-        <div className="card p-0 overflow-hidden">
-          <iframe
-            src="/teacher/tests/create"
-            className="w-full h-[800px] border-0"
-            title="اختبارات محاكية"
-          />
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* إنشاء اختبار جديد */}
+          <div className="card group hover:shadow-lg transition-all cursor-pointer" onClick={() => window.location.href = '/teacher/tests/create'}>
+            <div className="text-center space-y-4">
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-blue-100 group-hover:bg-blue-200 transition">
+                <svg className="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">إنشاء اختبار محاكي جديد</h3>
+                <p className="mt-2 text-sm text-slate-600">
+                  قومي بإنشاء اختبار محاكي مخصص لتدريب الطالبات
+                </p>
+              </div>
+              <div className="pt-4 border-t border-slate-100">
+                <span className="text-blue-600 font-semibold group-hover:text-blue-700">
+                  ابدئي الآن ←
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* نماذج اختبارات محاكية */}
+          <div className="card group hover:shadow-lg transition-all cursor-pointer" onClick={() => window.location.href = '/teacher/tests/share'}>
+            <div className="text-center space-y-4">
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 group-hover:bg-emerald-200 transition">
+                <svg className="h-10 w-10 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">نماذج اختبارات محاكية</h3>
+                <p className="mt-2 text-sm text-slate-600">
+                  تصفحي النماذج الجاهزة واختاري المناسب لفصلك
+                </p>
+              </div>
+              <div className="pt-4 border-t border-slate-100">
+                <span className="text-emerald-600 font-semibold group-hover:text-emerald-700">
+                  تصفح النماذج ←
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

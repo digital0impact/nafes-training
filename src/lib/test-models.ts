@@ -126,9 +126,29 @@ export function getQuestionsForModel(modelId: string): SimulationQuestion[] {
   
   if (!model) return [];
 
+  // الحصول على الأسئلة المخصصة من localStorage
+  let customQuestions: SimulationQuestion[] = [];
+  if (typeof window !== "undefined") {
+    try {
+      const saved = localStorage.getItem("customQuestions");
+      if (saved) {
+        customQuestions = JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error("Error loading custom questions", e);
+    }
+  }
+
   // الحصول على الأسئلة المحددة وإعادة ترقيمها
   const questions = model.questionIds
-    .map((id) => simulationQuestions.find((q) => q.id === id))
+    .map((id) => {
+      // البحث في الأسئلة المخصصة أولاً
+      const customQ = customQuestions.find((q) => q.id === id);
+      if (customQ) return customQ;
+      
+      // ثم البحث في الأسئلة العادية
+      return simulationQuestions.find((q) => q.id === id);
+    })
     .filter((q): q is SimulationQuestion => q !== undefined)
     .map((q, index) => ({
       ...q,

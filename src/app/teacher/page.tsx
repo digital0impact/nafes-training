@@ -6,23 +6,27 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-client";
-import { students } from "@/lib/data";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { type SubscriptionPlan } from "@/lib/subscription";
 
-const weakSkills = [
-  { skill: "قوانين نيوتن", students: 5 },
-  { skill: "التفاعلات الكيميائية", students: 4 },
-  { skill: "تحولات المادة", students: 3 }
-];
 
-type TabType = "overview" | "outcomes" | "tests" | "activities" | "students";
+type TabType = "overview" | "outcomes" | "tests" | "activities" | "classes";
 
 type DashboardStats = {
   classesCount: number;
   studentsCount: number;
   weeklyAttempts: number;
+  averageScore?: number;
+  advancedStudents?: number;
+  needSupportStudents?: number;
+  weeklyActivities?: number;
+  recentStudents?: Array<{
+    id: string;
+    nickname: string;
+    latestScore?: number;
+    trend?: number;
+  }>;
 };
 
 export default function TeacherDashboard() {
@@ -30,6 +34,7 @@ export default function TeacherDashboard() {
   const { user, signOut } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>("overview");
+  const [classesSubTab, setClassesSubTab] = useState<"classes" | "students">("classes");
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loadingStats, setLoadingStats] = useState(true);
   
@@ -159,69 +164,17 @@ export default function TeacherDashboard() {
             إدارة الأنشطة
           </button>
           <button
-            onClick={() => setActiveTab("students")}
+            onClick={() => setActiveTab("classes")}
             className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${
-              activeTab === "students"
+              activeTab === "classes"
                 ? "text-emerald-700 border-emerald-600"
                 : "text-slate-500 border-transparent hover:text-emerald-600"
             }`}
           >
-            إدارة الطالبات
+            إدارة الفصول والطلاب
           </button>
         </div>
       </header>
-
-      {/* Quick Links */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Link
-          href="/teacher/classes"
-          className="card bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200 hover:shadow-md transition-shadow"
-        >
-          <div className="flex items-center gap-4">
-            <div className="rounded-xl bg-emerald-500 p-3">
-              <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="font-semibold text-slate-900">إدارة الفصول</h3>
-              <p className="text-sm text-slate-600">أنشئي فصولاً وشاركي رمز الفصل</p>
-            </div>
-          </div>
-        </Link>
-        <Link
-          href="/teacher/students"
-          className="card bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 hover:shadow-md transition-shadow"
-        >
-          <div className="flex items-center gap-4">
-            <div className="rounded-xl bg-blue-500 p-3">
-              <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="font-semibold text-slate-900">إدارة الطالبات</h3>
-              <p className="text-sm text-slate-600">أضيفي طالبات وربطيهن بالفصول</p>
-            </div>
-          </div>
-        </Link>
-        <Link
-          href="/teacher/tests"
-          className="card bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 hover:shadow-md transition-shadow"
-        >
-          <div className="flex items-center gap-4">
-            <div className="rounded-xl bg-purple-500 p-3">
-              <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="font-semibold text-slate-900">إدارة الاختبارات</h3>
-              <p className="text-sm text-slate-600">أنشئي اختبارات واختاري الأسئلة</p>
-            </div>
-          </div>
-        </Link>
-      </div>
 
       {/* Overview Tab */}
       {activeTab === "overview" && (
@@ -249,97 +202,86 @@ export default function TeacherDashboard() {
           <section className="grid gap-4 md:grid-cols-4">
             <KpiCard
               label="متوسط الصف"
-              value="74%"
-              trend={{ value: "+6%", positive: true }}
-              hint="أعلى بنسبة 8% من الفترة السابقة"
+              value={loadingStats ? "..." : stats?.averageScore ? `${stats.averageScore}%` : "0%"}
+              hint="متوسط درجات الطالبات في الاختبارات"
             />
-            <KpiCard label="طالبات متقدمة" value="12" hint="من أصل 28 طالبة" />
+            <KpiCard 
+              label="طالبات متقدمة" 
+              value={loadingStats ? "..." : stats?.advancedStudents?.toString() || "0"} 
+              hint={`من أصل ${stats?.studentsCount || 0} طالبة`}
+            />
             <KpiCard
               label="بحاجة لدعم"
-              value="5"
-              trend={{ value: "−2", positive: true }}
-              hint="تم إغلاق 3 خطط علاجية"
+              value={loadingStats ? "..." : stats?.needSupportStudents?.toString() || "0"}
+              hint="طالبات بحاجة لمتابعة إضافية"
             />
-            <KpiCard label="أنشطة منجزة هذا الأسبوع" value="46" />
+            <KpiCard 
+              label="أنشطة منجزة هذا الأسبوع" 
+              value={loadingStats ? "..." : stats?.weeklyActivities?.toString() || "0"}
+            />
           </section>
 
-          <section>
-            <SectionHeader title="نقاط الضعف حسب المهارة" />
-            <div className="mt-4 grid gap-4 md:grid-cols-3">
-              {weakSkills.map((item) => (
-                <div key={item.skill} className="card space-y-2">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-slate-900">
-                      {item.skill}
-                    </h3>
-                    <span className="badge bg-rose-50 text-rose-600">
-                      {item.students} طالبات
-                    </span>
-                  </div>
-                  <p className="text-sm text-slate-500">
-                    تم اقتراح 3 أنشطة علاجية و5 أسئلة مستهدفة
-                  </p>
-                  <div className="flex gap-3">
-                    <button className="flex-1 rounded-2xl border border-slate-200 py-2 text-sm font-semibold">
-                      إرسال نشاط
-                    </button>
-                    <button className="flex-1 rounded-2xl bg-primary-600 py-2 text-sm font-semibold text-white">
-                      خطة علاجية
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section>
-            <SectionHeader
-              title="ملخص الطالبات"
-              subtitle="تابعي أداء كل طالبة ومقدار التحسن الأسبوعي"
-              action={
-                <button className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold">
-                  تصدير XLSX
-                </button>
-              }
-            />
-            <div className="mt-4 overflow-hidden rounded-3xl border border-slate-100 bg-white">
-              <table className="w-full text-right text-sm">
-                <thead className="bg-slate-50 text-slate-500">
-                  <tr>
-                    <th className="px-6 py-3 font-semibold">الطالبة</th>
-                    <th className="px-6 py-3 font-semibold">الدرجة</th>
-                    <th className="px-6 py-3 font-semibold">الحالة</th>
-                    <th className="px-6 py-3 font-semibold">التحسن</th>
-                    <th className="px-6 py-3 font-semibold">الإجراءات</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {students.map((student) => (
-                    <tr key={student.name} className="border-t border-slate-100">
-                      <td className="px-6 py-4 font-semibold text-slate-900">
-                        {student.name}
-                      </td>
-                      <td className="px-6 py-4">{student.score}%</td>
-                      <td className="px-6 py-4">
-                        <span className="badge bg-slate-100 text-slate-600">
-                          {student.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-emerald-600">+{student.progress}%</td>
-                      <td className="px-6 py-4">
-                        <button
-                          onClick={() => setActiveTab("students")}
-                          className="text-primary-600 underline"
-                        >
-                          عرض التقرير
-                        </button>
-                      </td>
+          {/* جدول الطالبات */}
+          {stats?.recentStudents && stats.recentStudents.length > 0 && (
+            <section>
+              <SectionHeader
+                title="ملخص الطالبات"
+                subtitle="تابعي أداء كل طالبة ومقدار التحسن"
+                action={
+                  <Link
+                    href="/teacher/reports"
+                    className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold hover:bg-slate-50"
+                  >
+                    عرض جميع التقارير
+                  </Link>
+                }
+              />
+              <div className="mt-4 overflow-hidden rounded-3xl border border-slate-100 bg-white">
+                <table className="w-full text-right text-sm">
+                  <thead className="bg-slate-50 text-slate-500">
+                    <tr>
+                      <th className="px-6 py-3 font-semibold">الطالبة</th>
+                      <th className="px-6 py-3 font-semibold">الدرجة</th>
+                      <th className="px-6 py-3 font-semibold">الحالة</th>
+                      <th className="px-6 py-3 font-semibold">التحسن</th>
+                      <th className="px-6 py-3 font-semibold">الإجراءات</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
+                  </thead>
+                  <tbody>
+                    {stats.recentStudents.map((student) => {
+                      const status = student.latestScore >= 80 ? "متقدمة" : student.latestScore >= 60 ? "جيدة" : "بحاجة لدعم";
+                      const statusColor = student.latestScore >= 80 ? "bg-emerald-100 text-emerald-700" : student.latestScore >= 60 ? "bg-blue-100 text-blue-700" : "bg-rose-100 text-rose-700";
+                      
+                      return (
+                        <tr key={student.id} className="border-t border-slate-100">
+                          <td className="px-6 py-4 font-semibold text-slate-900">
+                            {student.nickname}
+                          </td>
+                          <td className="px-6 py-4">{student.latestScore || 0}%</td>
+                          <td className="px-6 py-4">
+                            <span className={`badge ${statusColor}`}>
+                              {status}
+                            </span>
+                          </td>
+                          <td className={`px-6 py-4 ${student.trend >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                            {student.trend >= 0 ? '+' : ''}{student.trend}%
+                          </td>
+                          <td className="px-6 py-4">
+                            <Link
+                              href={`/teacher/reports?student=${student.id}`}
+                              className="text-primary-600 underline"
+                            >
+                              عرض التقرير
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
         </>
       )}
 
@@ -354,13 +296,70 @@ export default function TeacherDashboard() {
         </div>
       )}
 
-      {activeTab === "students" && (
-        <div className="card p-0 overflow-hidden">
-          <iframe
-            src="/teacher/students"
-            className="w-full h-[800px] border-0"
-            title="إدارة الطالبات"
-          />
+      {activeTab === "classes" && (
+        <div className="space-y-6">
+          {/* Sub Tabs */}
+          <div className="card p-0 overflow-hidden">
+            <div className="flex border-b border-slate-200 bg-slate-50">
+              <button
+                onClick={() => setClassesSubTab("classes")}
+                className={`flex-1 px-6 py-4 font-semibold transition-colors border-b-2 ${
+                  classesSubTab === "classes"
+                    ? "text-emerald-700 border-emerald-600 bg-white"
+                    : "text-slate-500 border-transparent hover:text-emerald-600"
+                }`}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  إدارة الفصول
+                </div>
+              </button>
+              <button
+                onClick={() => setClassesSubTab("students")}
+                className={`flex-1 px-6 py-4 font-semibold transition-colors border-b-2 ${
+                  classesSubTab === "students"
+                    ? "text-blue-700 border-blue-600 bg-white"
+                    : "text-slate-500 border-transparent hover:text-blue-600"
+                }`}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  إدارة الطلاب
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Sub Tab Content */}
+          {classesSubTab === "classes" ? (
+            <div className="card p-0 overflow-hidden">
+              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 p-4 border-b border-emerald-200">
+                <h2 className="text-xl font-bold text-slate-900">إدارة الفصول</h2>
+                <p className="text-sm text-slate-600 mt-1">قومي بإنشاء الفصول ومشاركة رمز الانضمام</p>
+              </div>
+              <iframe
+                src="/teacher/classes"
+                className="w-full h-[600px] border-0"
+                title="إدارة الفصول"
+              />
+            </div>
+          ) : (
+            <div className="card p-0 overflow-hidden">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 border-b border-blue-200">
+                <h2 className="text-xl font-bold text-slate-900">إدارة الطالبات</h2>
+                <p className="text-sm text-slate-600 mt-1">أضيفي طالبات وربطيهن بالفصول</p>
+              </div>
+              <iframe
+                src="/teacher/students"
+                className="w-full h-[600px] border-0"
+                title="إدارة الطالبات"
+              />
+            </div>
+          )}
         </div>
       )}
 

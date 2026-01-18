@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { getQuestionsForModel, testModels, getRelatedOutcomes, type TestModel } from "@/lib/test-models";
+import { getQuestionsForModel, getRelatedOutcomes, getPrebuiltTestModels, getAllTestModels, type TestModel } from "@/lib/test-models";
 import { type SimulationQuestion } from "@/lib/simulation-questions";
 import { useStudentStore } from "@/store/student-store";
 
@@ -31,7 +31,12 @@ export default function SimulationPage() {
   // Load model and questions
   useEffect(() => {
     if (modelId) {
-      const model = testModels.find((m) => m.id === modelId);
+      // البحث في جميع النماذج (الجاهزة والمخصصة)
+      const prebuiltModels = getPrebuiltTestModels();
+      const customModels = getAllTestModels();
+      const allModels = [...prebuiltModels, ...customModels];
+      
+      const model = allModels.find((m) => m.id === modelId);
       if (model) {
         setCurrentModel(model);
         const modelQuestions = getQuestionsForModel(modelId);

@@ -23,6 +23,12 @@ const levelColors: Record<string, string> = {
 
 type TabType = "all" | "shared" | "unshared" | "create"
 
+type Student = {
+  id: string;
+  nickname: string;
+  classCode: string;
+};
+
 export default function ActivitiesManagementPage() {
   const [activities, setActivities] = useState<Activity[]>([])
   const [sharedActivities, setSharedActivities] = useState<Set<string>>(new Set())
@@ -30,6 +36,17 @@ export default function ActivitiesManagementPage() {
   const [activeTab, setActiveTab] = useState<TabType>("all")
   const [showTemplateSelector, setShowTemplateSelector] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<ActivityTemplate | null>(null)
+  const [showPreviewModal, setShowPreviewModal] = useState(false)
+  const [showSendModal, setShowSendModal] = useState(false)
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
+  const [students, setStudents] = useState<Student[]>([])
+  const [selectedStudents, setSelectedStudents] = useState<Set<string>>(new Set())
+  const [sendToAll, setSendToAll] = useState(false)
+  const [loadingStudents, setLoadingStudents] = useState(false)
+  const [importing, setImporting] = useState(false)
+  const [importMessage, setImportMessage] = useState<string | null>(null)
+  const [cleaning, setCleaning] = useState(false)
+  const [cleanupMessage, setCleanupMessage] = useState<string | null>(null)
 
   // Load activities and shared status
   useEffect(() => {
@@ -58,6 +75,167 @@ export default function ActivitiesManagementPage() {
     loadData()
   }, [])
 
+  // جلب قائمة الطلاب
+  const fetchStudents = async () => {
+    setLoadingStudents(true)
+    try {
+      const response = await fetch("/api/students")
+      if (response.ok) {
+        const data = await response.json()
+        setStudents(data.students || [])
+      }
+    } catch (error) {
+      console.error("Error fetching students:", error)
+    } finally {
+      setLoadingStudents(false)
+    }
+  }
+
+  // استيراد الأنشطة من ملف JSON
+  const handleImportActivities = async () => {
+    setImporting(true)
+    setImportMessage(null)
+    try {
+      const response = await fetch("/api/activities/import", {
+        method: "POST",
+      })
+      const data = await response.json()
+      
+      if (response.ok) {
+        setImportMessage(`✅ ${data.message}`)
+        // إعادة تحميل الأنشطة
+        const activitiesResponse = await fetch("/api/activities")
+        const activitiesData = await activitiesResponse.json()
+        setActivities(activitiesData.activities || [])
+      } else {
+        setImportMessage(`❌ ${data.error || "حدث خطأ أثناء الاستيراد"}`)
+      }
+    } catch (error) {
+      console.error("Error importing activities:", error)
+      setImportMessage("❌ حدث خطأ أثناء استيراد الأنشطة")
+    } finally {
+      setImporting(false)
+      setTimeout(() => setImportMessage(null), 5000)
+    }
+  }
+
+  // حذف الأنشطة غير المدمجة
+  const handleCleanupActivities = async () => {
+    if (!confirm("هل أنت متأكد من حذف الأنشطة غير المدمجة؟ هذا الإجراء لا يمكن التراجع عنه.")) {
+      return
+    }
+
+    setCleaning(true)
+    setCleanupMessage(null)
+    try {
+      const response = await fetch("/api/activities/cleanup", {
+        method: "POST",
+      })
+      const data = await response.json()
+      
+      if (response.ok) {
+        setCleanupMessage(`✅ ${data.message}`)
+        // إعادة تحميل الأنشطة
+        const activitiesResponse = await fetch("/api/activities")
+        const activitiesData = await activitiesResponse.json()
+        setActivities(activitiesData.activities || [])
+      } else {
+        setCleanupMessage(`❌ ${data.error || "حدث خطأ أثناء الحذف"}`)
+      }
+    } catch (error) {
+      console.error("Error cleaning up activities:", error)
+      setCleanupMessage("❌ حدث خطأ أثناء حذف الأنشطة")
+    } finally {
+      setCleaning(false)
+      setTimeout(() => setCleanupMessage(null), 5000)
+    }
+  }
+
+  // فتح نافذة المعاينة
+  const openPreviewModal = (activity: Activity) => {
+    setSelectedActivity(activity)
+    setShowPreviewModal(true)
+  }
+
+  // إغلاق نافذة المعاينة
+  const closePreviewModal = () => {
+    setShowPreviewModal(false)
+    setSelectedActivity(null)
+  }
+
+  // فتح نافذة الإرسال
+  const openSendModal = (activity: Activity) => {
+    setSelectedActivity(activity)
+    setShowSendModal(true)
+    fetchStudents()
+  }
+
+  // إغلاق نافذة الإرسال
+  const closeSendModal = () => {
+    setShowSendModal(false)
+    setSelectedActivity(null)
+    setSelectedStudents(new Set())
+    setSendToAll(false)
+  }
+
+  // تحديد/إلغاء تحديد طالبة
+  const toggleStudent = (studentId: string) => {
+    const newSelected = new Set(selectedStudents)
+    if (newSelected.has(studentId)) {
+      newSelected.delete(studentId)
+    } else {
+      newSelected.add(studentId)
+    }
+    setSelectedStudents(newSelected)
+  }
+
+  // تحديد/إلغاء تحديد الكل
+  const toggleSelectAll = () => {
+    if (sendToAll) {
+      setSendToAll(false)
+      setSelectedStudents(new Set())
+    } else {
+      setSendToAll(true)
+      setSelectedStudents(new Set(students.map(s => s.id)))
+    }
+  }
+
+  // إرسال النشاط
+  const handleSendActivity = async () => {
+    if (!selectedActivity) return
+
+    if (selectedStudents.size === 0 && !sendToAll) {
+      alert("الرجاء اختيار طالبة واحدة على الأقل")
+      return
+    }
+
+    try {
+      // حفظ معلومات الإرسال
+      const assignments = {
+        activityId: selectedActivity.id,
+        students: Array.from(selectedStudents),
+        sentAt: new Date().toISOString()
+      }
+
+      const saved = localStorage.getItem("activityAssignments")
+      const allAssignments = saved ? JSON.parse(saved) : []
+      allAssignments.push(assignments)
+      localStorage.setItem("activityAssignments", JSON.stringify(allAssignments))
+
+      // مشاركة النشاط
+      const newShared = new Set(sharedActivities)
+      newShared.add(selectedActivity.id)
+      setSharedActivities(newShared)
+      localStorage.setItem("sharedActivities", JSON.stringify(Array.from(newShared)))
+
+      alert(`تم إرسال النشاط إلى ${sendToAll ? 'جميع الطالبات' : selectedStudents.size + ' طالبة'}`)
+      closeSendModal()
+    } catch (error) {
+      console.error("Error sending activity:", error)
+      alert("حدث خطأ أثناء إرسال النشاط")
+    }
+  }
+
   const toggleShare = (activityId: string) => {
     const newShared = new Set(sharedActivities)
     if (newShared.has(activityId)) {
@@ -67,34 +245,6 @@ export default function ActivitiesManagementPage() {
     }
     setSharedActivities(newShared)
     localStorage.setItem("sharedActivities", JSON.stringify(Array.from(newShared)))
-  }
-
-  const deleteActivity = async (activityId: string) => {
-    if (!confirm("هل أنت متأكدة من حذف هذا النشاط؟")) {
-      return
-    }
-
-    try {
-      const response = await fetch(`/api/activities/${activityId}`, {
-        method: "DELETE"
-      })
-
-      if (response.ok) {
-        // Remove from local state
-        setActivities(activities.filter((a) => a.id !== activityId))
-        
-        // Remove from shared if it was shared
-        const newShared = new Set(sharedActivities)
-        newShared.delete(activityId)
-        setSharedActivities(newShared)
-        localStorage.setItem("sharedActivities", JSON.stringify(Array.from(newShared)))
-      } else {
-        alert("حدث خطأ أثناء حذف النشاط")
-      }
-    } catch (error) {
-      console.error("Error deleting activity", error)
-      alert("حدث خطأ أثناء حذف النشاط")
-    }
   }
 
   // Filter activities based on active tab
@@ -133,12 +283,48 @@ export default function ActivitiesManagementPage() {
       <PageBackground />
       <div className="relative z-10 space-y-6 p-4 py-8">
         <header className="card bg-gradient-to-br from-white to-primary-50">
-          <div className="mb-4">
-            <h1 className="text-3xl font-bold text-slate-900">إدارة الأنشطة</h1>
-            <p className="mt-2 text-slate-600">
-              قومي بإدارة الأنشطة المتاحة ومشاركتها مع الطالبات
-            </p>
+          <div className="mb-4 flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900">إدارة الأنشطة</h1>
+              <p className="mt-2 text-slate-600">
+                قومي بإدارة الأنشطة المتاحة ومشاركتها مع الطالبات
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleImportActivities}
+                disabled={importing}
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                {importing ? "جاري الاستيراد..." : "استيراد الأنشطة"}
+              </button>
+              <button
+                onClick={handleCleanupActivities}
+                disabled={cleaning}
+                className="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                {cleaning ? "جاري الحذف..." : "حذف الأنشطة غير المدمجة"}
+              </button>
+            </div>
           </div>
+          {importMessage && (
+            <div className={`mb-4 p-3 rounded-lg ${
+              importMessage.includes("✅") 
+                ? "bg-emerald-50 text-emerald-700 border border-emerald-200" 
+                : "bg-rose-50 text-rose-700 border border-rose-200"
+            }`}>
+              {importMessage}
+            </div>
+          )}
+          {cleanupMessage && (
+            <div className={`mb-4 p-3 rounded-lg ${
+              cleanupMessage.includes("✅") 
+                ? "bg-emerald-50 text-emerald-700 border border-emerald-200" 
+                : "bg-rose-50 text-rose-700 border border-rose-200"
+            }`}>
+              {cleanupMessage}
+            </div>
+          )}
           
           {/* Tabs */}
           <div className="flex gap-2 border-b border-primary-200 overflow-x-auto">
@@ -313,6 +499,53 @@ export default function ActivitiesManagementPage() {
                         <p className="text-sm text-slate-600">{activity.description}</p>
                       </div>
 
+                      {/* Content Preview */}
+                      {activity.content && (
+                        <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
+                          {activity.type === "quiz" && (activity.content as any).fromBank && (activity.content as any).questions && (
+                            <div>
+                              <p className="text-xs font-semibold text-slate-600 mb-1">الأسئلة:</p>
+                              <p className="text-sm text-slate-900">
+                                {((activity.content as any).questions || []).length} سؤال متعدد
+                              </p>
+                              {((activity.content as any).questions || []).length > 0 && (
+                                <p className="text-xs text-slate-500 mt-1 line-clamp-1">
+                                  {((activity.content as any).questions || [])[0].question}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                          {activity.type === "quiz" && !(activity.content as any).fromBank && (activity.content as any).question && (
+                            <div>
+                              <p className="text-xs font-semibold text-slate-600 mb-1">السؤال:</p>
+                              <p className="text-sm text-slate-900 line-clamp-2">{(activity.content as any).question}</p>
+                            </div>
+                          )}
+                          {activity.type === "drag-drop" && (activity.content as any).prompt && (
+                            <div>
+                              <p className="text-xs font-semibold text-slate-600 mb-1">التعليمات:</p>
+                              <p className="text-sm text-slate-900 line-clamp-2">{(activity.content as any).prompt}</p>
+                              {(activity.content as any).pairs && (
+                                <p className="text-xs text-slate-500 mt-1">
+                                  {((activity.content as any).pairs || []).length} زوج للمطابقة
+                                </p>
+                              )}
+                            </div>
+                          )}
+                          {activity.type === "ordering" && (activity.content as any).prompt && (
+                            <div>
+                              <p className="text-xs font-semibold text-slate-600 mb-1">التعليمات:</p>
+                              <p className="text-sm text-slate-900 line-clamp-2">{(activity.content as any).prompt}</p>
+                              {(activity.content as any).items && (
+                                <p className="text-xs text-slate-500 mt-1">
+                                  {((activity.content as any).items || []).length} عنصر للترتيب
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       {/* Info */}
                       <div className="space-y-2 border-t border-slate-100 pt-3">
                         <div className="flex items-center justify-between text-xs">
@@ -340,41 +573,36 @@ export default function ActivitiesManagementPage() {
                         )}
                       </div>
 
-                      {/* Share Status */}
-                      <div className="border-t border-slate-100 pt-3">
-                        <div className="mb-3 flex items-center justify-between">
-                          <span className="text-sm font-semibold text-slate-700">حالة المشاركة</span>
-                          <span
-                            className={`badge ${
-                              isShared
-                                ? "bg-emerald-100 text-emerald-700"
-                                : "bg-slate-100 text-slate-600"
-                            }`}
-                          >
-                            {isShared ? "✓ مشترك" : "غير مشترك"}
-                          </span>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => toggleShare(activity.id)}
-                            className={`flex-1 rounded-2xl py-2 text-sm font-semibold transition ${
-                              isShared
-                                ? "border-2 border-rose-500 bg-white text-rose-600 hover:bg-rose-50"
-                                : "bg-primary-600 text-white hover:bg-primary-700"
-                            }`}
-                          >
-                            {isShared ? "إلغاء المشاركة" : "مشاركة مع الطالبات"}
-                          </button>
-                          <button
-                            onClick={() => deleteActivity(activity.id)}
-                            className="rounded-2xl border-2 border-rose-500 bg-white px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50"
-                            title="حذف النشاط"
-                          >
-                            🗑️
-                          </button>
-                        </div>
+                      {/* Action Buttons */}
+                      <div className="grid grid-cols-3 gap-2 border-t border-slate-100 pt-3">
+                        <button
+                          onClick={() => openPreviewModal(activity)}
+                          className="flex items-center justify-center gap-1 rounded-xl bg-blue-50 px-2 py-2 text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
+                        >
+                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          معاينة
+                        </button>
+                        <button
+                          onClick={() => window.location.href = `/teacher/activities/edit/${activity.id}`}
+                          className="flex items-center justify-center gap-1 rounded-xl bg-amber-50 px-2 py-2 text-xs font-semibold text-amber-700 transition hover:bg-amber-100"
+                        >
+                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                          تعديل
+                        </button>
+                        <button
+                          onClick={() => openSendModal(activity)}
+                          className="flex items-center justify-center gap-1 rounded-xl bg-emerald-600 px-2 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700"
+                        >
+                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                          </svg>
+                          مشاركة
+                        </button>
                       </div>
                     </div>
                   )
@@ -411,6 +639,359 @@ export default function ActivitiesManagementPage() {
               }
             }}
           />
+        )}
+
+        {/* Preview Modal */}
+        {showPreviewModal && selectedActivity && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="w-full max-w-3xl rounded-3xl bg-white shadow-2xl max-h-[90vh] overflow-hidden flex flex-col">
+              {/* Modal Header */}
+              <div className="border-b border-slate-200 p-6 bg-gradient-to-br from-white to-primary-50">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold text-slate-900">معاينة النشاط</h2>
+                    <p className="mt-1 text-sm text-slate-600">{selectedActivity.title}</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+                        {selectedActivity.type === "quiz" ? "📝 اختبار" : "🔗 سحب وإفلات"}
+                      </span>
+                      <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-700">
+                        {selectedActivity.duration}
+                      </span>
+                      <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                        {selectedActivity.skill}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={closePreviewModal}
+                    className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                  >
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* Modal Body */}
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-600 mb-2">الوصف</h3>
+                    <p className="text-slate-900">{selectedActivity.description}</p>
+                  </div>
+
+                  {selectedActivity.outcomeLesson && (
+                    <div className="rounded-xl bg-blue-50 p-4 border border-blue-200">
+                      <h3 className="text-sm font-semibold text-blue-900 mb-1">ناتج التعلم المرتبط</h3>
+                      <p className="text-sm text-blue-800">{selectedActivity.outcomeLesson}</p>
+                    </div>
+                  )}
+
+                  {selectedActivity.targetLevel && (
+                    <div className="rounded-xl bg-purple-50 p-4 border border-purple-200">
+                      <h3 className="text-sm font-semibold text-purple-900 mb-1">المستوى المستهدف</h3>
+                      <p className="text-sm text-purple-800">{selectedActivity.targetLevel}</p>
+                    </div>
+                  )}
+
+                  {/* Quiz Content - Multiple Questions */}
+                  {selectedActivity.type === "quiz" && selectedActivity.content && (selectedActivity.content as any).fromBank && (selectedActivity.content as any).questions && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-slate-600 mb-3">
+                        الأسئلة ({((selectedActivity.content as any).questions || []).length} سؤال)
+                      </h3>
+                      <div className="space-y-4">
+                        {((selectedActivity.content as any).questions || []).map((q: any, qIndex: number) => (
+                          <div key={q.id || qIndex} className="rounded-xl border-2 border-slate-200 bg-slate-50 p-4">
+                            <p className="font-semibold text-slate-900 mb-3">
+                              {qIndex + 1}. {q.question}
+                            </p>
+                            {q.options && (
+                              <div className="space-y-2">
+                                {q.options.map((option: string, optIndex: number) => {
+                                  const isCorrect = option === q.answer;
+                                  return (
+                                    <div
+                                      key={optIndex}
+                                      className={`flex items-center gap-2 rounded-lg px-3 py-2 ${
+                                        isCorrect ? 'bg-emerald-100 border border-emerald-300' : 'bg-white border border-slate-200'
+                                      }`}
+                                    >
+                                      <span className={`flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold ${
+                                        isCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600'
+                                      }`}>
+                                        {String.fromCharCode(65 + optIndex)}
+                                      </span>
+                                      <span className={isCorrect ? 'font-semibold text-emerald-900' : 'text-slate-700'}>
+                                        {option}
+                                      </span>
+                                      {isCorrect && (
+                                        <span className="mr-auto text-xs text-emerald-700">✓</span>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                            {q.reasonPrompt && (
+                              <div className="mt-3 rounded-lg bg-purple-50 border border-purple-200 p-3">
+                                <p className="text-xs font-semibold text-purple-900 mb-1">📝 طلب السبب:</p>
+                                <p className="text-sm text-purple-800">{q.reasonPrompt}</p>
+                                {q.expectedReasonKeywords && (
+                                  <p className="text-xs text-purple-600 mt-1">
+                                    الكلمات المفتاحية المتوقعة: {q.expectedReasonKeywords.join(", ")}
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Quiz Content - Single Question */}
+                  {selectedActivity.type === "quiz" && selectedActivity.content && !(selectedActivity.content as any).fromBank && (selectedActivity.content as any).question && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-slate-600 mb-3">السؤال</h3>
+                      <div className="rounded-xl border-2 border-slate-200 bg-slate-50 p-4">
+                        <p className="font-semibold text-slate-900 mb-3">
+                          {(selectedActivity.content as any).question}
+                        </p>
+                        {(selectedActivity.content as any).options && (
+                          <div className="space-y-2">
+                            {(selectedActivity.content as any).options.map((option: string, optIndex: number) => {
+                              const isCorrect = option === (selectedActivity.content as any).answer;
+                              return (
+                                <div
+                                  key={optIndex}
+                                  className={`flex items-center gap-2 rounded-lg px-3 py-2 ${
+                                    isCorrect ? 'bg-emerald-100 border border-emerald-300' : 'bg-white border border-slate-200'
+                                  }`}
+                                >
+                                  <span className={`flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold ${
+                                    isCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600'
+                                  }`}>
+                                    {String.fromCharCode(65 + optIndex)}
+                                  </span>
+                                  <span className={isCorrect ? 'font-semibold text-emerald-900' : 'text-slate-700'}>
+                                    {option}
+                                  </span>
+                                  {isCorrect && (
+                                    <span className="mr-auto text-xs text-emerald-700">✓</span>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                        {(selectedActivity.content as any).hint && (
+                          <div className="mt-3 rounded-lg bg-blue-50 border border-blue-200 p-3">
+                            <p className="text-xs font-semibold text-blue-900 mb-1">💡 تلميح:</p>
+                            <p className="text-sm text-blue-800">{(selectedActivity.content as any).hint}</p>
+                          </div>
+                        )}
+                        {(selectedActivity.content as any).reasonPrompt && (
+                          <div className="mt-3 rounded-lg bg-purple-50 border border-purple-200 p-3">
+                            <p className="text-xs font-semibold text-purple-900 mb-1">📝 طلب السبب:</p>
+                            <p className="text-sm text-purple-800">{(selectedActivity.content as any).reasonPrompt}</p>
+                            {(selectedActivity.content as any).expectedReasonKeywords && (
+                              <p className="text-xs text-purple-600 mt-1">
+                                الكلمات المفتاحية المتوقعة: {((selectedActivity.content as any).expectedReasonKeywords || []).join(", ")}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Drag and Drop Content */}
+                  {selectedActivity.type === "drag-drop" && selectedActivity.content && (selectedActivity.content as any).pairs && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-slate-600 mb-3">
+                        {(selectedActivity.content as any).prompt || "أزواج المطابقة"}
+                      </h3>
+                      <div className="grid gap-3 md:grid-cols-2">
+                        {((selectedActivity.content as any).pairs || []).map((pair: any, index: number) => (
+                          <div key={index} className="rounded-xl border-2 border-blue-200 bg-blue-50 p-4">
+                            <div className="flex items-center gap-3">
+                              <div className="flex-1">
+                                <p className="text-sm font-semibold text-blue-900">{pair.label}</p>
+                              </div>
+                              <svg className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                              </svg>
+                              <div className="flex-1">
+                                <p className="text-sm text-blue-800">{pair.target}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Ordering Content */}
+                  {selectedActivity.type === "ordering" && selectedActivity.content && (selectedActivity.content as any).items && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-slate-600 mb-3">
+                        {(selectedActivity.content as any).prompt || "ترتيب العناصر"}
+                      </h3>
+                      <div className="space-y-2">
+                        {((selectedActivity.content as any).items || [])
+                          .sort((a: any, b: any) => a.order - b.order)
+                          .map((item: any, index: number) => (
+                            <div key={item.id || index} className="rounded-xl border-2 border-purple-200 bg-purple-50 p-4">
+                              <div className="flex items-center gap-3">
+                                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-600 text-sm font-bold text-white">
+                                  {item.order}
+                                </span>
+                                <p className="text-sm font-semibold text-purple-900">{item.text}</p>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="border-t border-slate-200 p-6 bg-slate-50">
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      closePreviewModal()
+                      openSendModal(selectedActivity)
+                    }}
+                    className="flex-1 rounded-2xl bg-emerald-600 py-3 font-semibold text-white hover:bg-emerald-700"
+                  >
+                    مشاركة هذا النشاط مع الطالبات
+                  </button>
+                  <button
+                    onClick={closePreviewModal}
+                    className="rounded-2xl border border-slate-300 bg-white px-6 py-3 font-semibold text-slate-700 hover:bg-slate-50"
+                  >
+                    إغلاق
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Send Modal */}
+        {showSendModal && selectedActivity && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="w-full max-w-2xl rounded-3xl bg-white shadow-2xl">
+              {/* Modal Header */}
+              <div className="border-b border-slate-200 p-6">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold text-slate-900">مشاركة النشاط</h2>
+                    <p className="mt-1 text-sm text-slate-600">{selectedActivity.title}</p>
+                  </div>
+                  <button
+                    onClick={closeSendModal}
+                    className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                  >
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* Modal Body */}
+              <div className="max-h-[60vh] overflow-y-auto p-6">
+                {loadingStudents ? (
+                  <div className="py-8 text-center">
+                    <p className="text-slate-600">جاري تحميل قائمة الطالبات...</p>
+                  </div>
+                ) : students.length === 0 ? (
+                  <div className="py-8 text-center">
+                    <p className="text-slate-600">لا توجد طالبات في الفصل</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Select All */}
+                    <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-4">
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={sendToAll}
+                          onChange={toggleSelectAll}
+                          className="h-5 w-5 rounded text-emerald-600"
+                        />
+                        <div className="flex-1">
+                          <p className="font-semibold text-slate-900">جميع الطالبات</p>
+                          <p className="text-sm text-slate-600">
+                            إرسال النشاط لجميع طالبات الفصل ({students.length} طالبة)
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+
+                    {/* Individual Students */}
+                    <div className="space-y-2">
+                      <p className="text-sm font-semibold text-slate-700">أو اختاري طالبات محددات:</p>
+                      <div className="max-h-64 space-y-2 overflow-y-auto rounded-xl border border-slate-200 p-3">
+                        {students.map((student) => (
+                          <label
+                            key={student.id}
+                            className="flex items-center gap-3 rounded-xl bg-slate-50 p-3 cursor-pointer hover:bg-slate-100 transition"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedStudents.has(student.id)}
+                              onChange={() => toggleStudent(student.id)}
+                              disabled={sendToAll}
+                              className="h-4 w-4 rounded text-emerald-600 disabled:opacity-50"
+                            />
+                            <div className="flex-1">
+                              <p className="font-medium text-slate-900">{student.nickname}</p>
+                              <p className="text-xs text-slate-500">رمز الفصل: {student.classCode}</p>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Selected Count */}
+                    {selectedStudents.size > 0 && (
+                      <div className="rounded-xl bg-emerald-50 p-3 text-center">
+                        <p className="text-sm text-emerald-700">
+                          تم اختيار {selectedStudents.size} {selectedStudents.size === 1 ? 'طالبة' : 'طالبات'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="border-t border-slate-200 p-6">
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleSendActivity}
+                    disabled={selectedStudents.size === 0 && !sendToAll}
+                    className="flex-1 rounded-2xl bg-emerald-600 py-3 font-semibold text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    إرسال النشاط
+                  </button>
+                  <button
+                    onClick={closeSendModal}
+                    className="rounded-2xl border border-slate-300 bg-white px-6 py-3 font-semibold text-slate-700 hover:bg-slate-50"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </main>
