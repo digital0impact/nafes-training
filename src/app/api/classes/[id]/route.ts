@@ -13,7 +13,7 @@ export async function GET(
   try {
     const user = await requireTeacher()
 
-    const classData = await prisma.class.findUnique({
+    const classData = await prisma.class.findFirst({
       where: {
         id: params.id,
         userId: user.id, // التأكد من أن الفصل يخص المعلم
@@ -81,7 +81,7 @@ export async function PATCH(
     const updateData = validationResult.data
 
     // التحقق من وجود الفصل وأنه يخص المعلم
-    const existingClass = await prisma.class.findUnique({
+    const existingClass = await prisma.class.findFirst({
       where: {
         id: params.id,
         userId: user.id,

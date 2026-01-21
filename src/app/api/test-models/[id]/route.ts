@@ -16,7 +16,7 @@ export async function GET(
       );
     }
 
-    const testModel = await prisma.testModel.findUnique({
+    const testModel = await prisma.testModel.findFirst({
       where: {
         id: params.id,
         userId: user.id, // التأكد من أن النموذج يخص المعلم
@@ -63,7 +63,7 @@ export async function DELETE(
     }
 
     // التحقق من أن النموذج يخص المعلم قبل الحذف
-    const testModel = await prisma.testModel.findUnique({
+    const testModel = await prisma.testModel.findFirst({
       where: {
         id: params.id,
         userId: user.id,

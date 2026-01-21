@@ -5,11 +5,13 @@ import { persist, createJSONStorage } from "zustand/middleware"
 
 type Student = {
   id: string
-  nickname: string
+  studentId: string
+  name: string
   classCode: string
   className?: string
   grade?: string
   classId?: string
+  teacherId?: string
 }
 
 type StudentStore = {

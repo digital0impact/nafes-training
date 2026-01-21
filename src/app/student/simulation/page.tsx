@@ -140,8 +140,9 @@ export default function SimulationPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            nickname: student.nickname,
+            nickname: student.name,
             classCode: student.classCode,
+            studentDbId: student.id,
             testModelId: currentModel?.id,
             testModelTitle: currentModel?.title,
             answers,

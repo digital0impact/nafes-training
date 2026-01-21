@@ -18,6 +18,7 @@ type Student = {
   id: string;
   nickname: string;
   classId: string;
+  classCode?: string;
 };
 
 export default function DiagnosticModelsPage() {

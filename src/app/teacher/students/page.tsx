@@ -1,14 +1,13 @@
 "use client"
 
-export const dynamic = 'force-dynamic';
-
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, type ChangeEvent } from "react"
 import Link from "next/link"
 import { SectionHeader } from "@/components/ui/section-header"
 import { PageBackground } from "@/components/layout/page-background"
 
 type Student = {
   id: string
+  studentId?: string
   name: string
   grade: string
   classCode: string
@@ -34,7 +33,6 @@ export default function StudentsPage() {
     name: "",
     grade: "",
     classCode: "",
-    password: "",
     classId: ""
   })
 
@@ -76,27 +74,40 @@ export default function StudentsPage() {
 
   function handleCancel() {
     setEditingId(null)
-    setFormData({ id: "", name: "", grade: "", classCode: "", password: "" })
+    setFormData({ id: "", name: "", grade: "", classCode: "" })
     if (activeTab === "add" && !editingId) {
       setActiveTab("all")
     }
   }
 
   async function handleSave() {
-    if (!formData.name || !formData.grade || !formData.classCode) {
-      alert("الرجاء إدخال جميع الحقول المطلوبة")
+    // التحقق من البيانات المطلوبة
+    if (!formData.name || !formData.grade) {
+      alert("الرجاء إدخال اسم الطالبة والصف")
+      return
+    }
+
+    // التحقق من وجود الفصل
+    let finalClassCode = formData.classCode
+    let finalClassId = formData.classId
+
+    if (formData.classId) {
+      // إذا تم اختيار فصل من القائمة
+      const selectedClass = classes.find(c => c.id === formData.classId)
+      if (selectedClass) {
+        finalClassCode = selectedClass.code
+        finalClassId = selectedClass.id
+      } else {
+        alert("الفصل المحدد غير موجود")
+        return
+      }
+    } else if (!formData.classCode) {
+      alert("الرجاء اختيار الفصل أو إدخال كود الفصل")
       return
     }
 
     if (!editingId) {
-      // إضافة جديدة
-      if (!formData.password || formData.password.length < 4) {
-        alert("كلمة المرور مطلوبة ويجب أن تكون 4 أحرف على الأقل")
-        return
-      }
-
-      const newId = `STU-${String(students.length + 301).padStart(3, "0")}`
-      
+      // إضافة جديدة - سيتم إنشاء كلمة مرور افتراضية تلقائياً
       try {
         const response = await fetch("/api/students/create", {
           method: "POST",
@@ -104,12 +115,11 @@ export default function StudentsPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            studentId: newId,
-            name: formData.name,
-            grade: formData.grade,
-            classCode: formData.classCode,
-            classId: formData.classId || undefined,
-            password: formData.password,
+            name: formData.name.trim(),
+            grade: formData.grade.trim(),
+            classCode: finalClassCode.trim(),
+            classId: finalClassId || undefined,
+            // لا نرسل كلمة المرور - سيتم إنشاؤها تلقائياً في API
           }),
         })
 
@@ -121,7 +131,9 @@ export default function StudentsPage() {
         }
 
         await fetchStudents()
-        alert(`تم إنشاء حساب الطالبة بنجاح!\nرقم الطالبة: ${newId}\nكلمة المرور: ${formData.password}`)
+        alert(
+          `تم إنشاء حساب الطالبة بنجاح!\nرقم الطالبة: ${data.student?.studentId}\nكلمة المرور: ${data.password || "1234"}`
+        )
         handleCancel()
         setActiveTab("all")
       } catch (error) {
@@ -130,9 +142,34 @@ export default function StudentsPage() {
       }
     } else {
       // تحديث بيانات الطالبة
-      await fetchStudents()
-      handleCancel()
-      setActiveTab("all")
+      try {
+        const response = await fetch(`/api/students/${editingId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: formData.name.trim(),
+            grade: formData.grade.trim(),
+            classCode: finalClassCode.trim(),
+            classId: finalClassId || undefined,
+          }),
+        })
+
+        if (!response.ok) {
+          const data = await response.json()
+          alert(data.error || "حدث خطأ أثناء تحديث بيانات الطالبة")
+          return
+        }
+
+        await fetchStudents()
+        alert("تم تحديث بيانات الطالبة بنجاح")
+        handleCancel()
+        setActiveTab("all")
+      } catch (error) {
+        console.error("Error updating student:", error)
+        alert("حدث خطأ أثناء تحديث بيانات الطالبة")
+      }
     }
   }
 
@@ -155,7 +192,7 @@ export default function StudentsPage() {
     }
   }
 
-  function handleFileImport(event: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileImport(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
     if (!file) return
 
@@ -165,24 +202,22 @@ export default function StudentsPage() {
     reader.onload = async (e) => {
       try {
         const text = e.target?.result as string
-        const lines = text.split('\n').filter(line => line.trim())
+        const lines = text.split("\n").filter(line => line.trim())
         
-        const dataLines = lines[0]?.includes('اسم') || lines[0]?.includes('الصف') 
+        const dataLines = lines[0]?.includes("اسم") || lines[0]?.includes("الصف") 
           ? lines.slice(1) 
           : lines
 
         const importedStudents: Student[] = []
-        let nextId = students.length + 301
         const defaultPassword = "1234"
 
         for (const line of dataLines) {
-          const parts = line.split(',').map(p => p.trim())
+          const parts = line.split(",").map(p => p.trim())
           
           if (parts.length >= 2) {
             const name = parts[0]
-            const grade = parts[1] || ''
-            const classCode = parts[2] || `SCI${grade.replace('/', '')}`
-            const studentId = `STU-${String(nextId++).padStart(3, "0")}`
+            const grade = parts[1] || ""
+            const classCode = parts[2] || `SCI${grade.replace("/", "")}`
             
             if (name) {
               try {
@@ -192,18 +227,18 @@ export default function StudentsPage() {
                     "Content-Type": "application/json",
                   },
                   body: JSON.stringify({
-                    studentId,
                     name,
                     grade,
                     classCode,
-                    password: defaultPassword,
+                    // لا نرسل password - سيتم إنشاء كلمة مرور افتراضية تلقائياً
                     classId: undefined, // سيتم البحث عن الفصل باستخدام classCode
                   }),
                 })
 
                 if (response.ok) {
+                  const created = await response.json()
                   importedStudents.push({
-                    id: studentId,
+                    id: created.student?.studentId,
                     name,
                     grade,
                     classCode
@@ -218,17 +253,19 @@ export default function StudentsPage() {
 
         if (importedStudents.length > 0) {
           await fetchStudents()
-          alert(`تم استيراد ${importedStudents.length} طالبة بنجاح!\nكلمة المرور الافتراضية للجميع: ${defaultPassword}`)
+          alert(
+            `تم استيراد ${importedStudents.length} طالبة بنجاح!\nكلمة المرور الافتراضية للجميع: ${defaultPassword}`
+          )
           setActiveTab("all")
         } else {
-          alert('لم يتم العثور على بيانات صحيحة في الملف أو حدث خطأ في إنشاء الحسابات')
+          alert("لم يتم العثور على بيانات صحيحة في الملف أو حدث خطأ في إنشاء الحسابات")
         }
       } catch (error) {
-        console.error('خطأ في استيراد الملف:', error)
-        alert('حدث خطأ أثناء استيراد الملف. تأكدي من تنسيق الملف')
+        console.error("خطأ في استيراد الملف:", error)
+        alert("حدث خطأ أثناء استيراد الملف. تأكدي من تنسيق الملف")
       } finally {
         setIsImporting(false)
-        event.target.value = ''
+        event.target.value = ""
       }
     }
 
@@ -236,29 +273,33 @@ export default function StudentsPage() {
   }
 
   function handleExportTemplate() {
-    const template = 'اسم الطالبة,الصف,رمز الفصل\nسارة محمد,3/1,SCI3A\nنورة عبدالله,3/2,SCI3B'
-    const blob = new Blob(['\ufeff' + template], { type: 'text/csv;charset=utf-8;' })
-    const link = document.createElement('a')
+    const template = "اسم الطالبة,الصف,رمز الفصل\nسارة محمد,3/1,SCI3A\nنورة عبدالله,3/2,SCI3B"
+    const blob = new Blob(["\ufeff" + template], { type: "text/csv;charset=utf-8;" })
+    const link = document.createElement("a")
     const url = URL.createObjectURL(blob)
-    link.setAttribute('href', url)
-    link.setAttribute('download', 'نموذج_استيراد_الطالبات.csv')
-    link.style.visibility = 'hidden'
+    link.setAttribute("href", url)
+    link.setAttribute("download", "نموذج_استيراد_الطالبات.csv")
+    link.style.visibility = "hidden"
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
   }
 
   // تجميع الطالبات حسب الصف
-  const studentsByGrade = students.reduce((acc, student) => {
-    const grade = student.grade || "غير محدد"
-    if (!acc[grade]) {
-      acc[grade] = []
-    }
-    acc[grade].push(student)
-    return acc
-  }, {} as Record<string, Student[]>)
+  const studentsByGrade = useMemo(() => {
+    return students.reduce((acc, student) => {
+      const grade = student.grade || "غير محدد"
+      if (!acc[grade]) {
+        acc[grade] = []
+      }
+      acc[grade].push(student)
+      return acc
+    }, {} as Record<string, Student[]>)
+  }, [students])
 
-  const sortedGrades = Object.keys(studentsByGrade).sort()
+  const sortedGrades = useMemo(() => {
+    return Object.keys(studentsByGrade).sort()
+  }, [studentsByGrade])
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#faf9f7]">
@@ -373,7 +414,9 @@ export default function StudentsPage() {
                         <tbody>
                           {studentsByGrade[grade].map((student) => (
                             <tr key={student.id} className="border-t border-slate-100">
-                              <td className="px-6 py-4 font-semibold text-slate-900">{student.id}</td>
+                              <td className="px-6 py-4 font-semibold text-slate-900">
+                                {student.studentId || student.id}
+                              </td>
                               <td className="px-6 py-4 font-semibold text-slate-900">
                                 {student.name}
                               </td>
@@ -441,20 +484,29 @@ export default function StudentsPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-slate-600">الفصل</label>
+                  <label className="text-sm font-semibold text-slate-600">الفصل *</label>
                   {classes.length > 0 ? (
                     <select
                       className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-primary-300 focus:outline-none"
                       value={formData.classId || ""}
                       onChange={(e) => {
                         const selectedClass = classes.find(c => c.id === e.target.value)
-                        setFormData({ 
-                          ...formData, 
-                          classId: e.target.value,
-                          classCode: selectedClass?.code || "",
-                          grade: selectedClass?.grade || formData.grade
-                        })
+                        if (selectedClass) {
+                          setFormData({ 
+                            ...formData, 
+                            classId: e.target.value,
+                            classCode: selectedClass.code,
+                            grade: selectedClass.grade || formData.grade
+                          })
+                        } else {
+                          setFormData({ 
+                            ...formData, 
+                            classId: "",
+                            classCode: ""
+                          })
+                        }
                       }}
+                      required
                     >
                       <option value="">اختر الفصل</option>
                       {classes.map((classItem) => (
@@ -470,7 +522,8 @@ export default function StudentsPage() {
                         className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-primary-300 focus:outline-none"
                         placeholder="مثال: SCI3A"
                         value={formData.classCode}
-                        onChange={(e) => setFormData({ ...formData, classCode: e.target.value })}
+                        onChange={(e) => setFormData({ ...formData, classCode: e.target.value.toUpperCase() })}
+                        required
                       />
                       <Link
                         href="/teacher/classes"
@@ -478,23 +531,10 @@ export default function StudentsPage() {
                       >
                         + إنشاء فصل جديد
                       </Link>
+                      <p className="text-xs text-slate-500">أو يمكنك إنشاء فصل جديد أولاً</p>
                     </div>
                   )}
                 </div>
-                {!editingId && (
-                  <div>
-                    <label className="text-sm font-semibold text-slate-600">كلمة المرور</label>
-                    <input
-                      type="text"
-                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-primary-300 focus:outline-none"
-                      placeholder="مثال: 1234"
-                      value={formData.password || ""}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      minLength={4}
-                    />
-                    <p className="mt-1 text-xs text-slate-500">سيتم عرض كلمة المرور بعد الإنشاء</p>
-                  </div>
-                )}
               </div>
               <div className="flex gap-3">
                 <button

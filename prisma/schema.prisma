@@ -25,6 +25,7 @@ model User {
   testModels      TestModel[]
   activities      Activity[]
   classes         Class[]
+  gameShares      GameShare[]
   
   @@map("users")
 }
@@ -90,6 +91,8 @@ model Class {
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   students      Student[]
   trainingAttempts TrainingAttempt[]
+  gameAttempts  GameAttempt[]
+  gameShares    GameShare[]
   
   @@map("classes")
 }
@@ -108,6 +111,9 @@ model Student {
   
   // العلاقات
   class         Class?    @relation(fields: [classId], references: [id], onDelete: SetNull)
+  trainingAttempts TrainingAttempt[]
+  gameAttempts   GameAttempt[]
+  mastery        StudentMastery[]
   
   @@map("students")
 }
@@ -119,6 +125,7 @@ model TrainingAttempt {
   nickname      String    // اسم الطالب المستعار
   classCode     String    // كود الفصل
   classId       String?   // ربط بالفصل (اختياري)
+  studentDbId   String?   // ربط بالطالبة (اختياري للتوافق)
   testModelId   String?   // معرف نموذج الاختبار (إن وجد)
   testModelTitle String?  // عنوان نموذج الاختبار
   answers       String    // JSON string: { questionId: answer }
@@ -130,9 +137,85 @@ model TrainingAttempt {
   
   // العلاقات
   class         Class?    @relation(fields: [classId], references: [id], onDelete: SetNull)
+  student       Student?  @relation(fields: [studentDbId], references: [id], onDelete: SetNull)
   
   @@map("training_attempts")
   @@index([classCode])
   @@index([classId])
+  @@index([studentDbId])
   @@index([completedAt])
+}
+
+// نموذج محاولة اللعبة التعليمية
+// يحفظ محاولات الطلاب في الألعاب التعليمية
+model GameAttempt {
+  id            String    @id @default(cuid())
+  nickname      String    // اسم الطالب المستعار
+  classCode     String    // كود الفصل
+  classId       String?   // ربط بالفصل (اختياري)
+  studentDbId   String?   // ربط بالطالبة (اختياري للتوافق)
+  gameId        String    // معرف اللعبة (game_id)
+  gameTitle     String    // عنوان اللعبة
+  gameType      String    // نوع اللعبة (ordering, multiple_choice, etc.)
+  chapter       String    // الفصل الدراسي
+  answers       String    // JSON string: الإجابات
+  score         Int       // النقاط المحققة
+  totalScore    Int       // إجمالي النقاط الممكنة
+  percentage    Float     // النسبة المئوية
+  timeSpent     Int       // الوقت المستغرق بالثواني
+  completedAt   DateTime  @default(now())
+  
+  // العلاقات
+  class         Class?    @relation(fields: [classId], references: [id], onDelete: SetNull)
+  student       Student?  @relation(fields: [studentDbId], references: [id], onDelete: SetNull)
+  
+  @@map("game_attempts")
+  @@index([classCode])
+  @@index([classId])
+  @@index([studentDbId])
+  @@index([gameId])
+  @@index([completedAt])
+  @@index([nickname])
+}
+
+// تتبع إتقان المهارات/المؤشرات للطالبة
+model StudentMastery {
+  id           String   @id @default(cuid())
+  studentDbId  String
+  key          String   // مثال: "game:game_002" أو "testModel:abc" أو "skill:xyz"
+  status       String   // "mastered" | "not_mastered"
+  score        Float?   // آخر نسبة/تقييم
+  sourceType   String?  // "game" | "training" | ...
+  sourceId     String?  // gameId أو testModelId
+  updatedAt    DateTime @updatedAt
+  createdAt    DateTime @default(now())
+
+  student      Student  @relation(fields: [studentDbId], references: [id], onDelete: Cascade)
+
+  @@map("student_mastery")
+  @@unique([studentDbId, key])
+  @@index([studentDbId])
+  @@index([key])
+}
+
+// نموذج مشاركة اللعبة التعليمية
+// يحفظ معلومات مشاركة الألعاب مع الطلاب
+model GameShare {
+  id            String    @id @default(cuid())
+  gameId        String    // معرف اللعبة (game_id)
+  userId        String    // المعلم الذي شارك اللعبة
+  shareToAll    Boolean   @default(false) // مشاركة لجميع الطلاب
+  studentIds    String    // JSON array: قائمة معرفات الطلاب المحددين
+  classId       String?   // ربط بالفصل (اختياري)
+  sharedAt      DateTime  @default(now())
+  
+  // العلاقات
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  class         Class?    @relation(fields: [classId], references: [id], onDelete: SetNull)
+  
+  @@map("game_shares")
+  @@index([gameId])
+  @@index([userId])
+  @@index([classId])
+  @@index([sharedAt])
 }

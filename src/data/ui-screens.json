@@ -1,0 +1,623 @@
+{
+  "app_name": "ألعاب علوم ثالث متوسط",
+  "direction": "rtl",
+  "theme": {
+    "primary_color": "#3b82f6",
+    "success_color": "#10b981",
+    "warning_color": "#f59e0b",
+    "danger_color": "#ef4444",
+    "background_color": "#f9fafb",
+    "text_color": "#1f2937"
+  },
+  "screens": [
+    {
+      "screen_id": "home",
+      "title": "الصفحة الرئيسية",
+      "components": [
+        {
+          "type": "header",
+          "props": {
+            "text": "مرحباً",
+            "subtitle": "{{student_name}}"
+          }
+        },
+        {
+          "type": "status_card",
+          "props": {
+            "status": "{{overall_status}}",
+            "status_options": {
+              "متقن": {
+                "color": "success",
+                "icon": "نجمة",
+                "message": "ممتاز! أنت متقن للمادة"
+              },
+              "بحاجة إلى دعم": {
+                "color": "warning",
+                "icon": "تحذير",
+                "message": "تحتاج إلى مزيد من الممارسة"
+              },
+              "بحاجة إلى معالجة عاجلة": {
+                "color": "danger",
+                "icon": "تنبيه",
+                "message": "يحتاج إلى مراجعة فورية"
+              }
+            }
+          }
+        },
+        {
+          "type": "progress_bar",
+          "props": {
+            "label": "التقدم الإجمالي",
+            "percentage": "{{overall_progress}}",
+            "show_percentage": true
+          }
+        },
+        {
+          "type": "button",
+          "props": {
+            "text": "ابدأ اللعب",
+            "action": "navigate",
+            "target": "chapters",
+            "style": "primary",
+            "size": "large"
+          }
+        },
+        {
+          "type": "conditional_section",
+          "props": {
+            "condition": "has_remedial_plan",
+            "components": [
+              {
+                "type": "alert",
+                "props": {
+                  "type": "info",
+                  "message": "لديك خطة علاجية جاهزة",
+                  "action_button": {
+                    "text": "عرض الخطة",
+                    "target": "remedial_plan"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "screen_id": "chapters",
+      "title": "الفصول الدراسية",
+      "components": [
+        {
+          "type": "header",
+          "props": {
+            "text": "اختر الفصل",
+            "subtitle": "{{total_chapters}} فصول متاحة"
+          }
+        },
+        {
+          "type": "list",
+          "props": {
+            "items": "{{chapters}}",
+            "item_template": {
+              "type": "chapter_card",
+              "props": {
+                "chapter_name": "{{chapter}}",
+                "completion_percentage": "{{completion}}",
+                "status_badge": {
+                  "type": "badge",
+                  "color": "{{status_color}}",
+                  "text": "{{status_text}}"
+                },
+                "action_button": {
+                  "text": "الدخول إلى الفصل",
+                  "target": "games_list",
+                  "params": {
+                    "chapter": "{{chapter}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "screen_id": "games_list",
+      "title": "الألعاب التعليمية",
+      "components": [
+        {
+          "type": "header",
+          "props": {
+            "text": "{{chapter_name}}",
+            "back_button": true
+          }
+        },
+        {
+          "type": "filter_bar",
+          "props": {
+            "filters": [
+              {
+                "label": "الكل",
+                "value": "all"
+              },
+              {
+                "label": "سهل",
+                "value": "easy"
+              },
+              {
+                "label": "متوسط",
+                "value": "medium"
+              },
+              {
+                "label": "علاجية",
+                "value": "remedial"
+              }
+            ]
+          }
+        },
+        {
+          "type": "list",
+          "props": {
+            "items": "{{games}}",
+            "item_template": {
+              "type": "game_card",
+              "props": {
+                "title": "{{title}}",
+                "game_type": "{{game_type}}",
+                "level": {
+                  "text": "{{level}}",
+                  "color": "{{level === 'سهل' ? 'success' : 'warning'}}"
+                },
+                "difficulty": {
+                  "type": "stars",
+                  "count": "{{difficulty}}",
+                  "max": 3
+                },
+                "remedial_tag": {
+                  "visible": "{{remedial}}",
+                  "text": "لعبة علاجية",
+                  "color": "info"
+                },
+                "points": {
+                  "text": "{{points}} نقطة",
+                  "icon": "جائزة"
+                },
+                "action_button": {
+                  "text": "ابدأ اللعبة",
+                  "target": "game_play",
+                  "params": {
+                    "game_id": "{{game_id}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "screen_id": "game_play",
+      "title": "اللعب",
+      "components": [
+        {
+          "type": "header",
+          "props": {
+            "text": "{{game_title}}",
+            "back_button": true,
+            "progress_indicator": {
+              "current": "{{current_question}}",
+              "total": "{{total_questions}}"
+            }
+          }
+        },
+        {
+          "type": "instruction_card",
+          "props": {
+            "text": "{{objective}}",
+            "icon": "معلومة"
+          }
+        },
+        {
+          "type": "game_area",
+          "props": {
+            "game_type": "{{game_type}}",
+            "content": "{{game_content}}",
+            "config": {
+              "multiple_choice": {
+                "question": "{{question}}",
+                "options": "{{options}}",
+                "allow_multiple": false
+              },
+              "drag_drop": {
+                "items": "{{items}}",
+                "targets": "{{targets}}"
+              },
+              "matching": {
+                "pairs": "{{pairs}}"
+              },
+              "ordering": {
+                "items": "{{items}}",
+                "allow_drag": true
+              },
+              "scenario_choice": {
+                "scenario": "{{scenario}}",
+                "choices": "{{choices}}"
+              },
+              "map_selection": {
+                "map_image": "{{map_url}}",
+                "selectable_regions": "{{regions}}"
+              }
+            }
+          }
+        },
+        {
+          "type": "action_bar",
+          "props": {
+            "buttons": [
+              {
+                "text": "تأكيد الإجابة",
+                "action": "submit",
+                "style": "primary",
+                "disabled": "{{!has_answer}}"
+              }
+            ]
+          }
+        },
+        {
+          "type": "feedback_overlay",
+          "props": {
+            "visible": "{{show_feedback}}",
+            "type": "{{feedback_type}}",
+            "message": "{{feedback_message}}",
+            "auto_hide": true,
+            "duration": 2000
+          }
+        }
+      ]
+    },
+    {
+      "screen_id": "result",
+      "title": "النتيجة",
+      "components": [
+        {
+          "type": "header",
+          "props": {
+            "text": "انتهت اللعبة"
+          }
+        },
+        {
+          "type": "score_display",
+          "props": {
+            "score": "{{score}}",
+            "total": "{{total}}",
+            "percentage": "{{percentage}}",
+            "visual": "circular_progress"
+          }
+        },
+        {
+          "type": "status_message",
+          "props": {
+            "status": "{{result_status}}",
+            "message": "{{status_message}}",
+            "options": {
+              "excellent": {
+                "text": "ممتاز! لقد أتقنت هذا الموضوع",
+                "color": "success",
+                "icon": "نجمة"
+              },
+              "good": {
+                "text": "جيد جداً! استمر في الممارسة",
+                "color": "success",
+                "icon": "إبهام"
+              },
+              "needs_improvement": {
+                "text": "تحتاج إلى مزيد من الممارسة",
+                "color": "warning",
+                "icon": "تحذير"
+              },
+              "poor": {
+                "text": "يحتاج إلى مراجعة فورية",
+                "color": "danger",
+                "icon": "تنبيه"
+              }
+            }
+          }
+        },
+        {
+          "type": "action_bar",
+          "props": {
+            "buttons": [
+              {
+                "text": "إعادة المحاولة",
+                "action": "retry",
+                "target": "game_play",
+                "visible": "{{score < 70}}",
+                "style": "secondary"
+              },
+              {
+                "text": "التالي",
+                "action": "next",
+                "target": "games_list",
+                "style": "primary"
+              },
+              {
+                "text": "العودة للفصول",
+                "action": "navigate",
+                "target": "chapters",
+                "style": "outline"
+              }
+            ]
+          }
+        },
+        {
+          "type": "conditional_section",
+          "props": {
+            "condition": "score < 50",
+            "components": [
+              {
+                "type": "alert",
+                "props": {
+                  "type": "warning",
+                  "message": "سيتم إضافة ألعاب علاجية إلى خطتك",
+                  "action_button": {
+                    "text": "عرض الخطة العلاجية",
+                    "target": "remedial_plan"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "screen_id": "remedial_plan",
+      "title": "الخطة العلاجية",
+      "components": [
+        {
+          "type": "header",
+          "props": {
+            "text": "خطة التعلم العلاجية",
+            "subtitle": "مخصصة لك لتحسين أدائك"
+          }
+        },
+        {
+          "type": "overall_status_card",
+          "props": {
+            "status": "{{overall_status}}",
+            "message": "{{overall_message}}"
+          }
+        },
+        {
+          "type": "list",
+          "props": {
+            "items": "{{remedial_plan}}",
+            "item_template": {
+              "type": "chapter_remedial_card",
+              "props": {
+                "chapter": "{{chapter}}",
+                "student_status": "{{student_status}}",
+                "recommendation": "{{recommendation}}",
+                "assigned_games": {
+                  "count": "{{assigned_games.length}}",
+                  "games": "{{assigned_games}}",
+                  "display": "list"
+                },
+                "action_button": {
+                  "text": "ابدأ الألعاب العلاجية",
+                  "target": "games_list",
+                  "params": {
+                    "chapter": "{{chapter}}",
+                    "filter": "remedial"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "action_bar",
+          "props": {
+            "buttons": [
+              {
+                "text": "ابدأ خطة المعالجة",
+                "action": "start_remedial",
+                "style": "primary",
+                "size": "large"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "screen_id": "teacher_dashboard",
+      "title": "لوحة تحكم المعلم",
+      "components": [
+        {
+          "type": "header",
+          "props": {
+            "text": "لوحة التحكم",
+            "subtitle": "نظرة عامة على الفصل"
+          }
+        },
+        {
+          "type": "stats_grid",
+          "props": {
+            "stats": [
+              {
+                "label": "إجمالي الطلاب",
+                "value": "{{total_students}}",
+                "icon": "طلاب"
+              },
+              {
+                "label": "متقنون",
+                "value": "{{mastered_count}}",
+                "color": "success",
+                "icon": "نجمة"
+              },
+              {
+                "label": "بحاجة إلى دعم",
+                "value": "{{support_needed_count}}",
+                "color": "warning",
+                "icon": "تحذير"
+              },
+              {
+                "label": "معالجة عاجلة",
+                "value": "{{urgent_count}}",
+                "color": "danger",
+                "icon": "تنبيه"
+              }
+            ]
+          }
+        },
+        {
+          "type": "filter_bar",
+          "props": {
+            "label": "تصفية حسب الحالة",
+            "filters": [
+              {
+                "label": "الكل",
+                "value": "all"
+              },
+              {
+                "label": "متقن",
+                "value": "mastered",
+                "color": "success"
+              },
+              {
+                "label": "دعم",
+                "value": "support",
+                "color": "warning"
+              },
+              {
+                "label": "معالجة",
+                "value": "urgent",
+                "color": "danger"
+              }
+            ]
+          }
+        },
+        {
+          "type": "students_list",
+          "props": {
+            "students": "{{students}}",
+            "item_template": {
+              "type": "student_card",
+              "props": {
+                "name": "{{student_name}}",
+                "status": {
+                  "text": "{{status}}",
+                  "color": "{{status_color}}",
+                  "badge": true
+                },
+                "progress": {
+                  "percentage": "{{progress}}",
+                  "show_bar": true
+                },
+                "chapters_completed": "{{chapters_completed}}",
+                "action_button": {
+                  "text": "عرض التفاصيل",
+                  "target": "student_details",
+                  "params": {
+                    "student_id": "{{student_id}}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "chapter_performance_section",
+          "props": {
+            "title": "أداء الفصول",
+            "chapters": "{{chapters_performance}}",
+            "display": "chart",
+            "chart_type": "bar"
+          }
+        }
+      ]
+    }
+  ],
+  "components_library": {
+    "header": {
+      "description": "رأس الصفحة مع العنوان والأزرار",
+      "default_props": {
+        "back_button": false,
+        "show_menu": false
+      }
+    },
+    "status_card": {
+      "description": "بطاقة تعرض حالة الطالب",
+      "variants": ["success", "warning", "danger", "info"]
+    },
+    "progress_bar": {
+      "description": "شريط التقدم",
+      "variants": ["linear", "circular"]
+    },
+    "button": {
+      "description": "زر قابل لإعادة الاستخدام",
+      "variants": ["primary", "secondary", "outline", "danger"],
+      "sizes": ["small", "medium", "large"]
+    },
+    "game_card": {
+      "description": "بطاقة لعبة تعليمية",
+      "includes": ["title", "level", "difficulty", "points", "remedial_tag"]
+    },
+    "chapter_card": {
+      "description": "بطاقة فصل دراسي",
+      "includes": ["name", "completion", "status_badge"]
+    },
+    "game_area": {
+      "description": "منطقة تفاعل اللعبة",
+      "supports": ["multiple_choice", "drag_drop", "matching", "ordering", "scenario_choice", "map_selection"]
+    },
+    "score_display": {
+      "description": "عرض النتيجة",
+      "variants": ["circular", "linear", "percentage"]
+    },
+    "alert": {
+      "description": "تنبيه أو إشعار",
+      "variants": ["info", "success", "warning", "danger"]
+    },
+    "badge": {
+      "description": "شارة حالة",
+      "variants": ["success", "warning", "danger", "info"]
+    },
+    "list": {
+      "description": "قائمة قابلة للتخصيص",
+      "supports": ["filtering", "sorting", "pagination"]
+    }
+  },
+  "navigation": {
+    "home": {
+      "path": "/",
+      "can_access": ["student", "teacher"]
+    },
+    "chapters": {
+      "path": "/chapters",
+      "can_access": ["student"]
+    },
+    "games_list": {
+      "path": "/chapters/:chapter/games",
+      "can_access": ["student"]
+    },
+    "game_play": {
+      "path": "/games/:game_id/play",
+      "can_access": ["student"]
+    },
+    "result": {
+      "path": "/games/:game_id/result",
+      "can_access": ["student"]
+    },
+    "remedial_plan": {
+      "path": "/remedial-plan",
+      "can_access": ["student"],
+      "requires": "has_remedial_plan"
+    },
+    "teacher_dashboard": {
+      "path": "/teacher/dashboard",
+      "can_access": ["teacher"]
+    }
+  }
+}

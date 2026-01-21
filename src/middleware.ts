@@ -73,7 +73,7 @@ export const config = {
     "/teacher/:path*",
     "/student/:path*",
     "/api/test-models/:path*",
-    "/api/activities/:path*",
+    "/api/educational-games/:path*",
   ],
 }
 

@@ -2,19 +2,17 @@ import { z } from "zod"
 
 /**
  * Schema لتسجيل دخول الطالب
- * الطالب يدخل باسم مستعار + كود الفصل بدون إنشاء حساب
+ * الطالبة تدخل برقم الطالبة + كلمة المرور
  */
 export const studentSignInSchema = z.object({
-  nickname: z
+  studentId: z
     .string()
-    .min(1, "الاسم المستعار مطلوب")
-    .min(2, "الاسم المستعار يجب أن يكون حرفين على الأقل")
-    .max(50, "الاسم المستعار طويل جداً"),
-  classCode: z
+    .min(1, "رقم الطالبة مطلوب")
+    .regex(/^STU-\d+$/i, "رقم الطالبة يجب أن يكون بالصيغة STU-XXX"),
+  password: z
     .string()
-    .min(1, "كود الفصل مطلوب")
-    .regex(/^[A-Z0-9]+$/i, "كود الفصل يجب أن يحتوي على أحرف وأرقام فقط")
-    .max(20, "كود الفصل طويل جداً"),
+    .min(4, "كلمة المرور يجب أن تكون 4 أرقام على الأقل")
+    .max(50, "كلمة المرور طويلة جداً"),
 })
 
 export type StudentSignInInput = z.infer<typeof studentSignInSchema>
@@ -23,10 +21,12 @@ export type StudentSignInInput = z.infer<typeof studentSignInSchema>
  * Schema لإنشاء طالب
  */
 export const createStudentSchema = z.object({
+  // إذا لم يتم إرسال رقم الطالبة، سيتم توليده في السيرفر لتجنب التكرار
   studentId: z
     .string()
     .min(1, "رقم الطالبة مطلوب")
-    .regex(/^STU-\d{3}$/i, "رقم الطالبة يجب أن يكون بالصيغة STU-XXX"),
+    .regex(/^STU-\d+$/i, "رقم الطالبة يجب أن يكون بالصيغة STU-XXX")
+    .optional(),
   name: z
     .string()
     .min(1, "الاسم مطلوب")
@@ -36,8 +36,9 @@ export const createStudentSchema = z.object({
   classId: z.string().optional(), // ID الفصل (اختياري)
   password: z
     .string()
-    .min(1, "كلمة المرور مطلوبة")
-    .min(4, "كلمة المرور يجب أن تكون 4 أحرف على الأقل"),
+    .min(4, "كلمة المرور يجب أن تكون 4 أحرف على الأقل")
+    .optional() // كلمة المرور اختيارية - سيتم إنشاء كلمة مرور افتراضية
+    .default("1234"), // كلمة مرور افتراضية
 })
 
 export type CreateStudentInput = z.infer<typeof createStudentSchema>

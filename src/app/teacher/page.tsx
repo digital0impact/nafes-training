@@ -11,7 +11,7 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { type SubscriptionPlan } from "@/lib/subscription";
 
 
-type TabType = "overview" | "outcomes" | "tests" | "activities" | "classes";
+type TabType = "overview" | "outcomes" | "tests" | "games" | "classes";
 
 type DashboardStats = {
   classesCount: number;
@@ -154,14 +154,14 @@ export default function TeacherDashboard() {
             إدارة الاختبارات
           </button>
           <button
-            onClick={() => setActiveTab("activities")}
+            onClick={() => setActiveTab("games")}
             className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${
-              activeTab === "activities"
-                ? "text-amber-700 border-amber-600"
-                : "text-slate-500 border-transparent hover:text-amber-600"
+              activeTab === "games"
+                ? "text-purple-700 border-purple-600"
+                : "text-slate-500 border-transparent hover:text-purple-600"
             }`}
           >
-            إدارة الأنشطة
+            الألعاب التعليمية
           </button>
           <button
             onClick={() => setActiveTab("classes")}
@@ -216,7 +216,7 @@ export default function TeacherDashboard() {
               hint="طالبات بحاجة لمتابعة إضافية"
             />
             <KpiCard 
-              label="أنشطة منجزة هذا الأسبوع" 
+              label="ألعاب منجزة هذا الأسبوع" 
               value={loadingStats ? "..." : stats?.weeklyActivities?.toString() || "0"}
             />
           </section>
@@ -249,22 +249,34 @@ export default function TeacherDashboard() {
                   </thead>
                   <tbody>
                     {stats.recentStudents.map((student) => {
-                      const status = student.latestScore >= 80 ? "متقدمة" : student.latestScore >= 60 ? "جيدة" : "بحاجة لدعم";
-                      const statusColor = student.latestScore >= 80 ? "bg-emerald-100 text-emerald-700" : student.latestScore >= 60 ? "bg-blue-100 text-blue-700" : "bg-rose-100 text-rose-700";
+                      const latestScore = student.latestScore ?? 0
+                      const trend = student.trend ?? 0
+                      const status =
+                        latestScore >= 80
+                          ? "متقدمة"
+                          : latestScore >= 60
+                            ? "جيدة"
+                            : "بحاجة لدعم"
+                      const statusColor =
+                        latestScore >= 80
+                          ? "bg-emerald-100 text-emerald-700"
+                          : latestScore >= 60
+                            ? "bg-blue-100 text-blue-700"
+                            : "bg-rose-100 text-rose-700"
                       
                       return (
                         <tr key={student.id} className="border-t border-slate-100">
                           <td className="px-6 py-4 font-semibold text-slate-900">
                             {student.nickname}
                           </td>
-                          <td className="px-6 py-4">{student.latestScore || 0}%</td>
+                          <td className="px-6 py-4">{latestScore}%</td>
                           <td className="px-6 py-4">
                             <span className={`badge ${statusColor}`}>
                               {status}
                             </span>
                           </td>
-                          <td className={`px-6 py-4 ${student.trend >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                            {student.trend >= 0 ? '+' : ''}{student.trend}%
+                          <td className={`px-6 py-4 ${trend >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                            {trend >= 0 ? '+' : ''}{trend}%
                           </td>
                           <td className="px-6 py-4">
                             <Link
@@ -363,12 +375,12 @@ export default function TeacherDashboard() {
         </div>
       )}
 
-      {activeTab === "activities" && (
+      {activeTab === "games" && (
         <div className="card p-0 overflow-hidden">
           <iframe
-            src="/teacher/activities"
+            src="/teacher/games"
             className="w-full h-[800px] border-0"
-            title="إدارة الأنشطة"
+            title="الألعاب التعليمية"
           />
         </div>
       )}

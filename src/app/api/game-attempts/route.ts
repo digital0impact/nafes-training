@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
 import { requireTeacher } from "@/lib/auth-server"
+import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 
 async function upsertMastery(params: {
@@ -33,27 +33,29 @@ async function upsertMastery(params: {
   })
 }
 
-const createTrainingAttemptSchema = z.object({
+const createGameAttemptSchema = z.object({
   nickname: z.string().min(1, "الاسم المستعار مطلوب"),
   classCode: z.string().min(1, "كود الفصل مطلوب"),
   studentDbId: z.string().min(1, "معرف الطالبة مطلوب"),
-  testModelId: z.string().optional(),
-  testModelTitle: z.string().optional(),
-  answers: z.record(z.string(), z.string()),
+  gameId: z.string().min(1, "معرف اللعبة مطلوب"),
+  gameTitle: z.string().min(1, "عنوان اللعبة مطلوب"),
+  gameType: z.string().min(1, "نوع اللعبة مطلوب"),
+  chapter: z.string().min(1, "الفصل مطلوب"),
+  answers: z.record(z.string(), z.any()),
   score: z.number().int().min(0),
-  totalQuestions: z.number().int().min(1),
+  totalScore: z.number().int().min(1),
   percentage: z.number().min(0).max(100),
   timeSpent: z.number().int().min(0),
 })
 
 /**
- * POST - حفظ محاولة تدريب جديدة
+ * POST - حفظ محاولة لعبة تعليمية جديدة
  */
 export async function POST(request: Request) {
   try {
     const body = await request.json()
 
-    const validationResult = createTrainingAttemptSchema.safeParse(body)
+    const validationResult = createGameAttemptSchema.safeParse(body)
 
     if (!validationResult.success) {
       return NextResponse.json(
@@ -70,11 +72,13 @@ export async function POST(request: Request) {
       nickname,
       classCode,
       studentDbId,
-      testModelId,
-      testModelTitle,
+      gameId,
+      gameTitle,
+      gameType,
+      chapter,
       answers,
       score,
-      totalQuestions,
+      totalScore,
       percentage,
       timeSpent,
     } = validationResult.data
@@ -101,95 +105,81 @@ export async function POST(request: Request) {
     }
 
     // حفظ المحاولة
-    const attempt = await prisma.trainingAttempt.create({
+    const attempt = await prisma.gameAttempt.create({
       data: {
         nickname,
         classCode: classCode.toUpperCase(),
         classId: classData?.id || null,
         studentDbId: student.id,
-        testModelId: testModelId || null,
-        testModelTitle: testModelTitle || null,
+        gameId,
+        gameTitle,
+        gameType,
+        chapter,
         answers: JSON.stringify(answers),
         score,
-        totalQuestions,
+        totalScore,
         percentage,
         timeSpent,
       },
     })
 
-    // تحديث إتقان الطالبة (مبدئيًا: حسب الاختبار نفسه)
-    if (testModelId) {
-      const status = percentage >= 80 ? "mastered" : "not_mastered"
-      await upsertMastery({
-        studentDbId: student.id,
-        key: `testModel:${testModelId}`,
-        status,
-        score: percentage,
-        sourceType: "training",
-        sourceId: testModelId,
-      })
-
-      // إن كان للاختبار skill، سجله كمؤشر عام أيضًا
-      const model = await prisma.testModel.findUnique({
-        where: { id: testModelId },
-        select: { skill: true },
-      })
-      if (model?.skill) {
-        await upsertMastery({
-          studentDbId: student.id,
-          key: `skill:${model.skill}`,
-          status,
-          score: percentage,
-          sourceType: "training",
-          sourceId: testModelId,
-        })
-      }
-    }
+    // تحديث إتقان الطالبة (مبدئيًا: حسب اللعبة نفسها)
+    const status = percentage >= 80 ? "mastered" : "not_mastered"
+    await upsertMastery({
+      studentDbId: student.id,
+      key: `game:${gameId}`,
+      status,
+      score: percentage,
+      sourceType: "game",
+      sourceId: gameId,
+    })
 
     return NextResponse.json(
       {
-        message: "تم حفظ المحاولة بنجاح",
+        message: "تم حفظ محاولة اللعبة بنجاح",
         attempt: {
           id: attempt.id,
           score: attempt.score,
-          totalQuestions: attempt.totalQuestions,
+          totalScore: attempt.totalScore,
           percentage: attempt.percentage,
         },
       },
       { status: 201 }
     )
   } catch (error) {
-    console.error("Error creating training attempt:", error)
+    console.error("Error creating game attempt:", error)
     return NextResponse.json(
-      { error: "حدث خطأ أثناء حفظ المحاولة" },
+      { error: "حدث خطأ أثناء حفظ محاولة اللعبة" },
       { status: 500 }
     )
   }
 }
 
 /**
- * GET - جلب محاولات التدريب (للمعلم فقط)
+ * GET - جلب محاولات الألعاب (للمعلم فقط)
  */
 export async function GET(request: Request) {
   try {
     const user = await requireTeacher()
+
     const { searchParams } = new URL(request.url)
     const classCode = searchParams.get("classCode")
     const classId = searchParams.get("classId")
-
-    if (!classCode && !classId) {
-      return NextResponse.json(
-        { error: "يجب توفير كود الفصل أو معرف الفصل" },
-        { status: 400 }
-      )
-    }
+    const gameId = searchParams.get("gameId")
+    const nickname = searchParams.get("nickname")
 
     const where: {
       classCode?: string
       classId?: string
-      class?: { userId: string }
+      gameId?: string
+      nickname?: string
+      class?: {
+        userId: string
+      }
     } = {
-      class: { userId: user.id },
+      class: {
+        userId: user.id,
+      },
     }
 
     if (classCode) {
@@ -200,7 +190,15 @@ export async function GET(request: Request) {
       where.classId = classId
     }
 
-    const attempts = await prisma.trainingAttempt.findMany({
+    if (gameId) {
+      where.gameId = gameId
+    }
+
+    if (nickname) {
+      where.nickname = nickname
+    }
+
+    const attempts = await prisma.gameAttempt.findMany({
       where,
       orderBy: {
         completedAt: "desc",
@@ -210,9 +208,9 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ attempts })
   } catch (error) {
-    console.error("Error fetching training attempts:", error)
+    console.error("Error fetching game attempts:", error)
     return NextResponse.json(
-      { error: "حدث خطأ أثناء جلب المحاولات" },
+      { error: "حدث خطأ أثناء جلب محاولات الألعاب" },
       { status: 500 }
     )
   }

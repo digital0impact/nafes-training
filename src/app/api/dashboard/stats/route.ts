@@ -64,7 +64,7 @@ export async function GET() {
 
     // عدد الطالبات المتقدمات (درجة أعلى من 80%)
     const advancedStudents = await prisma.trainingAttempt.groupBy({
-      by: ['studentNickname'],
+      by: ['nickname'],
       where: {
         class: {
           userId: user.id,
@@ -74,13 +74,13 @@ export async function GET() {
         },
       },
       _count: {
-        studentNickname: true,
+        nickname: true,
       },
     })
 
     // عدد الطالبات بحاجة لدعم (درجة أقل من 60%)
     const needSupportStudents = await prisma.trainingAttempt.groupBy({
-      by: ['studentNickname'],
+      by: ['nickname'],
       where: {
         class: {
           userId: user.id,
@@ -90,17 +90,15 @@ export async function GET() {
         },
       },
       _count: {
-        studentNickname: true,
+        nickname: true,
       },
     })
 
-    // عدد الأنشطة المنجزة هذا الأسبوع
-    const weeklyActivities = await prisma.activityCompletion.count({
+    // عدد الألعاب المنجزة هذا الأسبوع
+    const weeklyActivities = await prisma.gameAttempt.count({
       where: {
-        student: {
-          class: {
-            userId: user.id,
-          },
+        class: {
+          userId: user.id,
         },
         completedAt: {
           gte: weekStart,
@@ -108,21 +106,30 @@ export async function GET() {
       },
     })
 
-    // جلب آخر الطالبات مع درجاتهن
-    const recentStudents = await prisma.student.findMany({
+    // جلب آخر المحاولات مع درجاتهن
+    // استخدام groupBy للحصول على آخر محاولة لكل طالبة
+    const latestAttemptsByStudent = await prisma.trainingAttempt.groupBy({
+      by: ['nickname'],
       where: {
         class: {
           userId: user.id,
         },
       },
-      take: 10,
-      orderBy: {
-        createdAt: 'desc',
+      _max: {
+        completedAt: true,
       },
-      select: {
-        id: true,
-        nickname: true,
-        trainingAttempts: {
+    })
+
+    // جلب آخر محاولتين لكل طالبة (أول 10 طالبات)
+    const studentsWithStats = await Promise.all(
+      latestAttemptsByStudent.slice(0, 10).map(async (group) => {
+        const studentAttempts = await prisma.trainingAttempt.findMany({
+          where: {
+            nickname: group.nickname,
+            class: {
+              userId: user.id,
+            },
+          },
           orderBy: {
             completedAt: 'desc',
           },
@@ -130,22 +137,19 @@ export async function GET() {
           select: {
             percentage: true,
           },
-        },
-      },
-    })
+        })
 
-    const studentsWithStats = recentStudents.map(student => {
-      const latest = student.trainingAttempts[0]?.percentage || 0
-      const previous = student.trainingAttempts[1]?.percentage || 0
-      const trend = latest - previous
+        const latest = studentAttempts[0]?.percentage || 0
+        const previous = studentAttempts[1]?.percentage || 0
+        const trend = latest - previous
 
-      return {
-        id: student.id,
-        nickname: student.nickname,
-        latestScore: latest,
-        trend: trend,
-      }
-    })
+        return {
+          nickname: group.nickname,
+          latestScore: latest,
+          trend: trend,
+        }
+      })
+    )
 
     return NextResponse.json({
       classesCount,

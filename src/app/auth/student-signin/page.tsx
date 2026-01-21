@@ -75,7 +75,7 @@ export default function StudentSignInPage() {
               تسجيل دخول الطالبة
             </h1>
             <p className="text-sm sm:text-base text-slate-600">
-              أدخلي اسمك المستعار وكود الفصل للبدء
+              أدخلي رقم الطالبة وكلمة المرور للبدء
             </p>
           </div>
 
@@ -88,57 +88,57 @@ export default function StudentSignInPage() {
 
             <div>
               <label
-                htmlFor="nickname"
+                htmlFor="studentId"
                 className="block text-sm font-medium text-slate-700 mb-2"
               >
-                الاسم المستعار
+                رقم الطالبة
               </label>
               <input
-                id="nickname"
+                id="studentId"
                 type="text"
-                {...register("nickname")}
+                {...register("studentId")}
                 className={`w-full px-4 py-3 sm:py-3.5 text-base border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
-                  errors.nickname
+                  errors.studentId
                     ? "border-red-300 focus:ring-red-500"
                     : "border-slate-300"
                 }`}
-                placeholder="مثال: سارة"
+                placeholder="مثال: STU-301"
               />
-              {errors.nickname && (
+              {errors.studentId && (
                 <p className="mt-1 text-sm text-red-600">
-                  {errors.nickname.message}
+                  {errors.studentId.message}
                 </p>
               )}
               <p className="mt-1 text-xs text-slate-500">
-                يمكنك اختيار أي اسم تريدينه
+                احصلي على رقم الطالبة من معلمتك
               </p>
             </div>
 
             <div>
               <label
-                htmlFor="classCode"
+                htmlFor="password"
                 className="block text-sm font-medium text-slate-700 mb-2"
               >
-                كود الفصل
+                كلمة المرور
               </label>
               <input
-                id="classCode"
-                type="text"
-                {...register("classCode")}
+                id="password"
+                type="password"
+                {...register("password")}
                 className={`w-full px-4 py-3 sm:py-3.5 text-base border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
-                  errors.classCode
+                  errors.password
                     ? "border-red-300 focus:ring-red-500"
                     : "border-slate-300"
                 }`}
-                placeholder="مثال: SCI3A"
+                placeholder="مثال: 1234"
               />
-              {errors.classCode && (
+              {errors.password && (
                 <p className="mt-1 text-sm text-red-600">
-                  {errors.classCode.message}
+                  {errors.password.message}
                 </p>
               )}
               <p className="mt-1 text-xs text-slate-500">
-                احصلي على كود الفصل من معلمتك
+                كلمة المرور الافتراضية غالباً: 1234
               </p>
             </div>
 
@@ -153,9 +153,9 @@ export default function StudentSignInPage() {
 
           <div className="mt-5 sm:mt-6 text-center">
             <p className="text-sm sm:text-base text-slate-600">
-              لا تحتاجين حساب!{" "}
+              لديك حساب طالبة.{" "}
               <span className="text-slate-500 text-xs sm:text-sm">
-                فقط أدخلي اسمك المستعار وكود الفصل من معلمتك
+                استخدمي رقم الطالبة وكلمة المرور من معلمتك
               </span>
             </p>
           </div>

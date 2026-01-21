@@ -1,0 +1,150 @@
+{
+  "course": "علوم ثالث متوسط",
+  "mode": "educational_games",
+  "games": [
+    {
+      "game_id": "game_001",
+      "chapter": "الفصل الأول: طبيعة العلم",
+      "title": "ترتيب خطوات المنهج العلمي",
+      "game_type": "ordering",
+      "learning_indicator": "يحدد خطوات المنهج العلمي بالترتيب الصحيح",
+      "objective": "ترتيب خطوات المنهج العلمي من الملاحظة إلى الاستنتاج",
+      "level": "سهل",
+      "difficulty": 1,
+      "remedial": true,
+      "points": 10
+    },
+    {
+      "game_id": "game_002",
+      "chapter": "الفصل الأول: طبيعة العلم",
+      "title": "تمييز مهارات العلم",
+      "game_type": "matching",
+      "learning_indicator": "يميز بين مهارات العلم المختلفة",
+      "objective": "ربط كل مهارة علمية بوصفها الصحيح",
+      "level": "متوسط",
+      "difficulty": 2,
+      "remedial": false,
+      "points": 15
+    },
+    {
+      "game_id": "game_003",
+      "chapter": "الفصل الثاني: الزلازل والبراكين",
+      "title": "أسباب حدوث الزلازل",
+      "game_type": "multiple_choice",
+      "learning_indicator": "يحدد الأسباب الرئيسية لحدوث الزلازل",
+      "objective": "اختيار السبب الصحيح لحدوث الزلزال من الخيارات",
+      "level": "سهل",
+      "difficulty": 1,
+      "remedial": true,
+      "points": 10
+    },
+    {
+      "game_id": "game_004",
+      "chapter": "الفصل الثاني: الزلازل والبراكين",
+      "title": "تصنيف أنواع البراكين",
+      "game_type": "drag_drop",
+      "learning_indicator": "يصنف أنواع البراكين حسب شكلها وطبيعة ثورانها",
+      "objective": "سحب كل نوع بركان إلى التصنيف المناسب",
+      "level": "متوسط",
+      "difficulty": 3,
+      "remedial": false,
+      "points": 20
+    },
+    {
+      "game_id": "game_005",
+      "chapter": "الفصل الثالث: الصفائح الأرضية",
+      "title": "ربط حدود الصفائح بنتائجها",
+      "game_type": "matching",
+      "learning_indicator": "يربط بين أنواع حدود الصفائح والظواهر الناتجة عنها",
+      "objective": "ربط كل نوع من حدود الصفائح بالنتيجة المناسبة",
+      "level": "سهل",
+      "difficulty": 1,
+      "remedial": true,
+      "points": 10
+    },
+    {
+      "game_id": "game_006",
+      "chapter": "الفصل الثالث: الصفائح الأرضية",
+      "title": "تحديد مناطق النشاط الزلزالي",
+      "game_type": "map_selection",
+      "learning_indicator": "يحدد المناطق الأكثر نشاطاً زلزالياً على الخريطة",
+      "objective": "اختيار المناطق الصحيحة للنشاط الزلزالي على الخريطة",
+      "level": "متوسط",
+      "difficulty": 2,
+      "remedial": false,
+      "points": 15
+    },
+    {
+      "game_id": "game_007",
+      "chapter": "الفصل الرابع: النقل عبر الغشاء البلازمي",
+      "title": "اختيار نوع النقل عبر الغشاء",
+      "game_type": "scenario_choice",
+      "learning_indicator": "يختار نوع النقل المناسب حسب المادة والظروف",
+      "objective": "اختيار نوع النقل الصحيح لكل سيناريو معطى",
+      "level": "سهل",
+      "difficulty": 1,
+      "remedial": true,
+      "points": 10
+    },
+    {
+      "game_id": "game_008",
+      "chapter": "الفصل الرابع: النقل عبر الغشاء البلازمي",
+      "title": "تصنيف النقل النشط والسلبي",
+      "game_type": "drag_drop",
+      "learning_indicator": "يميز بين أنواع النقل النشط والسلبي",
+      "objective": "سحب كل عملية نقل إلى التصنيف الصحيح",
+      "level": "متوسط",
+      "difficulty": 2,
+      "remedial": false,
+      "points": 15
+    },
+    {
+      "game_id": "game_009",
+      "chapter": "الفصل الخامس: الوراثة",
+      "title": "تصنيف الصفات الوراثية والمكتسبة",
+      "game_type": "matching",
+      "learning_indicator": "يميز بين الصفات الوراثية والصفات المكتسبة",
+      "objective": "ربط كل صفة بنوعها الصحيح",
+      "level": "سهل",
+      "difficulty": 1,
+      "remedial": true,
+      "points": 10
+    },
+    {
+      "game_id": "game_010",
+      "chapter": "الفصل الخامس: الوراثة",
+      "title": "ربط الصفات بين الآباء والأبناء",
+      "game_type": "scenario_choice",
+      "learning_indicator": "يفهم كيفية انتقال الصفات الوراثية من الآباء للأبناء",
+      "objective": "اختيار الصفة الصحيحة للابن بناءً على صفات الوالدين",
+      "level": "متوسط",
+      "difficulty": 3,
+      "remedial": false,
+      "points": 20
+    },
+    {
+      "game_id": "game_011",
+      "chapter": "الفصل السادس: التكاثر والنمو",
+      "title": "ترتيب مراحل دورة الحياة",
+      "game_type": "ordering",
+      "learning_indicator": "يرتب مراحل دورة الحياة بالترتيب الصحيح",
+      "objective": "ترتيب مراحل دورة الحياة من البداية للنهاية",
+      "level": "سهل",
+      "difficulty": 1,
+      "remedial": true,
+      "points": 10
+    },
+    {
+      "game_id": "game_012",
+      "chapter": "الفصل السادس: التكاثر والنمو",
+      "title": "تصنيف التكاثر الجنسي واللاجنسي",
+      "game_type": "drag_drop",
+      "learning_indicator": "يميز بين أنواع التكاثر الجنسي واللاجنسي",
+      "objective": "سحب كل كائن حي إلى نوع التكاثر المناسب",
+      "level": "متوسط",
+      "difficulty": 2,
+      "remedial": false,
+      "points": 15
+    }
+  ]
+}

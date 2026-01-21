@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { studentSignInSchema } from "@/lib/validations"
+import bcrypt from "bcryptjs"
 
 /**
  * API Route لتسجيل دخول الطالب
- * الطالب يدخل باسم مستعار + كود الفصل بدون إنشاء حساب
+ * الطالبة تدخل برقم الطالبة + كلمة المرور
  */
 export async function POST(request: Request) {
   try {
@@ -22,41 +23,51 @@ export async function POST(request: Request) {
       )
     }
 
-    const { nickname, classCode } = validationResult.data
+    const { studentId, password } = validationResult.data
 
-    // البحث عن الفصل باستخدام كود الفصل
-    const classData = await prisma.class.findUnique({
-      where: {
-        code: classCode.toUpperCase()
-      },
+    const student = await prisma.student.findUnique({
+      where: { studentId: studentId.toUpperCase() },
       include: {
-        _count: {
+        class: {
           select: {
-            students: true,
+            id: true,
+            code: true,
+            name: true,
+            grade: true,
+            userId: true,
           },
         },
       },
     })
 
-    if (!classData) {
+    if (!student || !student.class) {
       return NextResponse.json(
-        { error: "كود الفصل غير صحيح" },
+        { error: "بيانات الدخول غير صحيحة" },
         { status: 401 }
       )
     }
 
-    // إرجاع معلومات الجلسة (بدون إنشاء حساب)
-    // نستخدم nickname كمعرف مؤقت للطالب
+    const ok = await bcrypt.compare(password, student.password)
+    if (!ok) {
+      return NextResponse.json(
+        { error: "بيانات الدخول غير صحيحة" },
+        { status: 401 }
+      )
+    }
+
     return NextResponse.json({
       message: "تم تسجيل الدخول بنجاح",
       student: {
-        id: `temp-${Date.now()}`, // معرف مؤقت
-        nickname,
-        classCode: classData.code,
-        className: classData.name,
-        grade: classData.grade,
-        classId: classData.id,
-      }
+        // هذا هو معرف الطالبة الحقيقي داخل قاعدة البيانات
+        id: student.id,
+        studentId: student.studentId,
+        name: student.name,
+        classCode: student.class.code,
+        className: student.class.name,
+        grade: student.class.grade,
+        classId: student.class.id,
+        teacherId: student.class.userId,
+      },
     })
   } catch (error) {
     console.error("Error in student signin:", error)
