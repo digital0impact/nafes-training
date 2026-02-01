@@ -132,10 +132,21 @@ export default function SignInPage() {
         return
       }
 
-      console.log("Login successful, redirecting...")
-
-      // إعادة التوجيه إلى صفحة المعلمة
-      window.location.href = "/teacher"
+      // تحديد الوجهة حسب دور المستخدم
+      const userRes = await fetch("/api/auth/user")
+      const userData = await userRes.json().catch(() => ({}))
+      if (!userRes.ok || !userData?.user) {
+        setFormError("root", {
+          message: "تم تسجيل الدخول لكن جلب بيانات الحساب فشل. جرّب تحديث الصفحة أو تسجيل الدخول مرة أخرى.",
+        })
+        return
+      }
+      const role = userData.user.role
+      if (role === "visitor_reviewer") {
+        window.location.href = "/visitor"
+      } else {
+        window.location.href = "/teacher"
+      }
     } catch (err: any) {
       console.error("Sign in error:", err)
       let errorMessage = "حدث خطأ أثناء تسجيل الدخول"

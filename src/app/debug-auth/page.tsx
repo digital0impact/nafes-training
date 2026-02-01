@@ -52,12 +52,18 @@ export default function DebugAuthPage() {
   return (
     <main className="min-h-screen bg-slate-50 p-8">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-4">
+        <div className="mb-4 flex gap-4">
+          <Link
+            href="/debug-connection"
+            className="text-sm font-medium text-teal-600 hover:text-teal-700"
+          >
+            → فحص Supabase + قاعدة البيانات
+          </Link>
           <Link
             href="/debug-db"
             className="text-sm font-medium text-teal-600 hover:text-teal-700"
           >
-            → فحص قاعدة البيانات
+            → فحص قاعدة البيانات فقط
           </Link>
         </div>
         <h1 className="text-3xl font-bold mb-6">فحص إعدادات المصادقة</h1>

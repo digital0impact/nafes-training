@@ -112,6 +112,18 @@ export default function TeacherDashboard() {
             >
               إدارة الاشتراك
             </Link>
+            <Link
+              href="/teacher/visitors"
+              className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition"
+            >
+              إدارة الزوار
+            </Link>
+            <Link
+              href="/teacher/audit-log"
+              className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition"
+            >
+              سجل التدقيق
+            </Link>
             <button
               onClick={handleSignOut}
               className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-100 transition"

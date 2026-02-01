@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { signInSchema } from '@/lib/validations'
+import { logAudit } from '@/lib/auth-server'
 
 /**
  * API Route لتسجيل دخول المعلم باستخدام Supabase Auth فقط
@@ -46,8 +47,7 @@ export async function POST(request: Request) {
       )
     }
 
-    // جلب بيانات المستخدم من قاعدة البيانات باستخدام ID من Supabase
-    const user = await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
       where: { id: authData.user.id },
       select: {
         id: true,
@@ -58,7 +58,19 @@ export async function POST(request: Request) {
       },
     })
 
-    // إذا لم يكن المستخدم موجوداً في قاعدة البيانات، ننشئه
+    let isDisabled = false
+    if (user) {
+      try {
+        const row = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { isDisabled: true },
+        })
+        isDisabled = (row as { isDisabled?: boolean } | null)?.isDisabled ?? false
+      } catch {
+        // عمود isDisabled غير موجود (قبل تشغيل الترحيل)
+      }
+    }
+
     if (!user) {
       const newUser = await prisma.user.create({
         data: {
@@ -68,17 +80,24 @@ export async function POST(request: Request) {
           role: authData.user.user_metadata?.role || 'teacher',
         },
       })
+      user = {
+        id: newUser.id,
+        email: newUser.email,
+        name: newUser.name,
+        role: newUser.role,
+        subscriptionPlan: newUser.subscriptionPlan,
+      }
+    }
 
-      return NextResponse.json({
-        message: 'تم تسجيل الدخول بنجاح',
-        user: {
-          id: newUser.id,
-          email: newUser.email,
-          name: newUser.name,
-          role: newUser.role,
-          subscriptionPlan: newUser.subscriptionPlan,
-        },
-      })
+    if (user.role === 'visitor_reviewer' && isDisabled) {
+      return NextResponse.json(
+        { error: 'تم تعطيل هذا الحساب. يرجى التواصل مع المعلم.' },
+        { status: 403 }
+      )
+    }
+
+    if (user.role === 'visitor_reviewer') {
+      await logAudit({ userId: user.id, action: 'visitor_login' })
     }
 
     return NextResponse.json({
@@ -89,6 +108,7 @@ export async function POST(request: Request) {
         name: user.name,
         role: user.role,
         subscriptionPlan: user.subscriptionPlan,
+        isDisabled,
       },
     })
   } catch (error) {

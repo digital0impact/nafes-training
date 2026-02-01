@@ -8,6 +8,7 @@ export type User = {
   name: string
   role: string
   subscriptionPlan?: string
+  isDisabled?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }

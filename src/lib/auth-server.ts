@@ -7,6 +7,24 @@ export type User = {
   name: string
   role: string
   subscriptionPlan?: string
+  isDisabled?: boolean
+}
+
+/** نطاقات عرض الزائر التي يحددها المعلم */
+export const VISITOR_SCOPE_KEYS = [
+  'nafes_plan',
+  'activities',
+  'results',
+  'learning_indicators',
+] as const
+export type VisitorScopeKey = (typeof VISITOR_SCOPE_KEYS)[number]
+
+export type VisitorProfileData = {
+  id: string
+  teacherId: string
+  teacherName: string
+  scope: VisitorScopeKey[]
+  isActive: boolean
 }
 
 /**
@@ -23,7 +41,6 @@ export async function getCurrentUser(): Promise<User | null> {
       return null
     }
 
-    // جلب بيانات المستخدم من قاعدة البيانات باستخدام ID من Supabase
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },
       select: {
@@ -45,6 +62,7 @@ export async function getCurrentUser(): Promise<User | null> {
       name: dbUser.name,
       role: dbUser.role,
       subscriptionPlan: dbUser.subscriptionPlan,
+      isDisabled: false,
     }
   } catch (error) {
     console.error('Error getting current user:', error)
@@ -66,16 +84,87 @@ export async function requireAuth(): Promise<User> {
 }
 
 /**
- * التحقق من أن المستخدم معلم
+ * التحقق من أن المستخدم معلم (أو مدير) - يمنع الزائر من الوصول
  */
 export async function requireTeacher(): Promise<User> {
   const user = await requireAuth()
   
-  if (user.role !== 'teacher') {
+  if (user.role !== 'teacher' && user.role !== 'admin') {
     throw new Error('Forbidden: Teacher access required')
   }
   
   return user
+}
+
+/**
+ * التحقق من أن المستخدم زائر (visitor_reviewer) ونشط
+ */
+export async function requireVisitor(): Promise<User> {
+  const user = await requireAuth()
+  
+  if (user.role !== 'visitor_reviewer') {
+    throw new Error('Forbidden: Visitor access required')
+  }
+  
+  if (user.isDisabled) {
+    throw new Error('Forbidden: Account disabled')
+  }
+  
+  return user
+}
+
+/**
+ * جلب صلاحية الزائر (VisitorProfile) للمعلم المحدد
+ */
+export async function getVisitorProfile(visitorId: string): Promise<VisitorProfileData | null> {
+  const profile = await prisma.visitorProfile.findFirst({
+    where: { visitorId, isActive: true },
+    include: {
+      teacher: { select: { id: true, name: true } },
+    },
+  })
+  if (!profile) return null
+  let scope: VisitorScopeKey[] = []
+  try {
+    scope = JSON.parse(profile.scope) as VisitorScopeKey[]
+  } catch {
+    scope = []
+  }
+  return {
+    id: profile.id,
+    teacherId: profile.teacherId,
+    teacherName: profile.teacher.name,
+    scope,
+    isActive: profile.isActive,
+  }
+}
+
+/**
+ * التحقق من أن الزائر مسموح له برؤية القسم
+ */
+export function canVisitorSee(scope: VisitorScopeKey[], section: VisitorScopeKey): boolean {
+  return scope.includes(section)
+}
+
+/**
+ * تسجيل حدث في سجل التدقيق
+ */
+export async function logAudit(params: {
+  userId: string
+  action: string
+  details?: Record<string, unknown>
+}): Promise<void> {
+  try {
+    await prisma.auditLog.create({
+      data: {
+        userId: params.userId,
+        action: params.action,
+        details: params.details ? JSON.stringify(params.details) : null,
+      },
+    })
+  } catch (error) {
+    console.error('Error writing audit log:', error)
+  }
 }
 
 /**
@@ -96,6 +185,7 @@ export async function auth() {
       name: user.name,
       role: user.role,
       subscriptionPlan: user.subscriptionPlan,
+      isDisabled: user.isDisabled,
     },
   }
 }

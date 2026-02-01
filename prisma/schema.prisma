@@ -10,24 +10,81 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// نموذج المستخدم (المعلم)
+// أدوار المستخدم: teacher, admin, visitor_reviewer
+// نموذج المستخدم (المعلم / الزائر / المدير)
 // ملاحظة: كلمة المرور تُدار بواسطة Supabase Auth
 model User {
   id              String    @id @default(uuid()) // استخدام UUID من Supabase
   email           String    @unique
   name            String
-  role            String    @default("teacher") // teacher, admin
+  role            String    @default("teacher") // teacher, admin, visitor_reviewer
   subscriptionPlan String   @default("free") // free, premium
+  isDisabled      Boolean   @default(false) // تعطيل حساب الزائر فوراً
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   
   // العلاقات
-  testModels      TestModel[]
-  activities      Activity[]
-  classes         Class[]
-  gameShares      GameShare[]
+  testModels       TestModel[]
+  activities       Activity[]
+  classes          Class[]
+  gameShares       GameShare[]
+  visitorProfiles  VisitorProfile[]  @relation("VisitorProfileAsVisitor")
+  visitorComments  VisitorComment[]
+  auditLogs        AuditLog[]
+  teacherVisitors  VisitorProfile[]   @relation("VisitorProfileAsTeacher")
   
   @@map("users")
+}
+
+// صلاحية الزائر (ما يمكنه مشاهدته) - يحددها المعلم
+model VisitorProfile {
+  id          String   @id @default(cuid())
+  teacherId   String   // المعلم الذي منح الصلاحية
+  visitorId   String   // المستخدم بدور visitor_reviewer
+  scope       String   // JSON: ["nafes_plan","activities","results","learning_indicators"]
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  teacher     User     @relation("VisitorProfileAsTeacher", fields: [teacherId], references: [id], onDelete: Cascade)
+  visitor     User     @relation("VisitorProfileAsVisitor", fields: [visitorId], references: [id], onDelete: Cascade)
+
+  @@unique([teacherId, visitorId])
+  @@index([visitorId])
+  @@index([teacherId])
+  @@map("visitor_profiles")
+}
+
+// تعليق الزائر على عنصر (نشاط، اختبار، مؤشر نافس) - لا يمكن تعديله أو حذفه
+model VisitorComment {
+  id         String   @id @default(cuid())
+  visitorId  String
+  targetType String   // activity | test | indicator
+  targetId   String   // معرف العنصر
+  body       String   // نص التعليق
+  createdAt  DateTime @default(now())
+
+  visitor    User     @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+
+  @@index([visitorId])
+  @@index([targetType, targetId])
+  @@map("visitor_comments")
+}
+
+// سجل تدقيق أنشطة الزائر (دخول، تعليق)
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String   // الزائر أو المعلم حسب السياق
+  action    String   // visitor_login | visitor_comment | visitor_disabled | ...
+  details   String?  // JSON
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
 }
 
 // ملاحظة: تم إزالة Session, Account, VerificationToken

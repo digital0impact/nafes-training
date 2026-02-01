@@ -1,46 +1,30 @@
 // بيانات جميع الألعاب التعليمية
 
-export type GameItem = {
-  id: string
-  text: string
-  correctOrder?: number
-}
+// إعادة تصدير الواجهات من types/games.ts للتوافق مع الكود القديم
+export type {
+  OrderingItem as GameItem,
+  MultipleChoiceQuestion,
+  MatchingPair,
+  DragDropItem,
+  Scenario,
+  MapRegion,
+  GameData,
+  MultipleChoiceGameData,
+  DragDropGameData,
+  OrderingGameData,
+  MatchingGameData,
+  ScenarioChoiceGameData,
+  MapSelectionGameData,
+  AtomBuilderGameData,
+  AtomScenario,
+  PeriodicFamilyGameData,
+  PeriodicFamilyElement
+} from "@/types/games"
 
-export type MultipleChoiceQuestion = {
-  question: string
-  options: string[]
-  correctAnswer: string
-}
+import type { GameData } from "@/types/games"
+import { chemicalPhysicsGamesData } from "./chemical-physics-games-data"
 
-export type MatchingPair = {
-  id: string
-  label: string
-  target: string
-}
-
-export type DragDropItem = {
-  id: string
-  text: string
-  category: string
-}
-
-export type Scenario = {
-  id: string
-  scenario: string
-  choices: string[]
-  correctAnswer: string
-}
-
-export type MapRegion = {
-  id: string
-  name: string
-  x: number
-  y: number
-  width: number
-  height: number
-}
-
-export const gamesData: Record<string, any> = {
+const baseGamesData: Record<string, GameData> = {
   // game_001: ترتيب خطوات المنهج العلمي (ordering)
   game_001: {
     type: "ordering",
@@ -208,5 +192,155 @@ export const gamesData: Record<string, any> = {
       { id: "5", text: "الأسماك", category: "تكاثر جنسي" },
       { id: "6", text: "النجم البحر", category: "تكاثر لاجنسي" }
     ]
+  },
+
+  // game_atom_001: مهندس الذرّة (atom_builder)
+  // اللعبة تغطي المؤشر التعليمي: "يصف كيفية ترتيب الإلكترونات داخل الذرة، وعلاقته بموقعها في الجدول الدوري، ويقارن بين أعداد الإلكترونات التي تستوعبها مستويات الطاقة، ويحدد المستويات الأقل والأعلى طاقة لعنصرٍ ما."
+  game_atom_001: {
+    type: "atom_builder",
+    instruction: "قم بتوزيع الإلكترونات في مستويات الطاقة الصحيحة. تذكر: K = 2، L = 8، M = 18، N = 32",
+    energyLevelCapacities: {
+      K: 2,
+      L: 8,
+      M: 18,
+      N: 32
+    },
+    scenarios: [
+      // السيناريو 1: الصوديوم (Na)
+      // التركيز التعليمي: تحديد المستويات الأقل والأعلى طاقة، ربط الإلكترونات الخارجية بالمجموعة، ربط عدد المستويات بالدورة
+      {
+        id: "sodium",
+        elementName: "الصوديوم",
+        elementSymbol: "Na",
+        atomicNumber: 11,
+        totalElectrons: 11,
+        correctDistribution: { K: 2, L: 8, M: 1, N: 0 },
+        period: 3, // 3 مستويات مشغولة (K, L, M)
+        group: 1, // إلكترون واحد في المستوى الخارجي (M)
+        learningFocus: "تحديد المستويات الأقل والأعلى طاقة، ربط الإلكترونات الخارجية بالمجموعة، ربط عدد المستويات بالدورة"
+      },
+      // السيناريو 2: الأكسجين (O)
+      // التركيز التعليمي: مقارنة الإلكترونات الفعلية مع السعة القصوى لمستويات الطاقة، فهم المستويات الخارجية غير المكتملة، تحديد المجموعة والدورة
+      {
+        id: "oxygen",
+        elementName: "الأكسجين",
+        elementSymbol: "O",
+        atomicNumber: 8,
+        totalElectrons: 8,
+        correctDistribution: { K: 2, L: 6, M: 0, N: 0 },
+        period: 2, // مستويان مشغولان (K, L)
+        group: 6, // 6 إلكترونات في المستوى الخارجي (L)
+        learningFocus: "مقارنة الإلكترونات الفعلية مع السعة القصوى لمستويات الطاقة، فهم المستويات الخارجية غير المكتملة، تحديد المجموعة والدورة"
+      },
+      // السيناريو 3: الكالسيوم (Ca)
+      // التركيز التعليمي: ترتيب مستويات الطاقة من الأقل إلى الأعلى طاقة، مقارنة مستويات الطاقة المتعددة، ربط التوزيع الإلكتروني بموقع الجدول الدوري
+      {
+        id: "calcium",
+        elementName: "الكالسيوم",
+        elementSymbol: "Ca",
+        atomicNumber: 20,
+        totalElectrons: 20,
+        correctDistribution: { K: 2, L: 8, M: 8, N: 2 },
+        period: 4, // 4 مستويات مشغولة (K, L, M, N)
+        group: 2, // إلكترونان في المستوى الخارجي (N)
+        learningFocus: "ترتيب مستويات الطاقة من الأقل إلى الأعلى طاقة، مقارنة مستويات الطاقة المتعددة، ربط التوزيع الإلكتروني بموقع الجدول الدوري"
+      }
+    ]
+  },
+
+  // game_periodic_family_001: مقارنة عناصر الفلزات القلوية
+  game_periodic_family_001: {
+    type: "periodic_family_comparison",
+    familyName: "الفلزات القلوية",
+    familyDescription: "عناصر المجموعة الأولى في الجدول الدوري. جميعها لها إلكترون تكافؤ واحد في المستوى الخارجي، مما يجعلها نشطة كيميائياً.",
+    instruction: "قم ببناء ذرة كل عنصر من عناصر الفلزات القلوية، ولاحظ كيف تتغير الخصائص مع زيادة عدد مستويات الطاقة مع ثبات عدد إلكترونات التكافؤ.",
+    energyLevelCapacities: {
+      K: 2,
+      L: 8,
+      M: 8,
+      N: 18
+    },
+    elements: [
+      {
+        id: "li",
+        elementName: "الليثيوم",
+        elementSymbol: "Li",
+        atomicNumber: 3,
+        period: 2,
+        group: 1,
+        totalElectrons: 3,
+        correctDistribution: { K: 2, L: 1, M: 0, N: 0 },
+        properties: {
+          atomicRadius: 152, // نصف القطر الذري بالبيكومتر
+          ionizationEnergy: 520, // طاقة التأين بالكيلوجول/مول
+          reactivity: "عالية"
+        },
+        description: "أخف الفلزات القلوية، يستخدم في البطاريات",
+        hint: "الليثيوم له مستويان طاقة فقط (K و L)"
+      },
+      {
+        id: "na",
+        elementName: "الصوديوم",
+        elementSymbol: "Na",
+        atomicNumber: 11,
+        period: 3,
+        group: 1,
+        totalElectrons: 11,
+        correctDistribution: { K: 2, L: 8, M: 1, N: 0 },
+        properties: {
+          atomicRadius: 186,
+          ionizationEnergy: 496,
+          reactivity: "عالية"
+        },
+        description: "عنصر شائع في ملح الطعام، شديد التفاعل مع الماء",
+        hint: "الصوديوم له ثلاثة مستويات طاقة (K و L و M)"
+      },
+      {
+        id: "k",
+        elementName: "البوتاسيوم",
+        elementSymbol: "K",
+        atomicNumber: 19,
+        period: 4,
+        group: 1,
+        totalElectrons: 19,
+        correctDistribution: { K: 2, L: 8, M: 8, N: 1 },
+        properties: {
+          atomicRadius: 227,
+          ionizationEnergy: 419,
+          reactivity: "عالية"
+        },
+        description: "أكثر الفلزات القلوية تفاعلاً، ضروري للنباتات",
+        hint: "البوتاسيوم له أربعة مستويات طاقة (K و L و M و N)"
+      }
+    ],
+    comparisonQuestions: [
+      {
+        id: "q1",
+        question: "ما هو عدد إلكترونات التكافؤ في جميع عناصر الفلزات القلوية؟",
+        type: "valence",
+        correctAnswer: "1",
+        explanation: "جميع عناصر الفلزات القلوية لها إلكترون تكافؤ واحد في المستوى الخارجي، وهذا يفسر تشابه خصائصها الكيميائية."
+      },
+      {
+        id: "q2",
+        question: "كيف يتغير نصف القطر الذري عند الانتقال من الليثيوم إلى البوتاسيوم؟",
+        type: "trend",
+        correctAnswer: "يزداد",
+        explanation: "يزداد نصف القطر الذري مع زيادة عدد مستويات الطاقة. البوتاسيوم له 4 مستويات بينما الليثيوم له مستويان فقط."
+      },
+      {
+        id: "q3",
+        question: "كيف تتغير طاقة التأين عند الانتقال من الليثيوم إلى البوتاسيوم؟",
+        type: "trend",
+        correctAnswer: "تقل",
+        explanation: "تقل طاقة التأين مع زيادة عدد مستويات الطاقة لأن الإلكترون الخارجي يكون أبعد عن النواة وأسهل في إزالته."
+      }
+    ]
   }
+}
+
+// دمج جميع الألعاب في كائن واحد
+export const gamesData: Record<string, GameData> = {
+  ...baseGamesData,
+  ...chemicalPhysicsGamesData
 }

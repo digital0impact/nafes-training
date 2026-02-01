@@ -34,6 +34,12 @@ export default function DebugDbPage() {
       <div className="relative z-10 mx-auto max-w-4xl px-4 py-12">
         <div className="mb-6">
           <Link
+            href="/debug-connection"
+            className="text-sm font-medium text-teal-600 hover:text-teal-700 mr-4 inline-block"
+          >
+            فحص Supabase + قاعدة البيانات
+          </Link>
+          <Link
             href="/debug-auth"
             className="text-sm font-medium text-teal-600 hover:text-teal-700 mb-4 inline-block"
           >

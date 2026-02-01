@@ -30,12 +30,17 @@ export async function POST(request: Request) {
       )
     }
 
-    // التحقق من وجود المستخدم في قاعدة البيانات
     const existingUser = await prisma.user.findUnique({
       where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        subscriptionPlan: true,
+      },
     })
 
-    // إذا لم يكن المستخدم موجوداً، ننشئه
     if (!existingUser) {
       const newUser = await prisma.user.create({
         data: {

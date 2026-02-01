@@ -73,11 +73,14 @@ export default function GamesPage() {
 
   const gameTypeIcons: Record<string, string> = {
     "multiple_choice": "📝",
+    "interactive_circuit": "⚡",
     "drag_drop": "🖱️",
     "matching": "🔗",
     "ordering": "🔢",
     "scenario_choice": "🎯",
-    "map_selection": "🗺️"
+    "map_selection": "🗺️",
+    "atom_builder": "⚛️",
+    "periodic_family_comparison": "🧪"
   }
 
   const gameTypeLabels: Record<string, string> = {
@@ -86,7 +89,10 @@ export default function GamesPage() {
     "matching": "مطابقة",
     "ordering": "ترتيب",
     "scenario_choice": "سيناريو",
-    "map_selection": "خريطة"
+    "map_selection": "خريطة",
+    "interactive_circuit": "دائرة تفاعلية",
+    "atom_builder": "بناء الذرة",
+    "periodic_family_comparison": "مقارنة العائلة"
   }
 
   if (loading) {

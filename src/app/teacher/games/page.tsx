@@ -7,6 +7,8 @@ import Link from "next/link"
 import { SectionHeader } from "@/components/ui/section-header"
 import { PageBackground } from "@/components/layout/page-background"
 import { gamesData } from "@/data/games-data"
+import InteractiveCircuit from "@/components/games/InteractiveCircuit"
+import AtomBuilder from "@/components/games/AtomBuilder"
 
 type EducationalGame = {
   game_id: string
@@ -64,6 +66,14 @@ export default function TeacherGamesPage() {
 
   const [selectedRegions, setSelectedRegions] = useState<Set<string>>(new Set())
 
+  // Interactive circuit state
+  const [circuitScenarioIndex, setCircuitScenarioIndex] = useState(0)
+  const [circuitStates, setCircuitStates] = useState<Record<string, Record<string, boolean>>>({})
+
+  // Atom builder state
+  const [atomScenarioIndex, setAtomScenarioIndex] = useState(0)
+  const [electronDistributions, setElectronDistributions] = useState<Record<string, { K: number; L: number; M: number; N: number }>>({})
+
   useEffect(() => {
     async function loadGames() {
       try {
@@ -106,6 +116,10 @@ export default function TeacherGamesPage() {
     setScenarioIndex(0)
     setScenarioAnswers({})
     setSelectedRegions(new Set())
+    setCircuitScenarioIndex(0)
+    setCircuitStates({})
+    setAtomScenarioIndex(0)
+    setElectronDistributions({})
 
     if (d?.type === "ordering") {
       setOrderingItems([...d.items].sort(() => Math.random() - 0.5))
@@ -115,6 +129,30 @@ export default function TeacherGamesPage() {
       setDdItems([...d.items].sort(() => Math.random() - 0.5))
       setDdCategories(d.categories || [])
     }
+  }
+
+  const handleCircuitStateChange = (scenarioId: string, componentId: string, state: boolean) => {
+    setCircuitStates((prev) => ({
+      ...prev,
+      [scenarioId]: {
+        ...prev[scenarioId],
+        [componentId]: state
+      }
+    }))
+  }
+
+  const handleDistributionChange = (scenarioId: string, level: "K" | "L" | "M" | "N", delta: number) => {
+    setElectronDistributions((prev) => {
+      const current = prev[scenarioId] || { K: 0, L: 0, M: 0, N: 0 }
+      const newValue = Math.max(0, current[level] + delta)
+      return {
+        ...prev,
+        [scenarioId]: {
+          ...current,
+          [level]: newValue
+        }
+      }
+    })
   }
 
   const closePreview = () => {
@@ -255,6 +293,28 @@ export default function TeacherGamesPage() {
           if (!r.isCorrect && selectedRegions.has(r.id)) correct = Math.max(0, correct - 0.5)
         }
         break
+      case "interactive_circuit":
+        total = previewData.scenarios.length
+        for (const scenario of previewData.scenarios) {
+          const scenarioState = circuitStates[scenario.id] || {}
+          const isCorrect = Object.keys(scenario.correctState).every(
+            (key) => scenarioState[key] === scenario.correctState[key]
+          )
+          if (isCorrect) correct++
+        }
+        break
+      case "atom_builder":
+        total = previewData.scenarios.length
+        for (const scenario of previewData.scenarios) {
+          const distribution = electronDistributions[scenario.id] || { K: 0, L: 0, M: 0, N: 0 }
+          const isCorrect =
+            distribution.K === scenario.correctDistribution.K &&
+            distribution.L === scenario.correctDistribution.L &&
+            distribution.M === scenario.correctDistribution.M &&
+            distribution.N === scenario.correctDistribution.N
+          if (isCorrect) correct++
+        }
+        break
     }
 
     return Math.round((correct / total) * 100)
@@ -275,6 +335,19 @@ export default function TeacherGamesPage() {
         return Object.keys(scenarioAnswers).length === previewData.scenarios.length
       case "map_selection":
         return selectedRegions.size > 0
+      case "interactive_circuit":
+        return previewData.scenarios.every((scenario: any) => {
+          const scenarioState = circuitStates[scenario.id] || {}
+          return Object.keys(scenario.correctState).every(
+            (key) => scenarioState[key] !== undefined
+          )
+        })
+      case "atom_builder":
+        return previewData.scenarios.every((scenario: any) => {
+          const distribution = electronDistributions[scenario.id] || { K: 0, L: 0, M: 0, N: 0 }
+          const total = distribution.K + distribution.L + distribution.M + distribution.N
+          return total === scenario.totalElectrons
+        })
       default:
         return false
     }
@@ -299,6 +372,8 @@ export default function TeacherGamesPage() {
     setScenarioIndex(0)
     setScenarioAnswers({})
     setSelectedRegions(new Set())
+    setCircuitStates({})
+    setElectronDistributions({})
 
     if (previewData.type === "ordering") setOrderingItems([...previewData.items].sort(() => Math.random() - 0.5))
     if (previewData.type === "matching") setMatchingPairs([...previewData.pairs].sort(() => Math.random() - 0.5))
@@ -638,6 +713,76 @@ export default function TeacherGamesPage() {
                                 )
                               })}
                             </div>
+                          </div>
+                        )}
+
+                        {previewData.type === "interactive_circuit" && (
+                          <div className="rounded-xl border-2 border-purple-200 p-4">
+                            <InteractiveCircuit
+                              gameData={previewData}
+                              currentScenarioIndex={circuitScenarioIndex}
+                              circuitStates={circuitStates}
+                              onStateChange={handleCircuitStateChange}
+                              isSubmitted={submitted}
+                              showFeedback={submitted}
+                            />
+                            
+                            {previewData.scenarios.length > 1 && (
+                              <div className="mt-4 flex items-center justify-between">
+                                <button
+                                  onClick={() => setCircuitScenarioIndex(Math.max(0, circuitScenarioIndex - 1))}
+                                  disabled={circuitScenarioIndex === 0 || submitted}
+                                  className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50"
+                                >
+                                  السابق
+                                </button>
+                                <span className="text-sm text-slate-600">
+                                  السيناريو {circuitScenarioIndex + 1} من {previewData.scenarios.length}
+                                </span>
+                                <button
+                                  onClick={() => setCircuitScenarioIndex(Math.min(previewData.scenarios.length - 1, circuitScenarioIndex + 1))}
+                                  disabled={circuitScenarioIndex === previewData.scenarios.length - 1 || submitted}
+                                  className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50"
+                                >
+                                  التالي
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {previewData.type === "atom_builder" && (
+                          <div className="rounded-xl border-2 border-purple-200 p-4">
+                            <AtomBuilder
+                              gameData={previewData}
+                              currentScenarioIndex={atomScenarioIndex}
+                              electronDistributions={electronDistributions}
+                              onDistributionChange={handleDistributionChange}
+                              isSubmitted={submitted}
+                              showFeedback={submitted}
+                            />
+                            
+                            {previewData.scenarios.length > 1 && (
+                              <div className="mt-4 flex items-center justify-between">
+                                <button
+                                  onClick={() => setAtomScenarioIndex(Math.max(0, atomScenarioIndex - 1))}
+                                  disabled={atomScenarioIndex === 0 || submitted}
+                                  className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50"
+                                >
+                                  السابق
+                                </button>
+                                <span className="text-sm text-slate-600">
+                                  السيناريو {atomScenarioIndex + 1} من {previewData.scenarios.length}
+                                </span>
+                                <button
+                                  onClick={() => setAtomScenarioIndex(Math.min(previewData.scenarios.length - 1, atomScenarioIndex + 1))}
+                                  disabled={atomScenarioIndex === previewData.scenarios.length - 1 || submitted}
+                                  className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50"
+                                >
+                                  التالي
+                                </button>
+                              </div>
+                            )}
                           </div>
                         )}
 

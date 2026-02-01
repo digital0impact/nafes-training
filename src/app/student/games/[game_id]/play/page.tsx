@@ -5,6 +5,10 @@ import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { StudentAuthGuard, useStudentAuth } from "@/components/student"
 import { gamesData } from "@/data/games-data"
+import InteractiveCircuit from "@/components/games/InteractiveCircuit"
+import AtomBuilder from "@/components/games/AtomBuilder"
+import AtomBuilderEnhanced from "@/components/games/AtomBuilderEnhanced"
+import PeriodicFamilyComparison from "@/components/games/PeriodicFamilyComparison"
 
 type EducationalGame = {
   game_id: string
@@ -54,6 +58,62 @@ export default function GamePlayPage() {
   // Map selection state
   const [selectedRegions, setSelectedRegions] = useState<Set<string>>(new Set())
   
+  // Interactive circuit state
+  const [circuitScenarioIndex, setCircuitScenarioIndex] = useState(0)
+  const [circuitStates, setCircuitStates] = useState<Record<string, Record<string, boolean>>>({})
+  
+  const handleCircuitStateChange = (scenarioId: string, componentId: string, state: boolean) => {
+    setCircuitStates((prev) => ({
+      ...prev,
+      [scenarioId]: {
+        ...prev[scenarioId],
+        [componentId]: state
+      }
+    }))
+  }
+
+  // Atom builder state
+  const [atomScenarioIndex, setAtomScenarioIndex] = useState(0)
+  const [electronDistributions, setElectronDistributions] = useState<Record<string, { K: number; L: number; M: number; N: number }>>({})
+
+  const handleDistributionChange = (scenarioId: string, level: "K" | "L" | "M" | "N", delta: number) => {
+    setElectronDistributions((prev) => {
+      const current = prev[scenarioId] || { K: 0, L: 0, M: 0, N: 0 }
+      const newValue = Math.max(0, current[level] + delta)
+      return {
+        ...prev,
+        [scenarioId]: {
+          ...current,
+          [level]: newValue
+        }
+      }
+    })
+  }
+
+  // Periodic family comparison state
+  const [periodicFamilyElementIndex, setPeriodicFamilyElementIndex] = useState(0)
+  const [periodicFamilyDistributions, setPeriodicFamilyDistributions] = useState<Record<string, { K: number; L: number; M: number; N: number }>>({})
+  const [periodicFamilyAnswers, setPeriodicFamilyAnswers] = useState<Record<string, string>>({})
+
+  const handlePeriodicFamilyDistributionChange = (elementId: string, level: "K" | "L" | "M" | "N", delta: number) => {
+    setPeriodicFamilyDistributions((prev) => {
+      const current = prev[elementId] || { K: 0, L: 0, M: 0, N: 0 }
+      const newValue = Math.max(0, current[level] + delta)
+      return {
+        ...prev,
+        [elementId]: {
+          ...current,
+          [level]: newValue
+        }
+      }
+    })
+  }
+
+  const handlePeriodicFamilyAnswer = (questionId: string, answer: string) => {
+    if (isSubmitted) return
+    setPeriodicFamilyAnswers({ ...periodicFamilyAnswers, [questionId]: answer })
+  }
+  
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [score, setScore] = useState(0)
   const [showFeedback, setShowFeedback] = useState(false)
@@ -97,6 +157,16 @@ export default function GamePlayPage() {
             setCurrentScenarioIndex(0)
           } else if (dataForGame.type === "map_selection") {
             setSelectedRegions(new Set())
+          } else if (dataForGame.type === "interactive_circuit") {
+            setCircuitScenarioIndex(0)
+            setCircuitStates({})
+          } else if (dataForGame.type === "atom_builder") {
+            setAtomScenarioIndex(0)
+            setElectronDistributions({})
+          } else if (dataForGame.type === "periodic_family_comparison") {
+            setPeriodicFamilyElementIndex(0)
+            setPeriodicFamilyDistributions({})
+            setPeriodicFamilyAnswers({})
           }
           
           // بدء حساب الوقت
@@ -236,6 +306,43 @@ export default function GamePlayPage() {
           }
         })
         break
+
+      case "interactive_circuit":
+        total = gameData.scenarios.length
+        gameData.scenarios.forEach((scenario: any) => {
+          const scenarioState = circuitStates[scenario.id] || {}
+          const isCorrect = Object.keys(scenario.correctState).every(
+            (key) => scenarioState[key] === scenario.correctState[key]
+          )
+          if (isCorrect) correct++
+        })
+        break
+
+      case "atom_builder":
+        total = gameData.scenarios.length
+        gameData.scenarios.forEach((scenario: any) => {
+          const distribution = electronDistributions[scenario.id] || { K: 0, L: 0, M: 0, N: 0 }
+          const isCorrect =
+            distribution.K === scenario.correctDistribution.K &&
+            distribution.L === scenario.correctDistribution.L &&
+            distribution.M === scenario.correctDistribution.M &&
+            distribution.N === scenario.correctDistribution.N
+          if (isCorrect) correct++
+        })
+        break
+
+      case "periodic_family_comparison":
+        total = gameData.elements.length
+        gameData.elements.forEach((element: any) => {
+          const distribution = periodicFamilyDistributions[element.id] || { K: 0, L: 0, M: 0, N: 0 }
+          const isCorrect =
+            distribution.K === element.correctDistribution.K &&
+            distribution.L === element.correctDistribution.L &&
+            distribution.M === element.correctDistribution.M &&
+            distribution.N === element.correctDistribution.N
+          if (isCorrect) correct++
+        })
+        break
     }
 
     return Math.round((correct / total) * 100)
@@ -264,6 +371,28 @@ export default function GamePlayPage() {
         break
       case "map_selection":
         isComplete = selectedRegions.size > 0
+        break
+      case "interactive_circuit":
+        isComplete = gameData.scenarios.every((scenario: any) => {
+          const scenarioState = circuitStates[scenario.id] || {}
+          return Object.keys(scenario.correctState).every(
+            (key) => scenarioState[key] !== undefined
+          )
+        })
+        break
+      case "atom_builder":
+        isComplete = gameData.scenarios.every((scenario: any) => {
+          const distribution = electronDistributions[scenario.id] || { K: 0, L: 0, M: 0, N: 0 }
+          const total = distribution.K + distribution.L + distribution.M + distribution.N
+          return total === scenario.totalElectrons
+        })
+        break
+      case "periodic_family_comparison":
+        isComplete = gameData.elements.every((element: any) => {
+          const distribution = periodicFamilyDistributions[element.id] || { K: 0, L: 0, M: 0, N: 0 }
+          const total = distribution.K + distribution.L + distribution.M + distribution.N
+          return total === element.totalElectrons
+        })
         break
     }
 
@@ -301,6 +430,18 @@ export default function GamePlayPage() {
         break
       case "map_selection":
         answersData = { selectedRegions: Array.from(selectedRegions) }
+        break
+      case "interactive_circuit":
+        answersData = { circuitStates }
+        break
+      case "atom_builder":
+        answersData = { electronDistributions }
+        break
+      case "periodic_family_comparison":
+        answersData = { 
+          electronDistributions: periodicFamilyDistributions,
+          comparisonAnswers: periodicFamilyAnswers
+        }
         break
     }
 
@@ -764,6 +905,119 @@ export default function GamePlayPage() {
           </div>
         )}
 
+        {/* Game Area - Interactive Circuit */}
+        {gameData.type === "interactive_circuit" && (
+          <div className="card">
+            <InteractiveCircuit
+              gameData={gameData}
+              currentScenarioIndex={circuitScenarioIndex}
+              circuitStates={circuitStates}
+              onStateChange={handleCircuitStateChange}
+              isSubmitted={isSubmitted}
+              showFeedback={isSubmitted}
+            />
+            
+            {/* Navigation for multiple scenarios */}
+            {gameData.scenarios.length > 1 && (
+              <div className="mt-6 flex items-center justify-between">
+                <button
+                  onClick={() => setCircuitScenarioIndex(Math.max(0, circuitScenarioIndex - 1))}
+                  disabled={circuitScenarioIndex === 0 || isSubmitted}
+                  className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  السابق
+                </button>
+                <span className="text-sm text-slate-600">
+                  السيناريو {circuitScenarioIndex + 1} من {gameData.scenarios.length}
+                </span>
+                <button
+                  onClick={() => setCircuitScenarioIndex(Math.min(gameData.scenarios.length - 1, circuitScenarioIndex + 1))}
+                  disabled={circuitScenarioIndex === gameData.scenarios.length - 1 || isSubmitted}
+                  className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  التالي
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Game Area - Atom Builder (Enhanced with 4 stages) */}
+        {gameData.type === "atom_builder" && (
+          <div className="card">
+            <AtomBuilderEnhanced
+              gameData={gameData}
+              currentScenarioIndex={atomScenarioIndex}
+              electronDistributions={electronDistributions}
+              onDistributionChange={handleDistributionChange}
+              isSubmitted={isSubmitted}
+              showFeedback={isSubmitted}
+            />
+            
+            {/* Navigation for multiple scenarios */}
+            {gameData.scenarios.length > 1 && (
+              <div className="mt-6 flex items-center justify-between">
+                <button
+                  onClick={() => setAtomScenarioIndex(Math.max(0, atomScenarioIndex - 1))}
+                  disabled={atomScenarioIndex === 0 || isSubmitted}
+                  className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  السابق
+                </button>
+                <span className="text-sm text-slate-600">
+                  السيناريو {atomScenarioIndex + 1} من {gameData.scenarios.length}
+                </span>
+                <button
+                  onClick={() => setAtomScenarioIndex(Math.min(gameData.scenarios.length - 1, atomScenarioIndex + 1))}
+                  disabled={atomScenarioIndex === gameData.scenarios.length - 1 || isSubmitted}
+                  className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  التالي
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Game Area - Periodic Family Comparison */}
+        {gameData.type === "periodic_family_comparison" && (
+          <div className="card">
+            <PeriodicFamilyComparison
+              gameData={gameData}
+              currentElementIndex={periodicFamilyElementIndex}
+              electronDistributions={periodicFamilyDistributions}
+              onDistributionChange={handlePeriodicFamilyDistributionChange}
+              comparisonAnswers={periodicFamilyAnswers}
+              onComparisonAnswer={handlePeriodicFamilyAnswer}
+              isSubmitted={isSubmitted}
+              showFeedback={isSubmitted}
+            />
+            
+            {/* Navigation for multiple elements */}
+            {gameData.elements.length > 1 && (
+              <div className="mt-6 flex items-center justify-between">
+                <button
+                  onClick={() => setPeriodicFamilyElementIndex(Math.max(0, periodicFamilyElementIndex - 1))}
+                  disabled={periodicFamilyElementIndex === 0 || isSubmitted}
+                  className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  السابق
+                </button>
+                <span className="text-sm text-slate-600">
+                  العنصر {periodicFamilyElementIndex + 1} من {gameData.elements.length}
+                </span>
+                <button
+                  onClick={() => setPeriodicFamilyElementIndex(Math.min(gameData.elements.length - 1, periodicFamilyElementIndex + 1))}
+                  disabled={periodicFamilyElementIndex === gameData.elements.length - 1 || isSubmitted}
+                  className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  التالي
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Feedback Overlay */}
         {showFeedback && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -803,6 +1057,13 @@ export default function GamePlayPage() {
                     setCurrentScenarioIndex(0)
                   } else if (gameData.type === "map_selection") {
                     setSelectedRegions(new Set())
+                  } else if (gameData.type === "atom_builder") {
+                    setElectronDistributions({})
+                    setAtomScenarioIndex(0)
+                  } else if (gameData.type === "periodic_family_comparison") {
+                    setPeriodicFamilyDistributions({})
+                    setPeriodicFamilyElementIndex(0)
+                    setPeriodicFamilyAnswers({})
                   }
                 }}
                 className="px-6 rounded-2xl border border-slate-300 bg-white py-3 font-semibold text-slate-700 hover:bg-slate-50 transition"

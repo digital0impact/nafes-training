@@ -14,7 +14,9 @@
     "check-env": "tsx scripts/simple-check.ts",
     "show-env": "tsx scripts/show-env.ts",
     "check-url": "tsx scripts/check-db-url.ts",
-    "check-keys": "tsx scripts/check-supabase-keys.ts"
+    "check-keys": "tsx scripts/check-supabase-keys.ts",
+    "check-all-env": "tsx scripts/check-all-env.ts",
+    "fix-db-url": "tsx scripts/fix-database-url.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",

@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { SectionHeader } from "@/components/ui/section-header"
 import { LearningOutcomeCard } from "@/components/ui/learning-outcome-card"
 import { PageBackground } from "@/components/layout/page-background"
@@ -24,6 +24,8 @@ export default function TeacherOutcomesPage() {
   })
   const [weekAssignments, setWeekAssignments] = useState<Record<string, string>>({})
   const [activeTab, setActiveTab] = useState<TabType>("view")
+  const [draggedItem, setDraggedItem] = useState<string | null>(null)
+  const [dragOverWeek, setDragOverWeek] = useState<string | null>(null)
 
   // مزامنة وضع التحرير مع التبويب النشط
   useEffect(() => {
@@ -306,6 +308,55 @@ export default function TeacherOutcomesPage() {
     localStorage.setItem("weekAssignments", JSON.stringify(newAssignments))
   }
 
+  // دوال السحب والإفلات
+  const handleDragStart = (e: React.DragEvent, topicKey: string) => {
+    setDraggedItem(topicKey)
+    e.dataTransfer.effectAllowed = "move"
+    e.dataTransfer.setData("text/html", topicKey)
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = "0.5"
+    }
+  }
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = "1"
+    }
+    setDraggedItem(null)
+    setDragOverWeek(null)
+  }
+
+  const handleDragOver = (e: React.DragEvent, week: string) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = "move"
+    setDragOverWeek(week)
+  }
+
+  const handleDragLeave = () => {
+    setDragOverWeek(null)
+  }
+
+  const handleDrop = (e: React.DragEvent, targetWeek: string, targetPeriod: string) => {
+    e.preventDefault()
+    setDragOverWeek(null)
+
+    if (!draggedItem) return
+
+    const topicKey = draggedItem
+    const item = modifiedOutcomes.find((i) => getTopicKey(i) === topicKey)
+    if (!item) return
+
+    // تحديث الفترة إذا لزم الأمر
+    const currentPeriod = getTopicPeriod(item)
+    if (currentPeriod !== targetPeriod) {
+      changeTopicPeriod(topicKey, targetPeriod)
+    }
+
+    // تحديث الأسبوع
+    changeTopicWeek(topicKey, targetWeek)
+    setDraggedItem(null)
+  }
+
   const getTopicWeek = (item: (typeof learningOutcomes)[0], period: string) => {
     const topicKey = getTopicKey(item)
     const assignedWeek = weekAssignments[topicKey]
@@ -469,156 +520,325 @@ export default function TeacherOutcomesPage() {
         )}
 
         {/* عرض الخطة */}
-        <section className="space-y-8">
-          {periods.map((period) => {
-            if (!period) return null
-            const weekCount = weekCounts[period] || 8
-            const generatedWeeks = generateWeekNames(period, weekCount)
-            const weeksData = groupedOutcomes[period] || {}
+        {activeTab === "view" ? (
+          // عرض جدولي للخطة
+          <section className="card overflow-hidden p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gradient-to-r from-primary-600 to-primary-700 text-white">
+                    <th className="border border-primary-500 px-4 py-3 text-center font-bold text-sm">
+                      الفترة
+                    </th>
+                    <th className="border border-primary-500 px-4 py-3 text-center font-bold text-sm">
+                      عدد الأسابيع
+                    </th>
+                    <th className="border border-primary-500 px-4 py-3 text-right font-bold text-sm min-w-[200px]">
+                      الأسبوع
+                    </th>
+                    <th className="border border-primary-500 px-4 py-3 text-right font-bold text-sm min-w-[500px]">
+                      نواتج التعلم
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {periods.map((period) => {
+                    if (!period) return null
+                    const weekCount = weekCounts[period] || 8
+                    const generatedWeeks = generateWeekNames(period, weekCount)
+                    const weeksData = groupedOutcomes[period] || {}
+                    const allWeeksForPeriod = Array.from(
+                      new Set([...generatedWeeks, ...Object.keys(weeksData)])
+                    )
+                    const orderedWeeks = getOrderedWeeks(period, allWeeksForPeriod)
 
-            const allWeeksForPeriod = Array.from(
-              new Set([...generatedWeeks, ...Object.keys(weeksData)])
-            )
+                    return orderedWeeks.map((week, weekIndex) => {
+                      const items = weeksData[week] || []
+                      const orderedItems = getOrderedTopics(period, week, items)
+                      const isFirstWeekInPeriod = weekIndex === 0
 
-            return (
-              <div key={period} className="space-y-6">
-                {getOrderedWeeks(period, allWeeksForPeriod).map((week) => {
-                  const items = weeksData[week] || []
-                  const weekIndex = getOrderedWeeks(period, allWeeksForPeriod).indexOf(week)
-                  const totalWeeks = allWeeksForPeriod.length
-
-                  return (
-                    <div key={week} className="space-y-4">
-                      <div className="grid gap-4 md:grid-cols-2">
-                        {getOrderedTopics(period, week, items).map((item) => {
-                          const topicKey = getTopicKey(item)
-                          const orderedItems = getOrderedTopics(period, week, items)
-                          const topicIndex = orderedItems.findIndex(
-                            (i) => getTopicKey(i) === topicKey
-                          )
-                          const totalTopics = orderedItems.length
-                          const currentPeriod = getTopicPeriod(item)
-                          const currentWeek = getTopicWeek(item, currentPeriod)
-                          
-                          // الحصول على الأسابيع المتاحة للفترة المحددة
-                          const availableWeeks = currentPeriod 
-                            ? generateWeekNames(currentPeriod, weekCounts[currentPeriod] || 8)
-                            : []
-
-                          return (
-                            <div key={topicKey} className="relative">
-                              {isEditMode && (
-                                <div className="mb-3 space-y-3 p-4 bg-primary-50 rounded-xl border-2 border-primary-200">
-                                  <div className="flex items-center gap-2">
-                                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary-600 text-white font-bold text-sm shadow-md">
-                                      {topicIndex + 1}
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                      <button
-                                        onClick={() => moveTopic(period, week, topicKey, "up")}
-                                        disabled={topicIndex === 0}
-                                        className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
-                                          topicIndex === 0
-                                            ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                                            : "bg-primary-600 text-white hover:bg-primary-700 shadow-md"
-                                        }`}
-                                        title="نقل للأعلى"
-                                      >
-                                        ↑ للأعلى
-                                      </button>
-                                      <button
-                                        onClick={() => moveTopic(period, week, topicKey, "down")}
-                                        disabled={topicIndex === totalTopics - 1}
-                                        className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
-                                          topicIndex === totalTopics - 1
-                                            ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                                            : "bg-primary-600 text-white hover:bg-primary-700 shadow-md"
-                                        }`}
-                                        title="نقل للأسفل"
-                                      >
-                                        ↓ للأسفل
-                                      </button>
-                                    </div>
-                                  </div>
-                                  
-                                  {/* خطوات التخصيص */}
-                                  <div className="space-y-3 border-t border-primary-200 pt-3">
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-sm font-semibold text-slate-700 min-w-[80px]">الخطوة 1:</span>
-                                      <span className="text-xs text-slate-500">اختر الفترة</span>
-                                    </div>
-                                    <select
-                                      value={currentPeriod}
-                                      onChange={(e) => {
-                                        changeTopicPeriod(topicKey, e.target.value)
-                                      }}
-                                      className="w-full rounded-lg border-2 border-primary-300 bg-white px-4 py-2.5 text-sm font-semibold text-primary-700 shadow-md focus:border-primary-500 focus:outline-none"
-                                      title="تغيير الفترة"
-                                    >
-                                      <option value="الفترة الأولى">الفترة الأولى</option>
-                                      <option value="الفترة الثانية">الفترة الثانية</option>
-                                    </select>
-                                    
-                                    {currentPeriod && (
-                                      <>
-                                        <div className="flex items-center gap-2">
-                                          <span className="text-sm font-semibold text-slate-700 min-w-[80px]">الخطوة 2:</span>
-                                          <span className="text-xs text-slate-500">اختر الأسبوع</span>
-                                        </div>
-                                        <select
-                                          value={currentWeek}
-                                          onChange={(e) => {
-                                            changeTopicWeek(topicKey, e.target.value)
-                                          }}
-                                          className="w-full rounded-lg border-2 border-primary-300 bg-white px-4 py-2.5 text-sm font-semibold text-primary-700 shadow-md focus:border-primary-500 focus:outline-none"
-                                          title="تغيير الأسبوع"
-                                        >
-                                          <option value="">اختر الأسبوع</option>
-                                          {availableWeeks.map((weekName) => (
-                                            <option key={weekName} value={weekName}>
-                                              {weekName}
-                                            </option>
-                                          ))}
-                                        </select>
-                                      </>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                              <div
-                                className={
-                                  isEditMode
-                                    ? "border-2 border-primary-300 rounded-2xl p-4 bg-primary-50/30"
-                                    : ""
-                                }
-                              >
-                                <LearningOutcomeCard
-                                  item={{ ...item, period: currentPeriod }}
-                                />
-                                {isEditMode && (
-                                  <div className="mt-3 flex items-center justify-between text-xs">
-                                    <span className="text-slate-500">
-                                      الترتيب: {topicIndex + 1} من {totalTopics}
-                                    </span>
-                                    {currentPeriod !== item.period && (
-                                      <span className="text-amber-600 font-semibold">
-                                        ⚠ تم نقلها من {item.period || "غير محدد"}
-                                      </span>
-                                    )}
-                                  </div>
-                                )}
+                      return (
+                        <tr
+                          key={`${period}-${week}`}
+                          className={`hover:bg-slate-50 transition-colors ${
+                            weekIndex % 2 === 0 ? "bg-white" : "bg-slate-50/50"
+                          }`}
+                        >
+                          {isFirstWeekInPeriod && (
+                            <td
+                              rowSpan={orderedWeeks.length}
+                              className="border border-slate-200 px-4 py-3 text-center align-top bg-primary-50 font-bold text-primary-900"
+                            >
+                              <div className="flex flex-col items-center justify-center min-h-[60px]">
+                                <span className="text-lg">{period}</span>
                               </div>
+                            </td>
+                          )}
+                          {isFirstWeekInPeriod && (
+                            <td
+                              rowSpan={orderedWeeks.length}
+                              className="border border-slate-200 px-4 py-3 text-center align-top bg-primary-50 font-bold text-primary-900"
+                            >
+                              <div className="flex flex-col items-center justify-center min-h-[60px]">
+                                <span className="text-2xl">{weekCount}</span>
+                                <span className="text-sm">أسبوع</span>
+                              </div>
+                            </td>
+                          )}
+                          <td className="border border-slate-200 px-4 py-3 text-right font-semibold text-slate-700">
+                            <div className="flex items-center justify-end gap-2">
+                              <span className="text-base">{week}</span>
                             </div>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )
-          })}
-        </section>
+                          </td>
+                          <td className="border border-slate-200 px-4 py-3">
+                            {orderedItems.length > 0 ? (
+                              <div className="space-y-3">
+                                {orderedItems.map((item, itemIndex) => {
+                                  const currentPeriod = getTopicPeriod(item)
+                                  return (
+                                    <div
+                                      key={getTopicKey(item)}
+                                      className="rounded-lg border border-slate-200 bg-white p-3 hover:shadow-md transition-all"
+                                    >
+                                      <div className="flex items-start gap-3">
+                                        <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-bold">
+                                          {itemIndex + 1}
+                                        </span>
+                                        <div className="flex-1 space-y-2">
+                                          <div>
+                                            <p className="text-sm font-bold text-slate-900 mb-1">
+                                              {item.domain}
+                                            </p>
+                                            <p className="text-xs font-semibold text-primary-700">
+                                              {item.lesson}
+                                            </p>
+                                          </div>
+                                          <p className="text-xs text-slate-700 leading-relaxed">
+                                            {item.outcome}
+                                          </p>
+                                          {item.indicators && item.indicators.length > 0 && (
+                                            <div className="mt-2 pt-2 border-t border-slate-100 space-y-1">
+                                              <p className="text-xs font-semibold text-primary-700 mb-1">المؤشرات:</p>
+                                              {item.indicators.map((indicator, idx) => (
+                                                <p key={idx} className="text-xs text-primary-600 leading-relaxed pr-2">
+                                                  • {indicator}
+                                                </p>
+                                              ))}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            ) : (
+                              <div className="text-center py-6 text-slate-400 text-sm italic">
+                                لا توجد نواتج تعلم لهذا الأسبوع
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    })
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ) : (
+          // عرض جدولي لوضع التحرير مع السحب والإفلات
+          <section className="card overflow-hidden p-0">
+            <div className="p-4 bg-amber-50 border-b border-amber-200">
+              <p className="text-sm text-amber-800">
+                <span className="font-semibold">💡 تلميح:</span> اسحبي نواتج التعلم وأفلتيها في الأسبوع المناسب. يمكنك أيضاً استخدام القوائم المنسدلة لتغيير الفترة والأسبوع.
+              </p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gradient-to-r from-amber-600 to-amber-700 text-white">
+                    <th className="border border-amber-500 px-4 py-3 text-center font-bold text-sm">
+                      الفترة
+                    </th>
+                    <th className="border border-amber-500 px-4 py-3 text-center font-bold text-sm">
+                      عدد الأسابيع
+                    </th>
+                    <th className="border border-amber-500 px-4 py-3 text-right font-bold text-sm min-w-[200px]">
+                      الأسبوع
+                    </th>
+                    <th className="border border-amber-500 px-4 py-3 text-right font-bold text-sm min-w-[500px]">
+                      نواتج التعلم (اسحبي وأفلتي)
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {periods.map((period) => {
+                    if (!period) return null
+                    const weekCount = weekCounts[period] || 8
+                    const generatedWeeks = generateWeekNames(period, weekCount)
+                    const weeksData = groupedOutcomes[period] || {}
+                    const allWeeksForPeriod = Array.from(
+                      new Set([...generatedWeeks, ...Object.keys(weeksData)])
+                    )
+                    const orderedWeeks = getOrderedWeeks(period, allWeeksForPeriod)
+
+                    return orderedWeeks.map((week, weekIndex) => {
+                      const items = weeksData[week] || []
+                      const orderedItems = getOrderedTopics(period, week, items)
+                      const isFirstWeekInPeriod = weekIndex === 0
+                      const isDragOver = dragOverWeek === week
+
+                      return (
+                        <tr
+                          key={`${period}-${week}`}
+                          className={`hover:bg-slate-50 transition-colors ${
+                            weekIndex % 2 === 0 ? "bg-white" : "bg-slate-50/50"
+                          } ${isDragOver ? "bg-blue-100" : ""}`}
+                          onDragOver={(e) => handleDragOver(e, week)}
+                          onDragLeave={handleDragLeave}
+                          onDrop={(e) => handleDrop(e, week, period)}
+                        >
+                          {isFirstWeekInPeriod && (
+                            <td
+                              rowSpan={orderedWeeks.length}
+                              className="border border-slate-200 px-4 py-3 text-center align-top bg-amber-50 font-bold text-amber-900"
+                            >
+                              <div className="flex flex-col items-center justify-center min-h-[60px]">
+                                <span className="text-lg">{period}</span>
+                              </div>
+                            </td>
+                          )}
+                          {isFirstWeekInPeriod && (
+                            <td
+                              rowSpan={orderedWeeks.length}
+                              className="border border-slate-200 px-4 py-3 text-center align-top bg-amber-50 font-bold text-amber-900"
+                            >
+                              <div className="flex flex-col items-center justify-center min-h-[60px]">
+                                <span className="text-2xl">{weekCount}</span>
+                                <span className="text-sm">أسبوع</span>
+                              </div>
+                            </td>
+                          )}
+                          <td className="border border-slate-200 px-4 py-3 text-right font-semibold text-slate-700">
+                            <div className="flex items-center justify-end gap-2">
+                              <span className="text-base">{week}</span>
+                            </div>
+                          </td>
+                          <td 
+                            className={`border border-slate-200 px-4 py-3 min-h-[100px] ${
+                              isDragOver ? "bg-blue-100 border-blue-400 border-dashed border-4" : ""
+                            }`}
+                          >
+                            {orderedItems.length > 0 ? (
+                              <div className="space-y-3">
+                                {orderedItems.map((item, itemIndex) => {
+                                  const topicKey = getTopicKey(item)
+                                  const currentPeriod = getTopicPeriod(item)
+                                  const currentWeek = getTopicWeek(item, currentPeriod)
+                                  const availableWeeks = currentPeriod 
+                                    ? generateWeekNames(currentPeriod, weekCounts[currentPeriod] || 8)
+                                    : []
+                                  const isDragging = draggedItem === topicKey
+
+                                  return (
+                                    <div
+                                      key={topicKey}
+                                      draggable
+                                      onDragStart={(e) => handleDragStart(e, topicKey)}
+                                      onDragEnd={handleDragEnd}
+                                      className={`rounded-lg border-2 p-3 bg-white hover:shadow-lg transition-all cursor-move ${
+                                        isDragging 
+                                          ? "opacity-50 border-primary-400 bg-primary-50" 
+                                          : "border-slate-200 hover:border-primary-300"
+                                      }`}
+                                    >
+                                      <div className="flex items-start gap-3">
+                                        <div className="flex-shrink-0 flex flex-col gap-1">
+                                          <span className="w-7 h-7 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-bold">
+                                            {itemIndex + 1}
+                                          </span>
+                                          <span className="text-xs text-slate-400 text-center">اسحب</span>
+                                        </div>
+                                        <div className="flex-1 space-y-2">
+                                          <div>
+                                            <p className="text-sm font-bold text-slate-900 mb-1">
+                                              {item.domain}
+                                            </p>
+                                            <p className="text-xs font-semibold text-primary-700">
+                                              {item.lesson}
+                                            </p>
+                                          </div>
+                                          <p className="text-xs text-slate-700 leading-relaxed">
+                                            {item.outcome}
+                                          </p>
+                                          {item.indicators && item.indicators.length > 0 && (
+                                            <div className="mt-2 pt-2 border-t border-slate-100 space-y-1">
+                                              <p className="text-xs font-semibold text-primary-700 mb-1">المؤشرات:</p>
+                                              {item.indicators.map((indicator, idx) => (
+                                                <p key={idx} className="text-xs text-primary-600 leading-relaxed pr-2">
+                                                  • {indicator}
+                                                </p>
+                                              ))}
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div className="flex-shrink-0 flex flex-col gap-2">
+                                          <select
+                                            value={currentPeriod}
+                                            onChange={(e) => {
+                                              changeTopicPeriod(topicKey, e.target.value)
+                                            }}
+                                            className="text-xs rounded-lg border border-slate-300 bg-white px-2 py-1 text-slate-700 focus:border-primary-500 focus:outline-none"
+                                            title="تغيير الفترة"
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
+                                            <option value="الفترة الأولى">الفترة الأولى</option>
+                                            <option value="الفترة الثانية">الفترة الثانية</option>
+                                          </select>
+                                          {currentPeriod && (
+                                            <select
+                                              value={currentWeek}
+                                              onChange={(e) => {
+                                                changeTopicWeek(topicKey, e.target.value)
+                                              }}
+                                              className="text-xs rounded-lg border border-slate-300 bg-white px-2 py-1 text-slate-700 focus:border-primary-500 focus:outline-none"
+                                              title="تغيير الأسبوع"
+                                              onClick={(e) => e.stopPropagation()}
+                                            >
+                                              <option value="">اختر الأسبوع</option>
+                                              {availableWeeks.map((weekName) => (
+                                                <option key={weekName} value={weekName}>
+                                                  {weekName.replace(`${currentPeriod} - `, "")}
+                                                </option>
+                                              ))}
+                                            </select>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            ) : (
+                              <div 
+                                className={`text-center py-8 text-slate-400 text-sm italic rounded-lg border-2 border-dashed ${
+                                  isDragOver ? "border-blue-400 bg-blue-50" : "border-slate-300"
+                                }`}
+                              >
+                                {isDragOver ? "أفلت هنا" : "اسحبي ناتج تعلم هنا"}
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    })
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
       </div>
     </main>
   )
