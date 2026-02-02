@@ -18,11 +18,14 @@ export type {
   AtomBuilderGameData,
   AtomScenario,
   PeriodicFamilyGameData,
-  PeriodicFamilyElement
+  PeriodicFamilyElement,
+  VolcanoTypesGameData,
+  VolcanoTypeData
 } from "@/types/games"
 
 import type { GameData } from "@/types/games"
 import { chemicalPhysicsGamesData } from "./chemical-physics-games-data"
+import { VOLCANO_TYPES } from "./volcano-types-data"
 
 const baseGamesData: Record<string, GameData> = {
   // game_001: ترتيب خطوات المنهج العلمي (ordering)
@@ -63,17 +66,12 @@ const baseGamesData: Record<string, GameData> = {
     correctAnswer: "حركة الصفائح التكتونية"
   },
 
-  // game_004: تصنيف أنواع البراكين (drag_drop)
+  // game_004: بركانك الصحيح - أنواع البراكين (4 مستويات: تعريف، خصائص، أمثلة، تحدي زمني)
   game_004: {
-    type: "drag_drop",
-    categories: ["بركان نشط", "بركان خامد", "بركان منقرض"],
-    items: [
-      { id: "1", text: "بركان كيلاويا", category: "بركان نشط" },
-      { id: "2", text: "بركان فيزوف", category: "بركان خامد" },
-      { id: "3", text: "بركان إتنا", category: "بركان نشط" },
-      { id: "4", text: "بركان كراكاتوا", category: "بركان منقرض" }
-    ]
-  },
+    type: "volcano_types",
+    volcanoTypes: VOLCANO_TYPES,
+    level4TimePerQuestion: 10,
+  } as GameData,
 
   // game_005: ربط حدود الصفائح بنتائجها (matching)
   game_005: {

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { PageBackground } from "@/components/layout/page-background"
-import { TeacherHeader } from "@/features/classes/components/teacher-header"
 import { requireAuth } from "@/lib/auth-server"
 
 type GameAttempt = {
@@ -135,8 +134,6 @@ export default function GameAttemptsPage() {
     <main className="relative min-h-screen overflow-hidden bg-[#faf9f7]">
       <PageBackground />
       <div className="relative z-10 space-y-6 px-4 py-6">
-        <TeacherHeader />
-
         <div className="card bg-white">
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
             محاولات الألعاب التعليمية

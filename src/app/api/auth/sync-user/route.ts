@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = createClient()
+    const supabase = await createClient()
     
     // التحقق من أن المستخدم مسجل دخول
     const { data: { user }, error: authError } = await supabase.auth.getUser()

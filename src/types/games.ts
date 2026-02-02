@@ -30,12 +30,13 @@ export type GameType =
   | "multiple_choice" 
   | "drag_drop" 
   | "ordering" 
-  | "matching"
-  | "scenario_choice"
-  | "map_selection"
-  | "interactive_circuit"
-  | "atom_builder"
+  | "matching" 
+  | "scenario_choice" 
+  | "map_selection" 
+  | "interactive_circuit" 
+  | "atom_builder" 
   | "periodic_family_comparison"
+  | "volcano_types"
 
 // ============================================
 // واجهات لعبة الاختيار من متعدد (Multiple Choice)
@@ -89,6 +90,14 @@ export interface CorrectMoleculeStructure {
 }
 
 /**
+ * سيناريو إضافي للعبة السحب والإفلات (يُستخدم في game_force_003 وغيرها)
+ */
+export interface AdditionalDragDropScenario {
+  scenario: string
+  answer: string
+}
+
+/**
  * بيانات لعبة السحب والإفلات
  */
 export interface DragDropGameData {
@@ -98,6 +107,8 @@ export interface DragDropGameData {
   instruction?: string // تعليمات خاصة
   equation?: string // للمعادلات الكيميائية
   correctStructure?: CorrectMoleculeStructure // لبناء الجزيئات
+  scenario?: string // سيناريو الحالة الأولى
+  additionalScenarios?: AdditionalDragDropScenario[] // سيناريوهات إضافية
 }
 
 // ============================================
@@ -329,6 +340,40 @@ export interface PeriodicFamilyGameData {
 }
 
 // ============================================
+// واجهات لعبة أنواع البراكين (بركانك الصحيح) - متعددة المستويات
+// ============================================
+
+/** مستوى الصعوبة لكل نوع بركان */
+export type VolcanoDifficulty = "easy" | "medium" | "hard"
+
+/** مستوى التعلم (NAFS) */
+export type VolcanoLevel = "remedial" | "standard" | "advanced"
+
+/** نموذج بيانات نوع بركان واحد - متوافق مع مؤشرات نافس */
+export interface VolcanoTypeData {
+  id: string
+  name_ar: string
+  definition: string
+  characteristics: string[]
+  example_name: string
+  example_location: string
+  difficulty: VolcanoDifficulty
+  level: VolcanoLevel
+  /** مسار الصورة من مجلد public (مثل /images/activities/بركان درعي.gif) */
+  imagePath?: string
+  /** خاصية واحدة لمستوى مطابقة الخصائص (مثل: تدفقات لابة سائلة) */
+  matchCharacteristic?: string
+}
+
+/** بيانات لعبة أنواع البراكين (4 مستويات: تعريف، خصائص، أمثلة، تحدي زمني) */
+export interface VolcanoTypesGameData {
+  type: "volcano_types"
+  volcanoTypes: VolcanoTypeData[]
+  /** وقت كل سؤال بالثواني في المستوى الرابع */
+  level4TimePerQuestion?: number
+}
+
+// ============================================
 // واجهة موحدة لبيانات الألعاب
 // ============================================
 
@@ -345,26 +390,16 @@ export type GameData =
   | InteractiveCircuitGameData
   | AtomBuilderGameData
   | PeriodicFamilyGameData
+  | VolcanoTypesGameData
 
 // ============================================
 // واجهات إضافية للبيانات المعقدة
 // ============================================
 
 /**
- * سيناريو إضافي للعبة السحب والإفلات (game_force_003)
+ * بيانات لعبة السحب والإفلات مع سيناريوهات إضافية (يُستخدم كمرجع، الخصائص موجودة في DragDropGameData)
  */
-export interface AdditionalDragDropScenario {
-  scenario: string
-  answer: string
-}
-
-/**
- * بيانات لعبة السحب والإفلات مع سيناريوهات إضافية
- */
-export interface DragDropWithScenarios extends DragDropGameData {
-  scenario?: string
-  additionalScenarios?: AdditionalDragDropScenario[]
-}
+export interface DragDropWithScenarios extends DragDropGameData {}
 
 // ============================================
 // واجهات حالة اللعبة (Game State)
@@ -535,6 +570,10 @@ export function isPeriodicFamilyGame(data: GameData): data is PeriodicFamilyGame
   return data.type === "periodic_family_comparison"
 }
 
+export function isVolcanoTypesGame(data: GameData): data is VolcanoTypesGameData {
+  return data.type === "volcano_types"
+}
+
 // ============================================
 // Helper Types
 // ============================================
@@ -552,6 +591,7 @@ export type GameDataByType<T extends GameType> =
   T extends "interactive_circuit" ? InteractiveCircuitGameData :
   T extends "atom_builder" ? AtomBuilderGameData :
   T extends "periodic_family_comparison" ? PeriodicFamilyGameData :
+  T extends "volcano_types" ? VolcanoTypesGameData :
   never
 
 /**
@@ -567,4 +607,5 @@ export type GameStateByType<T extends GameType> =
   T extends "interactive_circuit" ? InteractiveCircuitGameState :
   T extends "atom_builder" ? AtomBuilderGameState :
   T extends "periodic_family_comparison" ? PeriodicFamilyGameState :
+  T extends "volcano_types" ? Record<string, unknown> :
   never

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -16,9 +16,10 @@ export async function GET(
       );
     }
 
+    const { id } = await params;
     const testModel = await prisma.testModel.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: user.id, // التأكد من أن النموذج يخص المعلم
       },
     });
@@ -50,7 +51,7 @@ export async function GET(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -62,10 +63,10 @@ export async function DELETE(
       );
     }
 
-    // التحقق من أن النموذج يخص المعلم قبل الحذف
+    const { id } = await params;
     const testModel = await prisma.testModel.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: user.id,
       },
     });
@@ -79,7 +80,7 @@ export async function DELETE(
 
     await prisma.testModel.delete({
       where: {
-        id: params.id,
+        id,
       },
     });
 

@@ -60,7 +60,7 @@ export default function TeacherAuditLogPage() {
         >
           ← العودة للوحة التحكم
         </Link>
-        <h1 className="mt-2 text-2xl font-bold text-slate-900">سجل التدقيق (Audit Log)</h1>
+        <h1 className="mt-2 text-2xl font-bold text-slate-900">سجل التدقيق</h1>
         <p className="mt-1 text-sm text-slate-600">
           تسجيل دخول الزوار وتعليقاتهم وإجراءات التعطيل/التفعيل.
         </p>

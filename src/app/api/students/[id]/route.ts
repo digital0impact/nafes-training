@@ -7,15 +7,15 @@ import { prisma } from "@/lib/prisma";
  */
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireTeacher();
+    const { id } = await params;
 
-    // التحقق من أن الطالبة تنتمي لفصل المعلمة
     const student = await prisma.student.findFirst({
       where: {
-        id: params.id,
+        id,
         class: {
           userId: user.id,
         },
@@ -32,7 +32,7 @@ export async function DELETE(
     // حذف الطالبة
     await prisma.student.delete({
       where: {
-        id: params.id,
+        id,
       },
     });
 

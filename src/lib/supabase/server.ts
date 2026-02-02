@@ -16,7 +16,7 @@ import { cookies } from 'next/headers'
  * }
  * ```
  */
-export function createClient() {
+export async function createClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
 
@@ -71,7 +71,7 @@ export function createClient() {
     )
   }
 
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
@@ -83,7 +83,6 @@ export function createClient() {
           cookieStore.set({ name, value, ...options })
         } catch (error) {
           // قد يفشل في بعض السياقات (مثل middleware)
-          // يمكن تجاهل الخطأ في هذه الحالة
         }
       },
       remove(name: string, options: CookieOptions) {

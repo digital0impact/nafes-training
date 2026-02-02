@@ -8,14 +8,15 @@ import { updateClassSchema } from "@/lib/validations"
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireTeacher()
+    const { id } = await params
 
     const classData = await prisma.class.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: user.id, // التأكد من أن الفصل يخص المعلم
       },
       include: {
@@ -57,10 +58,11 @@ export async function GET(
  */
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireTeacher()
+    const { id } = await params
 
     const body = await request.json()
 
@@ -83,7 +85,7 @@ export async function PATCH(
     // التحقق من وجود الفصل وأنه يخص المعلم
     const existingClass = await prisma.class.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: user.id,
       },
     })
@@ -111,7 +113,7 @@ export async function PATCH(
 
     // تحديث الفصل
     const updatedClass = await prisma.class.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...updateData,
         code: updateData.code?.toUpperCase(),
@@ -143,15 +145,15 @@ export async function PATCH(
  */
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireTeacher()
+    const { id } = await params
 
-    // التحقق من وجود الفصل وأنه يخص المعلم
     const existingClass = await prisma.class.findUnique({
       where: {
-        id: params.id,
+        id,
         userId: user.id,
       },
       include: {
@@ -172,7 +174,7 @@ export async function DELETE(
 
     // حذف الفصل (الطالبات لن تُحذف، classId سيصبح null)
     await prisma.class.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({

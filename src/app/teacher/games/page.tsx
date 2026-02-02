@@ -9,6 +9,7 @@ import { PageBackground } from "@/components/layout/page-background"
 import { gamesData } from "@/data/games-data"
 import InteractiveCircuit from "@/components/games/InteractiveCircuit"
 import AtomBuilder from "@/components/games/AtomBuilder"
+import VolcanoTypesGame from "@/components/games/VolcanoTypesGame"
 
 type EducationalGame = {
   game_id: string
@@ -54,6 +55,7 @@ export default function TeacherGamesPage() {
   const [mcSelected, setMcSelected] = useState("")
 
   const [matchingPairs, setMatchingPairs] = useState<Array<{ id: string; label: string; target: string }>>([])
+  const [matchingTargets, setMatchingTargets] = useState<string[]>([])
   const [matchingSelectedLabel, setMatchingSelectedLabel] = useState<string | null>(null)
   const [matchingMatches, setMatchingMatches] = useState<Record<string, string>>({})
 
@@ -124,7 +126,9 @@ export default function TeacherGamesPage() {
     if (d?.type === "ordering") {
       setOrderingItems([...d.items].sort(() => Math.random() - 0.5))
     } else if (d?.type === "matching") {
-      setMatchingPairs([...d.pairs].sort(() => Math.random() - 0.5))
+      const shuffledPairs = [...d.pairs].sort(() => Math.random() - 0.5)
+      setMatchingPairs(shuffledPairs)
+      setMatchingTargets(shuffledPairs.map((p) => p.target).sort(() => Math.random() - 0.5))
     } else if (d?.type === "drag_drop") {
       setDdItems([...d.items].sort(() => Math.random() - 0.5))
       setDdCategories(d.categories || [])
@@ -376,7 +380,11 @@ export default function TeacherGamesPage() {
     setElectronDistributions({})
 
     if (previewData.type === "ordering") setOrderingItems([...previewData.items].sort(() => Math.random() - 0.5))
-    if (previewData.type === "matching") setMatchingPairs([...previewData.pairs].sort(() => Math.random() - 0.5))
+    if (previewData.type === "matching") {
+      const shuffledPairs = [...previewData.pairs].sort(() => Math.random() - 0.5)
+      setMatchingPairs(shuffledPairs)
+      setMatchingTargets(shuffledPairs.map((p) => p.target).sort(() => Math.random() - 0.5))
+    }
     if (previewData.type === "drag_drop") setDdItems([...previewData.items].sort(() => Math.random() - 0.5))
   }
 
@@ -504,6 +512,34 @@ export default function TeacherGamesPage() {
                       <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 text-center">
                         <p className="text-sm text-amber-800">بيانات اللعبة غير متاحة</p>
                       </div>
+                    ) : previewData.type === "volcano_types" ? (
+                      submitted ? (
+                        <div className="rounded-xl border-2 border-emerald-200 p-6 text-center bg-emerald-50">
+                          <p className="font-semibold text-emerald-900">انتهيت من المعاينة</p>
+                          <p className="text-lg font-bold text-emerald-800 mt-2">النتيجة: {score}%</p>
+                          <button
+                            onClick={closePreview}
+                            className="mt-4 px-6 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700"
+                          >
+                            إغلاق
+                          </button>
+                        </div>
+                      ) : (
+                        <VolcanoTypesGame
+                          gameData={previewData}
+                          game={{
+                            game_id: selectedGame.game_id,
+                            title: selectedGame.title,
+                            chapter: selectedGame.chapter,
+                            objective: selectedGame.objective,
+                            points: selectedGame.points,
+                          }}
+                          onComplete={(result) => {
+                            setScore(result.score)
+                            setSubmitted(true)
+                          }}
+                        />
+                      )
                     ) : (
                       <>
                         {previewData.type === "ordering" && (
@@ -585,18 +621,18 @@ export default function TeacherGamesPage() {
                                 })}
                               </div>
                               <div className="space-y-2">
-                                {matchingPairs.map((p) => (
+                                {matchingTargets.map((target) => (
                                   <button
-                                    key={p.id}
-                                    disabled={submitted || !matchingSelectedLabel || Object.values(matchingMatches).includes(p.target)}
+                                    key={target}
+                                    disabled={submitted || !matchingSelectedLabel || Object.values(matchingMatches).includes(target)}
                                     onClick={() => {
                                       if (!matchingSelectedLabel) return
-                                      setMatchingMatches({ ...matchingMatches, [matchingSelectedLabel]: p.target })
+                                      setMatchingMatches({ ...matchingMatches, [matchingSelectedLabel]: target })
                                       setMatchingSelectedLabel(null)
                                     }}
                                     className="w-full p-3 rounded-lg border-2 text-right bg-slate-50 border-slate-200 disabled:opacity-50"
                                   >
-                                    {p.target}
+                                    {target}
                                   </button>
                                 ))}
                               </div>

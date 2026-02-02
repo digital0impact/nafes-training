@@ -17,7 +17,7 @@ export default function PrivacyPolicyPage() {
             <h1 className="text-3xl font-bold text-slate-900 mb-4">
               سياسة الخصوصية
             </h1>
-            <p className="text-slate-600">
+            <p className="text-slate-600" suppressHydrationWarning>
               آخر تحديث: {new Date().toLocaleDateString("ar-SA")}
             </p>
           </div>

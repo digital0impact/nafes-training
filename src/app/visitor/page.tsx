@@ -275,16 +275,18 @@ export default function VisitorDashboard() {
           {loadingTab ? (
             <p className="text-slate-500">جاري التحميل...</p>
           ) : results ? (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <KpiCard label="عدد الفصول" value={String(results.classesCount)} hint="إجمالي الفصول" />
-              <KpiCard label="عدد الطالبات" value={String(results.studentsCount)} hint="إجمالي الطالبات" />
-              <KpiCard label="المحاولات الأسبوعية" value={String(results.weeklyAttempts)} hint="هذا الأسبوع" />
-              <KpiCard label="متوسط الصف" value={`${results.averageScore}%`} hint="نسبة مئوية" />
-              <KpiCard label="طالبات متقدمة" value={String(results.advancedStudents)} hint="درجة ≥ 80%" />
-              <KpiCard label="بحاجة لدعم" value={String(results.needSupportStudents)} hint="درجة &lt; 60%" />
-              <KpiCard label="ألعاب منجزة هذا الأسبوع" value={String(results.weeklyActivities)} hint="" />
-            </div>
-            <VisitorComments targetType="indicator" targetId="results" targetLabel="النتائج المجمعة" />
+            <>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <KpiCard label="عدد الفصول" value={String(results.classesCount)} hint="إجمالي الفصول" />
+                <KpiCard label="عدد الطالبات" value={String(results.studentsCount)} hint="إجمالي الطالبات" />
+                <KpiCard label="المحاولات الأسبوعية" value={String(results.weeklyAttempts)} hint="هذا الأسبوع" />
+                <KpiCard label="متوسط الصف" value={`${results.averageScore}%`} hint="نسبة مئوية" />
+                <KpiCard label="طالبات متقدمة" value={String(results.advancedStudents)} hint="درجة ≥ 80%" />
+                <KpiCard label="بحاجة لدعم" value={String(results.needSupportStudents)} hint="درجة أقل من 60%" />
+                <KpiCard label="ألعاب منجزة هذا الأسبوع" value={String(results.weeklyActivities)} hint="" />
+              </div>
+              <VisitorComments targetType="indicator" targetId="results" targetLabel="النتائج المجمعة" />
+            </>
           ) : (
             <p className="text-slate-500">لا توجد بيانات.</p>
           )}
@@ -297,31 +299,33 @@ export default function VisitorDashboard() {
           {loadingTab ? (
             <p className="text-slate-500">جاري التحميل...</p>
           ) : indicators?.indicators?.length ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-right text-sm">
-                <thead className="bg-slate-50 text-slate-500">
-                  <tr>
-                    <th className="px-4 py-2 font-semibold">المؤشر</th>
-                    <th className="px-4 py-2 font-semibold">متقن</th>
-                    <th className="px-4 py-2 font-semibold">غير متقن</th>
-                    <th className="px-4 py-2 font-semibold">المجموع</th>
-                    <th className="px-4 py-2 font-semibold">متوسط النقاط</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {indicators.indicators.map((ind) => (
-                    <tr key={ind.key} className="border-t border-slate-100">
-                      <td className="px-4 py-2 font-medium text-slate-800">{ind.key}</td>
-                      <td className="px-4 py-2">{ind.mastered}</td>
-                      <td className="px-4 py-2">{ind.notMastered}</td>
-                      <td className="px-4 py-2">{ind.total}</td>
-                      <td className="px-4 py-2">{ind.averageScore != null ? ind.averageScore : "-"}</td>
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full text-right text-sm">
+                  <thead className="bg-slate-50 text-slate-500">
+                    <tr>
+                      <th className="px-4 py-2 font-semibold">المؤشر</th>
+                      <th className="px-4 py-2 font-semibold">متقن</th>
+                      <th className="px-4 py-2 font-semibold">غير متقن</th>
+                      <th className="px-4 py-2 font-semibold">المجموع</th>
+                      <th className="px-4 py-2 font-semibold">متوسط النقاط</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <VisitorComments targetType="indicator" targetId="learning_indicators" targetLabel="مؤشرات التعلم" />
+                  </thead>
+                  <tbody>
+                    {indicators.indicators.map((ind) => (
+                      <tr key={ind.key} className="border-t border-slate-100">
+                        <td className="px-4 py-2 font-medium text-slate-800">{ind.key}</td>
+                        <td className="px-4 py-2">{ind.mastered}</td>
+                        <td className="px-4 py-2">{ind.notMastered}</td>
+                        <td className="px-4 py-2">{ind.total}</td>
+                        <td className="px-4 py-2">{ind.averageScore != null ? ind.averageScore : "-"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <VisitorComments targetType="indicator" targetId="learning_indicators" targetLabel="مؤشرات التعلم" />
+            </>
           ) : (
             <p className="text-slate-500">لا توجد مؤشرات.</p>
           )}

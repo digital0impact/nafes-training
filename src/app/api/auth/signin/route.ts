@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
     const { email, password } = validationResult.data
 
-    const supabase = createClient()
+    const supabase = await createClient()
 
     // تسجيل الدخول باستخدام Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({

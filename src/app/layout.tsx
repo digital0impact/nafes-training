@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl">
-      <body className={`${cairo.className} text-slate-900`}>
+      <body className={`${cairo.className} text-slate-900`} suppressHydrationWarning>
         <SessionProvider>
           {children}
         </SessionProvider>

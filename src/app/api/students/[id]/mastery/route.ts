@@ -7,15 +7,15 @@ import { prisma } from "@/lib/prisma"
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireTeacher()
+    const { id } = await params
 
-    // تأكد أن الطالبة تابعة للمعلم
     const student = await prisma.student.findFirst({
       where: {
-        id: params.id,
+        id,
         class: { userId: user.id },
       },
       select: { id: true, studentId: true, name: true },

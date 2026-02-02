@@ -33,7 +33,7 @@ export type VisitorProfileData = {
  */
 export async function getCurrentUser(): Promise<User | null> {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     
     const { data: { user }, error } = await supabase.auth.getUser()
     
