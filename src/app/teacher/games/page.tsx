@@ -10,6 +10,7 @@ import { gamesData } from "@/data/games-data"
 import InteractiveCircuit from "@/components/games/InteractiveCircuit"
 import AtomBuilder from "@/components/games/AtomBuilder"
 import VolcanoTypesGame from "@/components/games/VolcanoTypesGame"
+import GeologicalFaultsGame from "@/components/games/GeologicalFaultsGame"
 
 type EducationalGame = {
   game_id: string
@@ -526,6 +527,34 @@ export default function TeacherGamesPage() {
                         </div>
                       ) : (
                         <VolcanoTypesGame
+                          gameData={previewData}
+                          game={{
+                            game_id: selectedGame.game_id,
+                            title: selectedGame.title,
+                            chapter: selectedGame.chapter,
+                            objective: selectedGame.objective,
+                            points: selectedGame.points,
+                          }}
+                          onComplete={(result) => {
+                            setScore(result.score)
+                            setSubmitted(true)
+                          }}
+                        />
+                      )
+                    ) : previewData.type === "geological_faults" ? (
+                      submitted ? (
+                        <div className="rounded-xl border-2 border-emerald-200 p-6 text-center bg-emerald-50">
+                          <p className="font-semibold text-emerald-900">انتهيت من المعاينة</p>
+                          <p className="text-lg font-bold text-emerald-800 mt-2">النتيجة: {score}%</p>
+                          <button
+                            onClick={closePreview}
+                            className="mt-4 px-6 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700"
+                          >
+                            إغلاق
+                          </button>
+                        </div>
+                      ) : (
+                        <GeologicalFaultsGame
                           gameData={previewData}
                           game={{
                             game_id: selectedGame.game_id,

@@ -16,7 +16,8 @@
     "check-url": "tsx scripts/check-db-url.ts",
     "check-keys": "tsx scripts/check-supabase-keys.ts",
     "check-all-env": "tsx scripts/check-all-env.ts",
-    "fix-db-url": "tsx scripts/fix-database-url.ts"
+    "fix-db-url": "tsx scripts/fix-database-url.ts",
+    "db:add-isdisabled": "prisma db execute --file docs/ADD_ISDISABLED_COLUMN.sql"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",

@@ -22,6 +22,13 @@ type Class = {
   }
 }
 
+type StudentForPrint = {
+  id: string
+  studentId: string
+  name: string
+  grade: string
+}
+
 export default function ClassesPage() {
   const router = useRouter()
   const [classes, setClasses] = useState<Class[]>([])
@@ -142,6 +149,66 @@ export default function ClassesPage() {
   const copyClassCode = (code: string) => {
     navigator.clipboard.writeText(code)
     alert(`تم نسخ رمز الفصل: ${code}`)
+  }
+
+  const handlePrintStudents = async (classData: Class) => {
+    try {
+      const response = await fetch(`/api/classes/${classData.id}`)
+      if (!response.ok) return
+      const { class: classDetail } = await response.json()
+      const students: StudentForPrint[] = classDetail?.students ?? []
+      const printWindow = window.open("", "_blank", "width=800,height=600")
+      if (!printWindow) {
+        alert("يرجى السماح بالنوافذ المنبثقة لاستخدام الطباعة")
+        return
+      }
+      const tableRows = students
+        .map(
+          (s, i) =>
+            `<tr><td>${i + 1}</td><td>${s.studentId}</td><td>${s.name}</td><td>${s.grade || ""}</td></tr>`
+        )
+        .join("")
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html dir="rtl">
+        <head>
+          <meta charset="utf-8">
+          <title>قائمة الطلاب - ${classData.name}</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 24px; }
+            h1 { font-size: 1.5rem; margin-bottom: 8px; }
+            .meta { color: #64748b; margin-bottom: 20px; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #e2e8f0; padding: 10px 14px; text-align: right; }
+            th { background: #f1f5f9; font-weight: 600; }
+          </style>
+        </head>
+        <body>
+          <h1>قائمة الطلاب - ${classData.name}</h1>
+          <p class="meta">الصف: ${classData.grade} | رمز الفصل: ${classData.code} | عدد الطلاب: ${students.length}</p>
+          <table>
+            <thead>
+              <tr>
+                <th>م</th>
+                <th>رقم الطالب</th>
+                <th>اسم الطالب</th>
+                <th>الصف</th>
+              </tr>
+            </thead>
+            <tbody>${tableRows || "<tr><td colspan=\"4\">لا يوجد طلاب مسجلون في هذا الفصل</td></tr>"}</tbody>
+          </table>
+        </body>
+        </html>
+      `)
+      printWindow.document.close()
+      printWindow.focus()
+      setTimeout(() => {
+        printWindow.print()
+        printWindow.close()
+      }, 250)
+    } catch {
+      alert("حدث خطأ أثناء جلب قائمة الطلاب")
+    }
   }
 
   if (loading) {
@@ -356,6 +423,18 @@ export default function ClassesPage() {
                         {classData._count.students}
                       </span>
                     </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handlePrintStudents(classData)}
+                      className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                      title="طباعة قائمة الطلاب"
+                    >
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                      </svg>
+                      طباعة قائمة الطلاب
+                    </button>
 
                     <Link
                       href={`/teacher/classes/${classData.id}`}

@@ -20,7 +20,8 @@ export type {
   PeriodicFamilyGameData,
   PeriodicFamilyElement,
   VolcanoTypesGameData,
-  VolcanoTypeData
+  VolcanoTypeData,
+  FaultsGameData
 } from "@/types/games"
 
 import type { GameData } from "@/types/games"
@@ -66,11 +67,16 @@ const baseGamesData: Record<string, GameData> = {
     correctAnswer: "حركة الصفائح التكتونية"
   },
 
-  // game_004: بركانك الصحيح - أنواع البراكين (4 مستويات: تعريف، خصائص، أمثلة، تحدي زمني)
+  // game_004: بركانك الصحيح - أنواع البراكين (3 مستويات: مطابقة صورة/اسم/مميزات، أمثلة، تحدي زمني)
   game_004: {
     type: "volcano_types",
     volcanoTypes: VOLCANO_TYPES,
     level4TimePerQuestion: 10,
+  } as GameData,
+
+  // game_faults_001: الصدوع الجيولوجية (3 مراحل: مفهوم، محاكاة، تمييز بالرسم)
+  game_faults_001: {
+    type: "geological_faults",
   } as GameData,
 
   // game_005: ربط حدود الصفائح بنتائجها (matching)

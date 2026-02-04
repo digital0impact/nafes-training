@@ -371,6 +371,23 @@ export default function TeacherOutcomesPage() {
     return periodChanges[topicKey] || item.period || "غير محدد"
   }
 
+  // عناصر أسبوع معين — دمج من كلا التنسيقين لظهور أكثر من بطاقة في الأسبوع الواحد
+  const getItemsForWeekSlot = (period: string, weekKey: string) => {
+    const weeksData = groupedOutcomes[period] || {}
+    const shortLabel = weekKey.replace(`${period} - `, "")
+    const fromFull = weeksData[weekKey] || []
+    const fromShort = weeksData[shortLabel] || []
+    const seen = new Set<string>()
+    const merged: typeof learningOutcomes = []
+    for (const item of [...fromFull, ...fromShort]) {
+      const key = getTopicKey(item)
+      if (seen.has(key)) continue
+      seen.add(key)
+      merged.push(item)
+    }
+    return getOrderedTopics(period, weekKey, merged)
+  }
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#faf9f7]">
       <PageBackground />
@@ -519,323 +536,225 @@ export default function TeacherOutcomesPage() {
           </section>
         )}
 
-        {/* عرض الخطة */}
+        {/* عرض الخطة — نفس تصميم تصميم الخطة (شبكة أسابيع + بطاقات بدون سحب) */}
         {activeTab === "view" ? (
-          // عرض جدولي للخطة
-          <section className="card overflow-hidden p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-gradient-to-r from-primary-600 to-primary-700 text-white">
-                    <th className="border border-primary-500 px-4 py-3 text-center font-bold text-sm">
-                      الفترة
-                    </th>
-                    <th className="border border-primary-500 px-4 py-3 text-center font-bold text-sm">
-                      عدد الأسابيع
-                    </th>
-                    <th className="border border-primary-500 px-4 py-3 text-right font-bold text-sm min-w-[200px]">
-                      الأسبوع
-                    </th>
-                    <th className="border border-primary-500 px-4 py-3 text-right font-bold text-sm min-w-[500px]">
-                      نواتج التعلم
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {periods.map((period) => {
-                    if (!period) return null
-                    const weekCount = weekCounts[period] || 8
-                    const generatedWeeks = generateWeekNames(period, weekCount)
-                    const weeksData = groupedOutcomes[period] || {}
-                    const allWeeksForPeriod = Array.from(
-                      new Set([...generatedWeeks, ...Object.keys(weeksData)])
-                    )
-                    const orderedWeeks = getOrderedWeeks(period, allWeeksForPeriod)
+          <section className="card overflow-hidden p-0" dir="rtl">
+            {/* رأس: الأسابيع */}
+            <div className="rounded-t-2xl bg-amber-100 border-b border-amber-200 px-4 py-3">
+              <h2 className="text-center text-lg font-bold text-amber-900">الأسابيع</h2>
+            </div>
 
-                    return orderedWeeks.map((week, weekIndex) => {
-                      const items = weeksData[week] || []
-                      const orderedItems = getOrderedTopics(period, week, items)
-                      const isFirstWeekInPeriod = weekIndex === 0
+            <div className="p-4 md:p-6 space-y-6">
+              {periods.filter(Boolean).map((period) => {
+                const weekCount = weekCounts[period] || 8
+                const generatedWeeks = generateWeekNames(period, weekCount)
 
-                      return (
-                        <tr
-                          key={`${period}-${week}`}
-                          className={`hover:bg-slate-50 transition-colors ${
-                            weekIndex % 2 === 0 ? "bg-white" : "bg-slate-50/50"
-                          }`}
-                        >
-                          {isFirstWeekInPeriod && (
-                            <td
-                              rowSpan={orderedWeeks.length}
-                              className="border border-slate-200 px-4 py-3 text-center align-top bg-primary-50 font-bold text-primary-900"
-                            >
-                              <div className="flex flex-col items-center justify-center min-h-[60px]">
-                                <span className="text-lg">{period}</span>
-                              </div>
-                            </td>
-                          )}
-                          {isFirstWeekInPeriod && (
-                            <td
-                              rowSpan={orderedWeeks.length}
-                              className="border border-slate-200 px-4 py-3 text-center align-top bg-primary-50 font-bold text-primary-900"
-                            >
-                              <div className="flex flex-col items-center justify-center min-h-[60px]">
-                                <span className="text-2xl">{weekCount}</span>
-                                <span className="text-sm">أسبوع</span>
-                              </div>
-                            </td>
-                          )}
-                          <td className="border border-slate-200 px-4 py-3 text-right font-semibold text-slate-700">
-                            <div className="flex items-center justify-end gap-2">
-                              <span className="text-base">{week}</span>
+                return (
+                  <div
+                    key={period}
+                    className="flex flex-col md:flex-row gap-3 md:gap-4 items-stretch"
+                  >
+                    {/* تسمية الفترة */}
+                    <div className="flex md:flex-col md:w-24 flex-shrink-0 rounded-xl bg-amber-100 border border-amber-200 px-4 py-3 md:py-6 flex items-center justify-center min-h-[48px] md:min-h-[140px]">
+                      <span className="text-base font-bold text-amber-900 text-center">
+                        {period}
+                      </span>
+                    </div>
+
+                    {/* صف صناديق الأسابيع */}
+                    <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+                      {generatedWeeks.map((weekKey, weekIndex) => {
+                        const itemsInSlot = getItemsForWeekSlot(period, weekKey)
+                        const weekLabel = weekIndex === 0 ? "الأسبوع الأول" : `الأسبوع ${weekIndex + 1}`
+
+                        return (
+                          <div
+                            key={weekKey}
+                            className="rounded-xl border-2 min-h-[120px] p-3 flex flex-col bg-violet-50 border-violet-200"
+                          >
+                            <p className="text-xs font-semibold text-violet-800 mb-2 pb-1 border-b border-violet-200">
+                              {weekLabel}
+                            </p>
+                            <div className="flex-1 space-y-2 overflow-y-auto">
+                              {itemsInSlot.map((item, itemIndex) => {
+                                const topicKey = getTopicKey(item)
+                                return (
+                                  <div
+                                    key={topicKey}
+                                    className="rounded-lg border border-slate-200 p-2 bg-white shadow-sm"
+                                  >
+                                    <p className="text-xs font-semibold text-slate-900 truncate" title={item.lesson}>
+                                      {item.lesson}
+                                    </p>
+                                    <p className="text-[10px] text-slate-500 truncate" title={item.domain}>
+                                      {item.domain}
+                                    </p>
+                                    {item.indicators && item.indicators.length > 0 && (
+                                      <p className="text-[10px] text-primary-600 mt-0.5">
+                                        {item.indicators.length} مؤشر
+                                      </p>
+                                    )}
+                                    <p className="text-[10px] text-slate-600 mt-1 line-clamp-2" title={item.outcome}>
+                                      {item.outcome}
+                                    </p>
+                                  </div>
+                                )
+                              })}
+                              {itemsInSlot.length === 0 && (
+                                <p className="text-[10px] text-violet-500/80 italic py-2">
+                                  لا توجد نواتج لهذا الأسبوع
+                                </p>
+                              )}
                             </div>
-                          </td>
-                          <td className="border border-slate-200 px-4 py-3">
-                            {orderedItems.length > 0 ? (
-                              <div className="space-y-3">
-                                {orderedItems.map((item, itemIndex) => {
-                                  const currentPeriod = getTopicPeriod(item)
-                                  return (
-                                    <div
-                                      key={getTopicKey(item)}
-                                      className="rounded-lg border border-slate-200 bg-white p-3 hover:shadow-md transition-all"
-                                    >
-                                      <div className="flex items-start gap-3">
-                                        <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-bold">
-                                          {itemIndex + 1}
-                                        </span>
-                                        <div className="flex-1 space-y-2">
-                                          <div>
-                                            <p className="text-sm font-bold text-slate-900 mb-1">
-                                              {item.domain}
-                                            </p>
-                                            <p className="text-xs font-semibold text-primary-700">
-                                              {item.lesson}
-                                            </p>
-                                          </div>
-                                          <p className="text-xs text-slate-700 leading-relaxed">
-                                            {item.outcome}
-                                          </p>
-                                          {item.indicators && item.indicators.length > 0 && (
-                                            <div className="mt-2 pt-2 border-t border-slate-100 space-y-1">
-                                              <p className="text-xs font-semibold text-primary-700 mb-1">المؤشرات:</p>
-                                              {item.indicators.map((indicator, idx) => (
-                                                <p key={idx} className="text-xs text-primary-600 leading-relaxed pr-2">
-                                                  • {indicator}
-                                                </p>
-                                              ))}
-                                            </div>
-                                          )}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  )
-                                })}
-                              </div>
-                            ) : (
-                              <div className="text-center py-6 text-slate-400 text-sm italic">
-                                لا توجد نواتج تعلم لهذا الأسبوع
-                              </div>
-                            )}
-                          </td>
-                        </tr>
-                      )
-                    })
-                  })}
-                </tbody>
-              </table>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </section>
         ) : (
-          // عرض جدولي لوضع التحرير مع السحب والإفلات
-          <section className="card overflow-hidden p-0">
-            <div className="p-4 bg-amber-50 border-b border-amber-200">
+          // تصميم الخطة: شبكة أسابيع مع سحب وإفلات بطاقات المؤشرات (حسب المخطط المرفق)
+          <section className="card overflow-hidden p-0" dir="rtl">
+            {/* تلميح */}
+            <div className="p-3 bg-amber-50 border-b border-amber-200">
               <p className="text-sm text-amber-800">
-                <span className="font-semibold">💡 تلميح:</span> اسحبي نواتج التعلم وأفلتيها في الأسبوع المناسب. يمكنك أيضاً استخدام القوائم المنسدلة لتغيير الفترة والأسبوع.
+                <span className="font-semibold">💡</span> اسحبي بطاقات نواتج التعلم من القائمة أدناه وأفلتيها داخل مربع الأسبوع المناسب. يمكنك وضع أكثر من بطاقة في الأسبوع الواحد.
               </p>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-gradient-to-r from-amber-600 to-amber-700 text-white">
-                    <th className="border border-amber-500 px-4 py-3 text-center font-bold text-sm">
-                      الفترة
-                    </th>
-                    <th className="border border-amber-500 px-4 py-3 text-center font-bold text-sm">
-                      عدد الأسابيع
-                    </th>
-                    <th className="border border-amber-500 px-4 py-3 text-right font-bold text-sm min-w-[200px]">
-                      الأسبوع
-                    </th>
-                    <th className="border border-amber-500 px-4 py-3 text-right font-bold text-sm min-w-[500px]">
-                      نواتج التعلم (اسحبي وأفلتي)
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {periods.map((period) => {
-                    if (!period) return null
-                    const weekCount = weekCounts[period] || 8
-                    const generatedWeeks = generateWeekNames(period, weekCount)
-                    const weeksData = groupedOutcomes[period] || {}
-                    const allWeeksForPeriod = Array.from(
-                      new Set([...generatedWeeks, ...Object.keys(weeksData)])
-                    )
-                    const orderedWeeks = getOrderedWeeks(period, allWeeksForPeriod)
 
-                    return orderedWeeks.map((week, weekIndex) => {
-                      const items = weeksData[week] || []
-                      const orderedItems = getOrderedTopics(period, week, items)
-                      const isFirstWeekInPeriod = weekIndex === 0
-                      const isDragOver = dragOverWeek === week
+            {/* بطاقات نواتج التعلم — تظهر هنا لسحبها وإفلاتها */}
+            <div className="p-4 bg-slate-50 border-b border-slate-200">
+              <h3 className="text-sm font-bold text-slate-800 mb-3">بطاقات نواتج التعلم — اسحبي وأفلتي في الأسابيع</h3>
+              <div className="flex flex-wrap gap-3 overflow-x-auto pb-2 min-h-[88px]">
+                {modifiedOutcomes.map((item) => {
+                  const topicKey = getTopicKey(item)
+                  const isDragging = draggedItem === topicKey
+                  return (
+                    <div
+                      key={topicKey}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, topicKey)}
+                      onDragEnd={handleDragEnd}
+                      className={`flex-shrink-0 w-[180px] rounded-xl border-2 p-3 bg-white shadow-md cursor-grab active:cursor-grabbing transition-all hover:shadow-lg hover:border-primary-300 ${
+                        isDragging
+                          ? "opacity-50 border-primary-400 bg-primary-50"
+                          : "border-slate-200"
+                      }`}
+                    >
+                      <p className="text-xs font-bold text-slate-900 line-clamp-2" title={item.lesson}>
+                        {item.lesson}
+                      </p>
+                      <p className="text-[10px] text-slate-500 mt-0.5" title={item.domain}>
+                        {item.domain}
+                      </p>
+                      {item.indicators && item.indicators.length > 0 && (
+                        <p className="text-[10px] text-primary-600 mt-1 font-medium">
+                          {item.indicators.length} مؤشر
+                        </p>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
 
-                      return (
-                        <tr
-                          key={`${period}-${week}`}
-                          className={`hover:bg-slate-50 transition-colors ${
-                            weekIndex % 2 === 0 ? "bg-white" : "bg-slate-50/50"
-                          } ${isDragOver ? "bg-blue-100" : ""}`}
-                          onDragOver={(e) => handleDragOver(e, week)}
-                          onDragLeave={handleDragLeave}
-                          onDrop={(e) => handleDrop(e, week, period)}
-                        >
-                          {isFirstWeekInPeriod && (
-                            <td
-                              rowSpan={orderedWeeks.length}
-                              className="border border-slate-200 px-4 py-3 text-center align-top bg-amber-50 font-bold text-amber-900"
-                            >
-                              <div className="flex flex-col items-center justify-center min-h-[60px]">
-                                <span className="text-lg">{period}</span>
-                              </div>
-                            </td>
-                          )}
-                          {isFirstWeekInPeriod && (
-                            <td
-                              rowSpan={orderedWeeks.length}
-                              className="border border-slate-200 px-4 py-3 text-center align-top bg-amber-50 font-bold text-amber-900"
-                            >
-                              <div className="flex flex-col items-center justify-center min-h-[60px]">
-                                <span className="text-2xl">{weekCount}</span>
-                                <span className="text-sm">أسبوع</span>
-                              </div>
-                            </td>
-                          )}
-                          <td className="border border-slate-200 px-4 py-3 text-right font-semibold text-slate-700">
-                            <div className="flex items-center justify-end gap-2">
-                              <span className="text-base">{week}</span>
-                            </div>
-                          </td>
-                          <td 
-                            className={`border border-slate-200 px-4 py-3 min-h-[100px] ${
-                              isDragOver ? "bg-blue-100 border-blue-400 border-dashed border-4" : ""
+            {/* رأس: الأسابيع */}
+            <div className="rounded-none md:rounded-t-2xl bg-amber-100 border-b border-amber-200 px-4 py-3">
+              <h2 className="text-center text-lg font-bold text-amber-900">الأسابيع</h2>
+            </div>
+
+            <div className="p-4 md:p-6 space-y-6">
+              {periods.filter(Boolean).map((period) => {
+                const weekCount = weekCounts[period] || 8
+                const generatedWeeks = generateWeekNames(period, weekCount)
+
+                return (
+                  <div
+                    key={period}
+                    className="flex flex-col md:flex-row gap-3 md:gap-4 items-stretch"
+                  >
+                    {/* تسمية الفترة (عمودية / على اليمين) */}
+                    <div className="flex md:flex-col md:w-24 flex-shrink-0 rounded-xl bg-amber-100 border border-amber-200 px-4 py-3 md:py-6 flex items-center justify-center min-h-[48px] md:min-h-[140px]">
+                      <span className="text-base font-bold text-amber-900 text-center">
+                        {period}
+                      </span>
+                    </div>
+
+                    {/* صف صناديق الأسابيع */}
+                    <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+                      {generatedWeeks.map((weekKey, weekIndex) => {
+                        const isDragOver = dragOverWeek === weekKey
+                        const itemsInSlot = getItemsForWeekSlot(period, weekKey)
+                        const weekLabel = weekIndex === 0 ? "الأسبوع الأول" : `الأسبوع ${weekIndex + 1}`
+
+                        return (
+                          <div
+                            key={weekKey}
+                            onDragOver={(e) => {
+                              e.preventDefault()
+                              handleDragOver(e, weekKey)
+                            }}
+                            onDragLeave={handleDragLeave}
+                            onDrop={(e) => handleDrop(e, weekKey, period)}
+                            className={`rounded-xl border-2 min-h-[120px] p-3 flex flex-col transition-colors ${
+                              isDragOver
+                                ? "bg-violet-200 border-violet-400 border-dashed"
+                                : "bg-violet-50 border-violet-200"
                             }`}
                           >
-                            {orderedItems.length > 0 ? (
-                              <div className="space-y-3">
-                                {orderedItems.map((item, itemIndex) => {
-                                  const topicKey = getTopicKey(item)
-                                  const currentPeriod = getTopicPeriod(item)
-                                  const currentWeek = getTopicWeek(item, currentPeriod)
-                                  const availableWeeks = currentPeriod 
-                                    ? generateWeekNames(currentPeriod, weekCounts[currentPeriod] || 8)
-                                    : []
-                                  const isDragging = draggedItem === topicKey
+                            <p className="text-xs font-semibold text-violet-800 mb-2 pb-1 border-b border-violet-200">
+                              {weekLabel}
+                            </p>
+                            <div className="flex-1 space-y-2 overflow-y-auto">
+                              {itemsInSlot.map((item, itemIndex) => {
+                                const topicKey = getTopicKey(item)
+                                const isDragging = draggedItem === topicKey
 
-                                  return (
-                                    <div
-                                      key={topicKey}
-                                      draggable
-                                      onDragStart={(e) => handleDragStart(e, topicKey)}
-                                      onDragEnd={handleDragEnd}
-                                      className={`rounded-lg border-2 p-3 bg-white hover:shadow-lg transition-all cursor-move ${
-                                        isDragging 
-                                          ? "opacity-50 border-primary-400 bg-primary-50" 
-                                          : "border-slate-200 hover:border-primary-300"
-                                      }`}
-                                    >
-                                      <div className="flex items-start gap-3">
-                                        <div className="flex-shrink-0 flex flex-col gap-1">
-                                          <span className="w-7 h-7 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-bold">
-                                            {itemIndex + 1}
-                                          </span>
-                                          <span className="text-xs text-slate-400 text-center">اسحب</span>
-                                        </div>
-                                        <div className="flex-1 space-y-2">
-                                          <div>
-                                            <p className="text-sm font-bold text-slate-900 mb-1">
-                                              {item.domain}
-                                            </p>
-                                            <p className="text-xs font-semibold text-primary-700">
-                                              {item.lesson}
-                                            </p>
-                                          </div>
-                                          <p className="text-xs text-slate-700 leading-relaxed">
-                                            {item.outcome}
-                                          </p>
-                                          {item.indicators && item.indicators.length > 0 && (
-                                            <div className="mt-2 pt-2 border-t border-slate-100 space-y-1">
-                                              <p className="text-xs font-semibold text-primary-700 mb-1">المؤشرات:</p>
-                                              {item.indicators.map((indicator, idx) => (
-                                                <p key={idx} className="text-xs text-primary-600 leading-relaxed pr-2">
-                                                  • {indicator}
-                                                </p>
-                                              ))}
-                                            </div>
-                                          )}
-                                        </div>
-                                        <div className="flex-shrink-0 flex flex-col gap-2">
-                                          <select
-                                            value={currentPeriod}
-                                            onChange={(e) => {
-                                              changeTopicPeriod(topicKey, e.target.value)
-                                            }}
-                                            className="text-xs rounded-lg border border-slate-300 bg-white px-2 py-1 text-slate-700 focus:border-primary-500 focus:outline-none"
-                                            title="تغيير الفترة"
-                                            onClick={(e) => e.stopPropagation()}
-                                          >
-                                            <option value="الفترة الأولى">الفترة الأولى</option>
-                                            <option value="الفترة الثانية">الفترة الثانية</option>
-                                          </select>
-                                          {currentPeriod && (
-                                            <select
-                                              value={currentWeek}
-                                              onChange={(e) => {
-                                                changeTopicWeek(topicKey, e.target.value)
-                                              }}
-                                              className="text-xs rounded-lg border border-slate-300 bg-white px-2 py-1 text-slate-700 focus:border-primary-500 focus:outline-none"
-                                              title="تغيير الأسبوع"
-                                              onClick={(e) => e.stopPropagation()}
-                                            >
-                                              <option value="">اختر الأسبوع</option>
-                                              {availableWeeks.map((weekName) => (
-                                                <option key={weekName} value={weekName}>
-                                                  {weekName.replace(`${currentPeriod} - `, "")}
-                                                </option>
-                                              ))}
-                                            </select>
-                                          )}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  )
-                                })}
-                              </div>
-                            ) : (
-                              <div 
-                                className={`text-center py-8 text-slate-400 text-sm italic rounded-lg border-2 border-dashed ${
-                                  isDragOver ? "border-blue-400 bg-blue-50" : "border-slate-300"
-                                }`}
-                              >
-                                {isDragOver ? "أفلت هنا" : "اسحبي ناتج تعلم هنا"}
-                              </div>
-                            )}
-                          </td>
-                        </tr>
-                      )
-                    })
-                  })}
-                </tbody>
-              </table>
+                                return (
+                                  <div
+                                    key={topicKey}
+                                    draggable
+                                    onDragStart={(e) => handleDragStart(e, topicKey)}
+                                    onDragEnd={handleDragEnd}
+                                    className={`rounded-lg border p-2 bg-white shadow-sm cursor-move transition-all ${
+                                      isDragging
+                                        ? "opacity-50 border-primary-400 bg-primary-50"
+                                        : "border-slate-200 hover:border-primary-300 hover:shadow"
+                                    }`}
+                                  >
+                                    <p className="text-xs font-semibold text-slate-900 truncate" title={item.lesson}>
+                                      {item.lesson}
+                                    </p>
+                                    <p className="text-[10px] text-slate-500 truncate" title={item.domain}>
+                                      {item.domain}
+                                    </p>
+                                    {item.indicators && item.indicators.length > 0 && (
+                                      <p className="text-[10px] text-primary-600 mt-0.5">
+                                        {item.indicators.length} مؤشر
+                                      </p>
+                                    )}
+                                  </div>
+                                )
+                              })}
+                              {itemsInSlot.length === 0 && !isDragOver && (
+                                <p className="text-[10px] text-violet-500/80 italic py-2">
+                                  اسحب بطاقة هنا
+                                </p>
+                              )}
+                              {isDragOver && (
+                                <p className="text-xs font-medium text-violet-700 py-1">أفلت هنا</p>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </section>
         )}

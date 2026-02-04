@@ -4,7 +4,6 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from "react"
 import { PageBackground } from "@/components/layout/page-background"
-import { TeacherHeader } from "@/features/classes/components/teacher-header"
 
 type StudentReport = {
   nickname: string
@@ -80,8 +79,6 @@ export default function ReportsPage() {
     <main className="relative min-h-screen overflow-hidden bg-[#faf9f7]">
       <PageBackground />
       <div className="relative z-10 space-y-6 p-4 py-8">
-        <TeacherHeader />
-
         <header className="card bg-gradient-to-br from-white to-primary-50">
           <div className="mb-4">
             <p className="text-sm text-slate-500">تقارير مفصلة</p>

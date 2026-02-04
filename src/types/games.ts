@@ -37,6 +37,7 @@ export type GameType =
   | "atom_builder" 
   | "periodic_family_comparison"
   | "volcano_types"
+  | "geological_faults"
 
 // ============================================
 // واجهات لعبة الاختيار من متعدد (Multiple Choice)
@@ -365,12 +366,25 @@ export interface VolcanoTypeData {
   matchCharacteristic?: string
 }
 
-/** بيانات لعبة أنواع البراكين (4 مستويات: تعريف، خصائص، أمثلة، تحدي زمني) */
+/** بيانات لعبة أنواع البراكين (3 مستويات: مطابقة صورة/اسم/مميزات، أمثلة، تحدي زمني) */
 export interface VolcanoTypesGameData {
   type: "volcano_types"
   volcanoTypes: VolcanoTypeData[]
-  /** وقت كل سؤال بالثواني في المستوى الرابع */
+  /** وقت كل سؤال بالثواني في المستوى الثالث (تحدي السرعة) */
   level4TimePerQuestion?: number
+}
+
+// ============================================
+// واجهات لعبة الصدوع الجيولوجية (3 مراحل)
+// ============================================
+
+/** بيانات لعبة الصدوع الجيولوجية: مفهوم الصدع، محاكاة الأنواع، التمييز بالرسم */
+export interface FaultsGameData {
+  type: "geological_faults"
+  /** سؤال المرحلة الأولى (اختياري - يُستخدم النص الافتراضي إن لم يُحدد) */
+  stage1Question?: string
+  stage1Options?: string[]
+  stage1CorrectAnswer?: string
 }
 
 // ============================================
@@ -391,6 +405,7 @@ export type GameData =
   | AtomBuilderGameData
   | PeriodicFamilyGameData
   | VolcanoTypesGameData
+  | FaultsGameData
 
 // ============================================
 // واجهات إضافية للبيانات المعقدة
@@ -574,6 +589,10 @@ export function isVolcanoTypesGame(data: GameData): data is VolcanoTypesGameData
   return data.type === "volcano_types"
 }
 
+export function isFaultsGame(data: GameData): data is FaultsGameData {
+  return data.type === "geological_faults"
+}
+
 // ============================================
 // Helper Types
 // ============================================
@@ -592,6 +611,7 @@ export type GameDataByType<T extends GameType> =
   T extends "atom_builder" ? AtomBuilderGameData :
   T extends "periodic_family_comparison" ? PeriodicFamilyGameData :
   T extends "volcano_types" ? VolcanoTypesGameData :
+  T extends "geological_faults" ? FaultsGameData :
   never
 
 /**
@@ -608,4 +628,5 @@ export type GameStateByType<T extends GameType> =
   T extends "atom_builder" ? AtomBuilderGameState :
   T extends "periodic_family_comparison" ? PeriodicFamilyGameState :
   T extends "volcano_types" ? Record<string, unknown> :
+  T extends "geological_faults" ? Record<string, unknown> :
   never

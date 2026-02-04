@@ -10,6 +10,7 @@ import AtomBuilder from "@/components/games/AtomBuilder"
 import AtomBuilderEnhanced from "@/components/games/AtomBuilderEnhanced"
 import PeriodicFamilyComparison from "@/components/games/PeriodicFamilyComparison"
 import VolcanoTypesGame from "@/components/games/VolcanoTypesGame"
+import GeologicalFaultsGame from "@/components/games/GeologicalFaultsGame"
 
 type EducationalGame = {
   game_id: string
@@ -169,7 +170,7 @@ export default function GamePlayPage() {
             setPeriodicFamilyDistributions({})
             setPeriodicFamilyAnswers({})
           }
-          // volcano_types: لا حاجة لتهيئة إضافية، المكون يدير حالته
+          // volcano_types, geological_faults: لا حاجة لتهيئة إضافية، المكون يدير حالته
           
           // بدء حساب الوقت
           setStartTime(Date.now())
@@ -559,7 +560,7 @@ export default function GamePlayPage() {
           </div>
         </div>
 
-        {/* لعبة بركانك الصحيح - 4 مستويات */}
+        {/* لعبة بركانك الصحيح - 3 مستويات */}
         {gameData.type === "volcano_types" && (
           <VolcanoTypesGame
             gameData={gameData}
@@ -601,6 +602,57 @@ export default function GamePlayPage() {
               setShowFeedback(true)
               setFeedbackMessage(
                 result.score === 100 ? "ممتاز! لقد أتقنت الإجابة" : result.score >= 70 ? "جيد جداً! حاولي مرة أخرى لتحسين النتيجة" : "حاولي مرة أخرى"
+              )
+              setTimeout(() => {
+                setShowFeedback(false)
+                router.push(`/student/games/${gameId}/result?score=${result.score}`)
+              }, 2000)
+            }}
+          />
+        )}
+
+        {/* لعبة الصدوع الجيولوجية - 3 مراحل */}
+        {gameData.type === "geological_faults" && (
+          <GeologicalFaultsGame
+            gameData={gameData}
+            game={{
+              game_id: game.game_id,
+              title: game.title,
+              chapter: game.chapter,
+              objective: game.objective,
+              points: game.points,
+            }}
+            onComplete={async (result) => {
+              if (student) {
+                setSaving(true)
+                try {
+                  await fetch("/api/game-attempts", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      nickname: student.name,
+                      classCode: student.classCode,
+                      studentDbId: student.id,
+                      gameId,
+                      gameTitle: game.title,
+                      gameType: game.game_type,
+                      chapter: game.chapter,
+                      answers: result.answers,
+                      score: Math.round((result.score / 100) * game.points),
+                      totalScore: game.points,
+                      percentage: result.score,
+                      timeSpent: result.timeSpent,
+                    }),
+                  })
+                } catch (e) {
+                  console.error("Error saving faults game attempt", e)
+                } finally {
+                  setSaving(false)
+                }
+              }
+              setShowFeedback(true)
+              setFeedbackMessage(
+                result.score === 100 ? "ممتاز! أتقنتِ الصدوع الجيولوجية" : result.score >= 70 ? "جيد جداً! حاولي مرة أخرى لتحسين النتيجة" : "حاولي مرة أخرى"
               )
               setTimeout(() => {
                 setShowFeedback(false)
@@ -1080,8 +1132,8 @@ export default function GamePlayPage() {
           </div>
         )}
 
-        {/* Action Buttons - لا تظهر للعبة بركانك الصحيح (4 مستويات تنتهي تلقائياً) */}
-        {gameData.type !== "volcano_types" && (
+        {/* Action Buttons - لا تظهر لألعاب متعددة المراحل التي تنتهي تلقائياً */}
+        {gameData.type !== "volcano_types" && gameData.type !== "geological_faults" && (
         <div className="card">
           <div className="flex gap-3">
             <button

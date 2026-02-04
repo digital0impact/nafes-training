@@ -1,11 +1,10 @@
 "use client"
 
 /**
- * لعبة بركانك الصحيح - أنواع البراكين (4 مستويات)
- * Level 1: بطاقات التعريف والتعرف (يعرف كل نوع)
- * Level 2: مطابقة الخصائص (يميز بين أنواع البراكين)
- * Level 3: أمثلة حقيقية (يذكر مثالًا على كل نوع)
- * Level 4: تحدي زمني (10 ثوانٍ لكل سؤال)
+ * لعبة بركانك الصحيح - أنواع البراكين (3 مستويات)
+ * Level 1: مطابقة صورة البركان واسمه ومميزاته
+ * Level 2: أمثلة حقيقية (يذكر مثالًا على كل نوع)
+ * Level 3: تحدي زمني (10 ثوانٍ لكل سؤال)
  */
 import { useState, useEffect, useCallback } from "react"
 import type { VolcanoTypesGameData } from "@/types/games"
@@ -72,12 +71,13 @@ export default function VolcanoTypesGame({ gameData, game, onComplete }: Volcano
   const [currentLevel, setCurrentLevel] = useState(1)
   const [startTime] = useState(Date.now())
 
-  // المستوى 2: مطابقة الخصائص (سحب وإفلات أو نقر)
-  const [level2Characteristics, setLevel2Characteristics] = useState<Array<{ id: string; text: string; typeId: string }>>([])
-  const [level2Placements, setLevel2Placements] = useState<Record<string, string>>({}) // charId -> typeId
-  const [level2WrongHint, setLevel2WrongHint] = useState<string | null>(null)
+  // المستوى 1: مطابقة صورة + اسم + مميزات (4 صفوف، كل صف 3 خانات)
+  const [level1ImagePlacements, setLevel1ImagePlacements] = useState<(string | null)[]>(() => [null, null, null, null])
+  const [level1NamePlacements, setLevel1NamePlacements] = useState<(string | null)[]>(() => [null, null, null, null])
+  const [level1FeaturePlacements, setLevel1FeaturePlacements] = useState<(string | null)[]>(() => [null, null, null, null])
+  const [level1SelectedCard, setLevel1SelectedCard] = useState<{ kind: "image" | "name" | "feature"; typeId: string } | null>(null)
 
-  // المستوى 3: أمثلة حقيقية
+  // المستوى 2 (أمثلة حقيقية)
   const [level3Examples] = useState(() => shuffle(LEVEL3_EXAMPLES))
   const [level3TypeOptions] = useState(() => shuffle([...TYPE_NAMES]))
   const [level3SelectedExample, setLevel3SelectedExample] = useState<string | null>(null)
@@ -102,42 +102,40 @@ export default function VolcanoTypesGame({ gameData, game, onComplete }: Volcano
   const [level4Scores, setLevel4Scores] = useState<number[]>([])
   const [level4Answered, setLevel4Answered] = useState(false)
   const [level4CorrectCount, setLevel4CorrectCount] = useState(0)
+  const [level4RetryUsed, setLevel4RetryUsed] = useState(false)
 
   // دقة حسب نوع البركان (للتكيف والتلميحات)
   const [accuracyPerType, setAccuracyPerType] = useState<Record<string, { correct: number; total: number }>>({})
 
-  // تهيئة المستوى 2: قائمة خصائص (من matchCharacteristic لكل نوع)
-  useEffect(() => {
-    const chars = types
-      .filter((t) => t.matchCharacteristic)
-      .map((t) => ({ id: t.id, text: t.matchCharacteristic!, typeId: t.id }))
-    setLevel2Characteristics(shuffle(chars))
-  }, [types])
-
   const finishGame = useCallback(
     (level4ScoresFinal: number[]) => {
-      const totalQuestions = level2Characteristics.length + level3Examples.length + level4Questions.length
-      const level2Correct = level2Characteristics.filter((c) => level2Placements[c.id] === c.typeId).length
+      const level1Correct = [0, 1, 2, 3].filter(
+        (r) =>
+          level1ImagePlacements[r] &&
+          level1ImagePlacements[r] === level1NamePlacements[r] &&
+          level1NamePlacements[r] === level1FeaturePlacements[r]
+      ).length
+      const totalQuestions = 4 + level3Examples.length + level4Questions.length
       const level3Correct = level3Examples.filter((e) => level3Matches[e.exampleName] === e.typeNameAr).length
       const level4Correct = level4ScoresFinal.reduce((a, b) => a + b, 0)
-      const totalCorrect = level2Correct + level3Correct + level4Correct
+      const totalCorrect = level1Correct + level3Correct + level4Correct
       const score = Math.round((totalCorrect / totalQuestions) * 100)
       const timeSpent = Math.floor((Date.now() - startTime) / 1000)
       onComplete({
         score,
         answers: {
-          level1: "cards_viewed",
-          level2: level2Placements,
-          level3: level3Matches,
-          level4: level4ScoresFinal,
+          level1: { image: level1ImagePlacements, name: level1NamePlacements, feature: level1FeaturePlacements },
+          level2: level3Matches,
+          level3: level4ScoresFinal,
           accuracyPerType,
         },
         timeSpent,
       })
     },
     [
-      level2Characteristics.length,
-      level2Placements,
+      level1ImagePlacements,
+      level1NamePlacements,
+      level1FeaturePlacements,
       level3Examples.length,
       level3Matches,
       level4Questions.length,
@@ -159,6 +157,7 @@ export default function VolcanoTypesGame({ gameData, game, onComplete }: Volcano
       setLevel4Selected(null)
       setLevel4TimeLeft(timePerQuestion)
       setLevel4Answered(false)
+      setLevel4RetryUsed(false)
     },
     [level4QuestionIndex, level4Questions.length, level4Scores, finishGame, timePerQuestion]
   )
@@ -176,15 +175,16 @@ export default function VolcanoTypesGame({ gameData, game, onComplete }: Volcano
           setLevel4Selected(null)
           setLevel4TimeLeft(timePerQuestion)
           setLevel4Answered(false)
+          setLevel4RetryUsed(false)
         }, 1500)
       }
       return next
     })
   }, [level4Answered, level4QuestionIndex, level4Questions.length, finishGame, timePerQuestion])
 
-  // مؤقت المستوى 4
+  // مؤقت المستوى 3 (تحدي السرعة)
   useEffect(() => {
-    if (currentLevel !== 4 || level4Answered) return
+    if (currentLevel !== 3 || level4Answered) return
     const t = setInterval(() => {
       setLevel4TimeLeft((prev) => {
         if (prev <= 1) {
@@ -208,22 +208,39 @@ export default function VolcanoTypesGame({ gameData, game, onComplete }: Volcano
     })
   }, [])
 
-  const handleLevel2Drop = (charId: string, typeId: string) => {
-    const char = level2Characteristics.find((c) => c.id === charId)
-    if (!char) return
-    const correct = char.typeId === typeId
-    if (!correct) {
-      const correctType = types.find((t) => t.id === char.typeId)
-      setLevel2WrongHint(
-        correctType
-          ? `هذه الخصيصة تنتمي إلى بركان ${correctType.name_ar}. جرّبي النوع الصحيح.`
-          : "هذه الخصيصة لا تنتمي لهذا النوع. جرّبي نوعاً آخر."
-      )
-      setTimeout(() => setLevel2WrongHint(null), 3000)
+  const handleLevel1Place = (kind: "image" | "name" | "feature", rowIndex: number) => {
+    if (!level1SelectedCard || level1SelectedCard.kind !== kind) return
+    const current =
+      kind === "image"
+        ? level1ImagePlacements[rowIndex]
+        : kind === "name"
+          ? level1NamePlacements[rowIndex]
+          : level1FeaturePlacements[rowIndex]
+    const setter =
+      kind === "image"
+        ? setLevel1ImagePlacements
+        : kind === "name"
+          ? setLevel1NamePlacements
+          : setLevel1FeaturePlacements
+    setter((prev) => {
+      const next = [...prev]
+      next[rowIndex] = level1SelectedCard!.typeId
+      return next
+    })
+    setLevel1SelectedCard(current ? { kind, typeId: current } : null)
+  }
+
+  const handleLevel3SelectExample = (exampleName: string) => {
+    if (level3Matches[exampleName]) {
+      setLevel3Matches((prev) => {
+        const next = { ...prev }
+        delete next[exampleName]
+        return next
+      })
+      setLevel3SelectedExample(null)
       return
     }
-    setLevel2Placements((prev) => ({ ...prev, [charId]: typeId }))
-    updateAccuracy(typeId, true)
+    setLevel3SelectedExample(level3SelectedExample === exampleName ? null : exampleName)
   }
 
   const handleLevel3SelectType = (typeNameAr: string) => {
@@ -242,24 +259,51 @@ export default function VolcanoTypesGame({ gameData, game, onComplete }: Volcano
 
   const handleLevel4Choice = (option: string) => {
     if (level4Answered) return
-    setLevel4Answered(true)
     const q = level4Questions[level4QuestionIndex]
     const correct = option === q.correctType
-    if (correct) setLevel4CorrectCount((c) => c + 1)
     setLevel4Selected(option)
+    setLevel4Answered(true)
+    if (correct) {
+      setLevel4CorrectCount((c) => c + 1)
+      const vol = types.find((t) => t.name_ar === q.correctType)
+      if (vol) updateAccuracy(vol.id, true)
+      setTimeout(() => advanceLevel4(1), 1500)
+      return
+    }
+    if (level4RetryUsed) {
+      const vol = types.find((t) => t.name_ar === q.correctType)
+      if (vol) updateAccuracy(vol.id, false)
+      setTimeout(() => advanceLevel4(0), 1500)
+      return
+    }
     const vol = types.find((t) => t.name_ar === q.correctType)
-    if (vol) updateAccuracy(vol.id, correct)
-    setTimeout(() => advanceLevel4(correct ? 1 : 0), 1500)
+    if (vol) updateAccuracy(vol.id, false)
   }
 
-  const level2Complete = Object.keys(level2Placements).length === level2Characteristics.length
+  const handleLevel4Retry = () => {
+    setLevel4Answered(false)
+    setLevel4Selected(null)
+    setLevel4TimeLeft(timePerQuestion)
+    setLevel4RetryUsed(true)
+  }
+
+  const level1Complete =
+    level1ImagePlacements.every(Boolean) &&
+    level1NamePlacements.every(Boolean) &&
+    level1FeaturePlacements.every(Boolean)
+  const level1AllCorrect =
+    level1Complete &&
+    [0, 1, 2, 3].every(
+      (r) =>
+        level1ImagePlacements[r] === level1NamePlacements[r] && level1NamePlacements[r] === level1FeaturePlacements[r]
+    )
   const level3Complete = level3Examples.every((e) => level3Matches[e.exampleName])
 
   return (
     <div className="space-y-6" dir="rtl">
       {/* شريط المستويات */}
       <div className="flex gap-2 justify-center flex-wrap">
-        {[1, 2, 3, 4].map((l) => (
+        {[1, 2, 3].map((l) => (
           <span
             key={l}
             className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -271,137 +315,205 @@ export default function VolcanoTypesGame({ gameData, game, onComplete }: Volcano
         ))}
       </div>
 
-      {/* المستوى 1: بطاقات التعريف والتعرف (Definition & Recognition) */}
+      {/* المستوى 1: مطابقة صورة البركان واسمه ومميزاته */}
       {currentLevel === 1 && (
         <div className="card">
-          <h3 className="text-lg font-semibold text-slate-900 mb-2">بطاقات أنواع البراكين</h3>
-          <p className="text-sm text-slate-600 mb-4">تعرفي على كل نوع: تعريف مختصر، شكل توضيحي، وأهم خاصيتين. ✔ يعرف كل نوع</p>
-          <div className="grid md:grid-cols-2 gap-4">
-            {types.map((t) => (
-              <div
-                key={t.id}
-                className="rounded-xl border-2 border-slate-200 bg-white overflow-hidden hover:border-purple-300 transition"
-              >
-                <p className="font-bold text-slate-900 p-3 border-b border-slate-100 bg-slate-50">
-                  بركان {t.name_ar}
-                </p>
-                <div className="p-3">
-                  <p className="text-sm text-slate-700 mb-3">{t.definition}</p>
-                  <div className="flex justify-center mb-3 min-h-[120px] bg-slate-50 rounded-lg">
-                    {t.imagePath ? (
-                      <img
-                        src={t.imagePath}
-                        alt={`بركان ${t.name_ar}`}
-                        className="max-h-[140px] w-auto object-contain"
-                      />
-                    ) : (
-                      <VolcanoSvg />
-                    )}
-                  </div>
-                  <p className="text-xs font-semibold text-slate-600 mb-1">أهم خاصيتين:</p>
-                  <ul className="text-sm text-slate-700 list-disc list-inside space-y-0.5">
-                    {(t.characteristics.slice(0, 2)).map((c, i) => (
-                      <li key={i}>{c}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-6 flex justify-center">
-            <button
-              onClick={() => setCurrentLevel(2)}
-              className="px-6 py-3 rounded-xl bg-purple-600 text-white font-semibold hover:bg-purple-700"
-            >
-              التالي ← المستوى 2 (مطابقة الخصائص)
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* المستوى 2: مطابقة الخصائص (Characteristics Matching) */}
-      {currentLevel === 2 && (
-        <div className="card">
-          <h3 className="text-lg font-semibold text-slate-900 mb-2">مطابقة الخصائص</h3>
-          <p className="text-sm text-slate-600 mb-4">اسحبي أو انقري لوضع كل خاصية تحت نوع البركان المناسب. ✔ يميز بين أنواع البراكين</p>
-          {level2WrongHint && (
-            <div className="mb-4 p-3 rounded-lg bg-rose-100 border border-rose-300 text-rose-800 text-sm">
-              {level2WrongHint}
-            </div>
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">مطابقة البركان مع اسمه ومميزاته</h3>
+          <p className="text-sm text-slate-600 mb-4">
+            انقري على عنصر من الأسفل ثم انقري على الخانة المناسبة في الصف. ربطي كل صورة بركان مع اسمه ومميزاته. ✔ يعرف كل نوع
+          </p>
+          {level1SelectedCard && (
+            <p className="text-sm text-purple-700 mb-2">
+              محدَد: {level1SelectedCard.kind === "image" ? "صورة" : level1SelectedCard.kind === "name" ? "اسم" : "مميزات"} — انقري على خانة في الصف لوضعه.
+            </p>
           )}
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <p className="text-sm font-semibold text-slate-700 mb-2">الخصائص:</p>
-              <div className="space-y-2">
-                {level2Characteristics
-                  .filter((c) => !level2Placements[c.id])
-                  .map((c) => (
-                    <div
-                      key={c.id}
-                      className="p-3 rounded-lg bg-slate-50 border border-slate-200 cursor-pointer hover:border-purple-300"
-                      onClick={() => {}}
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-slate-200">
+                  <th className="p-2 text-right font-semibold text-slate-700 w-24">صورة</th>
+                  <th className="p-2 text-right font-semibold text-slate-700 w-28">اسم النوع</th>
+                  <th className="p-2 text-right font-semibold text-slate-700">المميزات</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[0, 1, 2, 3].map((rowIndex) => {
+                  const imageId = level1ImagePlacements[rowIndex]
+                  const nameId = level1NamePlacements[rowIndex]
+                  const featureId = level1FeaturePlacements[rowIndex]
+                  const rowCorrect =
+                    imageId && nameId && featureId && imageId === nameId && nameId === featureId
+                  const imageType = imageId ? types.find((t) => t.id === imageId) : null
+                  const nameType = nameId ? types.find((t) => t.id === nameId) : null
+                  const featureType = featureId ? types.find((t) => t.id === featureId) : null
+                  return (
+                    <tr
+                      key={rowIndex}
+                      className={`border-b border-slate-100 ${rowCorrect ? "bg-emerald-50" : ""}`}
                     >
-                      {c.text}
-                    </div>
+                      <td
+                        className="p-2 align-middle min-h-[80px] cursor-pointer border border-dashed border-slate-200 rounded-lg hover:border-purple-400 min-w-[100px]"
+                        onClick={() => handleLevel1Place("image", rowIndex)}
+                      >
+                        {imageType ? (
+                          <div className="flex justify-center">
+                            {imageType.imagePath ? (
+                              <img
+                                src={imageType.imagePath}
+                                alt={`بركان ${imageType.name_ar}`}
+                                className="max-h-[80px] w-auto object-contain"
+                              />
+                            ) : (
+                              <VolcanoSvg />
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-slate-400 block text-center py-4">صورة</span>
+                        )}
+                      </td>
+                      <td
+                        className="p-2 align-middle cursor-pointer border border-dashed border-slate-200 rounded-lg hover:border-purple-400"
+                        onClick={() => handleLevel1Place("name", rowIndex)}
+                      >
+                        {nameType ? (
+                          <span className="font-medium text-slate-800">بركان {nameType.name_ar}</span>
+                        ) : (
+                          <span className="text-slate-400">اسم</span>
+                        )}
+                      </td>
+                      <td
+                        className="p-2 align-middle cursor-pointer border border-dashed border-slate-200 rounded-lg hover:border-purple-400"
+                        onClick={() => handleLevel1Place("feature", rowIndex)}
+                      >
+                        {featureType ? (
+                          <ul className="text-slate-700 list-disc list-inside text-xs space-y-0.5">
+                            {featureType.characteristics.slice(0, 2).map((c, i) => (
+                              <li key={i}>{c}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <span className="text-slate-400">مميزات</span>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-4">
+            <div>
+              <p className="text-xs font-semibold text-slate-600 mb-2">الصور (انقري لتحديد ثم انقري على خانة):</p>
+              <div className="flex flex-wrap gap-2">
+                {types
+                  .filter((t) => !level1ImagePlacements.includes(t.id))
+                  .map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() =>
+                        setLevel1SelectedCard(
+                          level1SelectedCard?.kind === "image" && level1SelectedCard?.typeId === t.id
+                            ? null
+                            : { kind: "image", typeId: t.id }
+                        )
+                      }
+                      className={`rounded-lg border-2 p-1 ${
+                        level1SelectedCard?.kind === "image" && level1SelectedCard?.typeId === t.id
+                          ? "border-purple-500 bg-purple-100"
+                          : "border-slate-200 hover:border-purple-300"
+                      }`}
+                    >
+                      {t.imagePath ? (
+                        <img src={t.imagePath} alt="" className="h-14 w-auto object-contain" />
+                      ) : (
+                        <VolcanoSvg />
+                      )}
+                    </button>
                   ))}
               </div>
             </div>
-            <div className="space-y-4">
-              {types.map((t) => (
-                <div key={t.id} className="rounded-xl border-2 border-dashed border-slate-300 p-4 min-h-[80px]">
-                  <p className="font-semibold text-slate-800 mb-2">{t.name_ar}</p>
-                  <div className="space-y-2">
-                    {level2Characteristics
-                      .filter((c) => level2Placements[c.id] === t.id)
-                      .map((c) => (
-                        <div
-                          key={c.id}
-                          className="p-2 rounded bg-white border border-slate-200 text-sm"
-                        >
-                          {c.text}
-                        </div>
-                      ))}
-                  </div>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {level2Characteristics
-                      .filter((c) => !level2Placements[c.id])
-                      .map((c) => (
-                        <button
-                          key={c.id}
-                          onClick={() => handleLevel2Drop(c.id, t.id)}
-                          className="px-3 py-1.5 rounded-lg bg-purple-100 text-purple-800 text-sm hover:bg-purple-200"
-                        >
-                          + {c.text.slice(0, 20)}…
-                        </button>
-                      ))}
-                  </div>
-                </div>
-              ))}
+            <div>
+              <p className="text-xs font-semibold text-slate-600 mb-2">الأسماء:</p>
+              <div className="flex flex-wrap gap-2">
+                {types
+                  .filter((t) => !level1NamePlacements.includes(t.id))
+                  .map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() =>
+                        setLevel1SelectedCard(
+                          level1SelectedCard?.kind === "name" && level1SelectedCard?.typeId === t.id
+                            ? null
+                            : { kind: "name", typeId: t.id }
+                        )
+                      }
+                      className={`rounded-lg border-2 px-3 py-2 text-sm ${
+                        level1SelectedCard?.kind === "name" && level1SelectedCard?.typeId === t.id
+                          ? "border-purple-500 bg-purple-100"
+                          : "border-slate-200 hover:border-purple-300"
+                      }`}
+                    >
+                      بركان {t.name_ar}
+                    </button>
+                  ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-slate-600 mb-2">المميزات:</p>
+              <div className="flex flex-wrap gap-2">
+                {types
+                  .filter((t) => !level1FeaturePlacements.includes(t.id))
+                  .map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() =>
+                        setLevel1SelectedCard(
+                          level1SelectedCard?.kind === "feature" && level1SelectedCard?.typeId === t.id
+                            ? null
+                            : { kind: "feature", typeId: t.id }
+                        )
+                      }
+                      className={`rounded-lg border-2 px-3 py-2 text-right text-xs max-w-[180px] ${
+                        level1SelectedCard?.kind === "feature" && level1SelectedCard?.typeId === t.id
+                          ? "border-purple-500 bg-purple-100"
+                          : "border-slate-200 hover:border-purple-300"
+                      }`}
+                    >
+                      {t.characteristics.slice(0, 2).join("، ")}
+                    </button>
+                  ))}
+              </div>
             </div>
           </div>
-          <div className="mt-6 flex justify-between">
+          {level1Complete && (
+            <p className={`mt-3 text-sm font-medium ${level1AllCorrect ? "text-emerald-700" : "text-amber-700"}`}>
+              {level1AllCorrect
+                ? "✓ كل المطابقات صحيحة! يمكنك الانتقال للمستوى التالي."
+                : "راجعي الصفوف — بعض المطابقات غير صحيحة (اللون الأخضر = صف صحيح). يمكنك تصحيح أي صف بالنقر على عنصر من الأسفل ثم النقر على الخانة الخاطئة."}
+            </p>
+          )}
+          <div className="mt-6 flex justify-center">
             <button
-              onClick={() => setCurrentLevel(1)}
-              className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50"
-            >
-              ← السابق
-            </button>
-            <button
-              onClick={() => setCurrentLevel(3)}
-              disabled={!level2Complete}
+              onClick={() => setCurrentLevel(2)}
+              disabled={!level1Complete}
               className="px-6 py-3 rounded-xl bg-purple-600 text-white font-semibold hover:bg-purple-700 disabled:opacity-50"
             >
-              التالي ← المستوى 3 (أمثلة حقيقية)
+              التالي ← المستوى 2 (أمثلة حقيقية)
             </button>
           </div>
         </div>
       )}
 
-      {/* المستوى 3: أمثلة حقيقية (Real-World Examples) */}
-      {currentLevel === 3 && (
+      {/* المستوى 2: أمثلة حقيقية (Real-World Examples) */}
+      {currentLevel === 2 && (
         <div className="card">
           <h3 className="text-lg font-semibold text-slate-900 mb-2">أمثلة حقيقية</h3>
-          <p className="text-sm text-slate-600 mb-4">اربطي كل مثال بنوع البركان. ماونا لوا→درعي، فيزوف→مركب، سانت هيلين→مخروطي، شقوق آيسلندا→ثوران الشقوق. ✔ يذكر مثالًا على كل نوع</p>
+          <p className="text-sm text-slate-600 mb-4">
+            اربطي كل مثال بنوع البركان. ماونا لوا→درعي، فيزوف→مركب، سانت هيلين→مخروطي، شقوق آيسلندا→ثوران الشقوق. ✔ يذكر مثالًا على كل نوع. يمكنك النقر على مثال مُجاب لإلغاء الإجابة وتصحيحها.
+          </p>
           {level3ShowExplanation && (
             <div className="mb-4 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-sm">
               {level3ShowExplanation}
@@ -414,8 +526,7 @@ export default function VolcanoTypesGame({ gameData, game, onComplete }: Volcano
                 {level3Examples.map((e) => (
                   <button
                     key={e.exampleName}
-                    onClick={() => setLevel3SelectedExample(level3Matches[e.exampleName] ? null : e.exampleName)}
-                    disabled={!!level3Matches[e.exampleName]}
+                    onClick={() => handleLevel3SelectExample(e.exampleName)}
                     className={`w-full p-4 rounded-xl border-2 text-right font-medium transition ${
                       level3SelectedExample === e.exampleName
                         ? "bg-purple-200 border-purple-500"
@@ -447,26 +558,26 @@ export default function VolcanoTypesGame({ gameData, game, onComplete }: Volcano
           </div>
           <div className="mt-6 flex justify-between">
             <button
-              onClick={() => setCurrentLevel(2)}
+              onClick={() => setCurrentLevel(1)}
               className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50"
             >
               ← السابق
             </button>
             <button
-              onClick={() => setCurrentLevel(4)}
+              onClick={() => setCurrentLevel(3)}
               disabled={!level3Complete}
               className="px-6 py-3 rounded-xl bg-purple-600 text-white font-semibold hover:bg-purple-700 disabled:opacity-50"
             >
-              التالي ← المستوى 4 (تحدي السرعة)
+              التالي ← المستوى 3 (تحدي السرعة)
             </button>
           </div>
         </div>
       )}
 
-      {/* المستوى 4: تحدي السرعة (Speed Challenge) */}
-      {currentLevel === 4 && (
+      {/* المستوى 3: تحدي السرعة (Speed Challenge) */}
+      {currentLevel === 3 && (
         <div className="card">
-          <h3 className="text-lg font-semibold text-slate-900 mb-2">تحدي السرعة</h3>
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">تحدي السرعة (المستوى 3)</h3>
           <p className="text-sm text-slate-600 mb-2">أسئلة اختيار من متعدد ({timePerQuestion} ثوانٍ لكل سؤال). شريط التقدم والنقاط.</p>
           <div className="flex items-center justify-between mb-4">
             <div className="flex gap-2">
@@ -489,6 +600,20 @@ export default function VolcanoTypesGame({ gameData, game, onComplete }: Volcano
               <p className="text-lg font-medium text-slate-800 mb-4">
                 ما نوع بركان &quot;{level4Questions[level4QuestionIndex].exampleName}&quot;؟
               </p>
+              {level4Answered &&
+                level4Selected !== level4Questions[level4QuestionIndex].correctType &&
+                !level4RetryUsed && (
+                  <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex flex-wrap items-center gap-3">
+                    <span>خطأ، جرّبي مرة أخرى.</span>
+                    <button
+                      type="button"
+                      onClick={handleLevel4Retry}
+                      className="px-4 py-2 rounded-lg bg-rose-200 text-rose-900 font-medium hover:bg-rose-300"
+                    >
+                      حاولي مرة أخرى
+                    </button>
+                  </div>
+                )}
               <div className="grid grid-cols-2 gap-3">
                 {level4Questions[level4QuestionIndex].options.map((opt) => (
                   <button
