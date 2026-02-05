@@ -29,7 +29,14 @@ export async function POST(request: Request) {
       )
     }
 
-    const { modelId, shareToAll, studentIds } = validationResult.data
+    let { modelId, shareToAll, studentIds } = validationResult.data
+
+    // النماذج المخصصة (من localStorage) لها معرف مثل custom-123-prebuilt-1؛ الطالبة لا تملكها.
+    // نستخدم معرف النموذج الجاهز الأصلي حتى تظهر الاختبارات للطالبة.
+    if (modelId.startsWith("custom-")) {
+      const parts = modelId.split("-")
+      if (parts.length >= 3) modelId = parts.slice(2).join("-")
+    }
 
     if (studentIds && studentIds.length > 0) {
       const count = await prisma.student.count({

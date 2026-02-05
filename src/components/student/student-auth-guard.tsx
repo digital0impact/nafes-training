@@ -10,19 +10,25 @@ export function useStudentAuth() {
   const clearStudent = useStudentStore((state) => state.clearStudent)
   const [isHydrated, setIsHydrated] = useState(false)
 
-  // انتظار التحميل من localStorage
+  // انتظار التحميل من localStorage قبل عرض المحتوى (لتجنب عرض القيم الافتراضية أو إعادة التوجيه بالخطأ)
   useEffect(() => {
-    useStudentStore.persist.rehydrate()
-    setIsHydrated(true)
+    useStudentStore.persist.rehydrate().then(() => setIsHydrated(true))
   }, [])
 
   const loading = !isHydrated
 
   useEffect(() => {
-    if (isHydrated && !student) {
+    if (!isHydrated) return
+    if (!student) {
+      router.push("/auth/student-signin")
+      return
+    }
+    // بيانات قديمة قد تكون بدون id (معرف قاعدة البيانات) فتبقى القيم الافتراضية
+    if (!student.id || typeof student.id !== "string" || student.id.length < 5) {
+      clearStudent()
       router.push("/auth/student-signin")
     }
-  }, [student, router, isHydrated])
+  }, [student, router, isHydrated, clearStudent])
 
   const signOut = () => {
     clearStudent()
@@ -45,8 +51,8 @@ export function StudentAuthGuard({ children }: { children: React.ReactNode }) {
     )
   }
 
-  if (!student) {
-    return null // سيتم إعادة التوجيه تلقائياً
+  if (!student || !student.id) {
+    return null // سيتم إعادة التوجيه تلقائياً أو تسجيل الدخول من جديد
   }
 
   return <>{children}</>

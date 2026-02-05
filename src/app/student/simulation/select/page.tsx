@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   getRelatedOutcomes,
@@ -12,6 +12,7 @@ import {
   type TestModel,
 } from "@/lib/test-models";
 import { useStudentStore } from "@/store/student-store";
+import { StudentAuthGuard } from "@/components/student";
 
 const skillColors: Record<string, string> = {
   "علوم الحياة": "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -48,68 +49,68 @@ function toClientModel(raw: {
   };
 }
 
-export default function SelectTestModelPage() {
+function SelectTestModelContent() {
   const student = useStudentStore((s) => s.student);
   const [availableModels, setAvailableModels] = useState<TestModel[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [debugReason, setDebugReason] = useState<string | null>(null);
+  const [loadingDebug, setLoadingDebug] = useState(false);
 
-  // جلب النماذج المُرسلة من المعلمة عبر API
-  useEffect(() => {
+  const loadAssignedTests = useCallback(async () => {
     if (!student?.id) {
       setAvailableModels([]);
       setLoading(false);
       return;
     }
 
-    let cancelled = false;
     setLoading(true);
+    try {
+      const res = await fetch(
+        `/api/student/assigned-tests?studentId=${encodeURIComponent(student.id)}`,
+        { cache: "no-store" }
+      );
+      const data = await res.json().catch(() => ({}));
+      const modelIds: string[] = data.modelIds ?? [];
 
-    (async () => {
-      try {
-        const res = await fetch(
-          `/api/student/assigned-tests?studentId=${encodeURIComponent(student.id)}`
-        );
-        const data = await res.json().catch(() => ({}));
-        const modelIds: string[] = data.modelIds ?? [];
-        if (cancelled) return;
+      const prebuilt = getPrebuiltTestModels();
+      const diagnostic = getPrebuiltDiagnosticTests();
+      const models: TestModel[] = [];
 
-        const prebuilt = getPrebuiltTestModels();
-        const diagnostic = getPrebuiltDiagnosticTests();
-        const models: TestModel[] = [];
-
-        for (const id of modelIds) {
-          const fromPrebuilt = prebuilt.find((m) => m.id === id);
-          const fromDiagnostic = diagnostic.find((m) => m.id === id);
-          if (fromPrebuilt) {
-            models.push(fromPrebuilt);
-            continue;
-          }
-          if (fromDiagnostic) {
-            models.push(fromDiagnostic);
-            continue;
-          }
-          const modelRes = await fetch(
-            `/api/student/test-model/${encodeURIComponent(id)}?studentId=${encodeURIComponent(student.id)}`
-          );
-          if (modelRes.ok) {
-            const raw = await modelRes.json();
-            models.push(toClientModel(raw));
-          }
+      for (const id of modelIds) {
+        const fromPrebuilt = prebuilt.find((m) => m.id === id);
+        const fromDiagnostic = diagnostic.find((m) => m.id === id);
+        if (fromPrebuilt) {
+          models.push(fromPrebuilt);
+          continue;
         }
-
-        if (!cancelled) setAvailableModels(models);
-      } catch (e) {
-        console.error("Error loading assigned tests", e);
-        if (!cancelled) setAvailableModels([]);
-      } finally {
-        if (!cancelled) setLoading(false);
+        if (fromDiagnostic) {
+          models.push(fromDiagnostic);
+          continue;
+        }
+        const modelRes = await fetch(
+          `/api/student/test-model/${encodeURIComponent(id)}?studentId=${encodeURIComponent(student.id)}`,
+          { cache: "no-store" }
+        );
+        if (modelRes.ok) {
+          const raw = await modelRes.json();
+          models.push(toClientModel(raw));
+        }
       }
-    })();
 
-    return () => {
-      cancelled = true;
-    };
+      setAvailableModels(models);
+    } catch (e) {
+      console.error("Error loading assigned tests", e);
+      setAvailableModels([]);
+    } finally {
+      setLoading(false);
+    }
   }, [student?.id]);
+
+  // جلب النماذج المُرسلة من المعلمة (بدون كاش لضمان ظهور الاختبارات الجديدة)
+  useEffect(() => {
+    loadAssignedTests();
+  }, [loadAssignedTests, refreshKey]);
 
   return (
     <main className="space-y-6">
@@ -133,8 +134,48 @@ export default function SelectTestModelPage() {
           </div>
           <h3 className="text-lg font-semibold text-slate-900">لا توجد نماذج متاحة حالياً</h3>
           <p className="mt-2 text-slate-600">
-            لم تقم معلمتك بمشاركة أي نماذج اختبارات بعد. تواصلي معها للحصول على النماذج.
+            لم تقم معلمتك بمشاركة أي نماذج اختبارات بعد، أو أن الاختبار لم يصل بعد. تواصلي معها للتأكد، ثم حدّثي القائمة أدناه.
           </p>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => setRefreshKey((k) => k + 1)}
+              className="rounded-2xl bg-primary-600 px-6 py-2.5 font-semibold text-white transition hover:bg-primary-700"
+            >
+              تحديث القائمة
+            </button>
+            <button
+              type="button"
+              disabled={loadingDebug || !student?.id}
+              onClick={async () => {
+                if (!student?.id) return
+                setLoadingDebug(true)
+                setDebugReason(null)
+                try {
+                  const res = await fetch(
+                    `/api/student/assigned-tests?studentId=${encodeURIComponent(student.id)}&debug=1`,
+                    { cache: "no-store" }
+                  )
+                  const data = await res.json().catch(() => ({}))
+                  const d = data.debug
+                  if (d?.reason) setDebugReason(d.reason)
+                  else setDebugReason("لا توجد معلومات تشخيص إضافية.")
+                } catch {
+                  setDebugReason("حدث خطأ أثناء التحقق.")
+                } finally {
+                  setLoadingDebug(false)
+                }
+              }}
+              className="rounded-2xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            >
+              {loadingDebug ? "جاري التحقق..." : "لماذا لا أرى اختبارات؟"}
+            </button>
+          </div>
+          {debugReason && (
+            <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+              {debugReason}
+            </p>
+          )}
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -232,6 +273,14 @@ export default function SelectTestModelPage() {
         </ul>
       </div>
     </main>
+  );
+}
+
+export default function SelectTestModelPage() {
+  return (
+    <StudentAuthGuard>
+      <SelectTestModelContent />
+    </StudentAuthGuard>
   );
 }
 

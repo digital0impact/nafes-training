@@ -144,7 +144,7 @@ export default function ShareTestModelsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           modelId: selectedModel.id,
-          shareToAll,
+          shareToAll: sendToAll,
           studentIds: sendToAll ? [] : Array.from(selectedStudents),
         }),
       });

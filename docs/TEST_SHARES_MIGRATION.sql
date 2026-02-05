@@ -16,5 +16,12 @@ CREATE UNIQUE INDEX IF NOT EXISTS "test_shares_userId_modelId_key" ON "test_shar
 CREATE INDEX IF NOT EXISTS "test_shares_userId_idx" ON "test_shares"("userId");
 CREATE INDEX IF NOT EXISTS "test_shares_modelId_idx" ON "test_shares"("modelId");
 
-ALTER TABLE "test_shares" ADD CONSTRAINT "test_shares_userId_fkey"
-    FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'test_shares_userId_fkey'
+  ) THEN
+    ALTER TABLE "test_shares" ADD CONSTRAINT "test_shares_userId_fkey"
+      FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+END $$;

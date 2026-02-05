@@ -145,7 +145,7 @@ export default function DiagnosticModelsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           modelId: selectedModel.id,
-          shareToAll,
+          shareToAll: sendToAll,
           studentIds: sendToAll ? [] : Array.from(selectedStudents),
         }),
       });

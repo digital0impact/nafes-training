@@ -21,6 +21,7 @@ type SkillItem = { name: string; score: number; level: "متقنة" | "متوس�
 function StudentHomeContent() {
   const { student } = useStudentAuth()
   const [mastery, setMastery] = useState<{ key: string; score: number | null; status: string }[]>([])
+  const [assignedTestsCount, setAssignedTestsCount] = useState(0)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -28,13 +29,28 @@ function StudentHomeContent() {
       setLoading(false)
       return
     }
-    fetch(`/api/student/mastery?studentId=${encodeURIComponent(student.id)}`)
+    setLoading(true)
+    fetch(`/api/student/mastery?studentId=${encodeURIComponent(student.id)}`, {
+      cache: "no-store",
+    })
       .then((res) => res.json())
       .then((data) => {
         setMastery(data.mastery || [])
       })
       .catch(() => setMastery([]))
       .finally(() => setLoading(false))
+  }, [student?.id])
+
+  // جلب عدد الاختبارات المعينة من المعلمة (بدون كاش لظهور الاختبارات الجديدة)
+  useEffect(() => {
+    if (!student?.id) return
+    fetch(`/api/student/assigned-tests?studentId=${encodeURIComponent(student.id)}`, { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        const ids = data.modelIds ?? []
+        setAssignedTestsCount(ids.length)
+      })
+      .catch(() => setAssignedTestsCount(0))
   }, [student?.id])
 
   const quickSkills = useMemo((): SkillItem[] => {
@@ -90,6 +106,17 @@ function StudentHomeContent() {
         </div>
       </header>
 
+      {assignedTestsCount > 0 && (
+        <div className="rounded-2xl border border-primary-200 bg-primary-50 p-4 text-primary-800">
+          <p className="font-semibold">
+            لديك {assignedTestsCount} اختبار{assignedTestsCount > 1 ? "ات" : ""} معين من معلمتك.
+          </p>
+          <p className="mt-1 text-sm opacity-90">
+            ادخلي من &quot;محاكاة اختبار نافس&quot; أدناه لبدء الاختبار.
+          </p>
+        </div>
+      )}
+
       <section>
         <SectionHeader title="إجراءات سريعة" subtitle="اختاري ما يناسبك لبدء التدريب الآن" />
         <div className="mt-6 grid gap-4 md:grid-cols-4">
@@ -97,10 +124,16 @@ function StudentHomeContent() {
             <Link
               key={action.label}
               href={action.href}
-              className="rounded-3xl border border-slate-100 bg-white p-6 text-center font-semibold text-slate-900 shadow-soft transition hover:-translate-y-1"
+              className={`rounded-3xl border bg-white p-6 text-center font-semibold text-slate-900 shadow-soft transition hover:-translate-y-1 ${
+                assignedTestsCount > 0 && action.href === "/student/simulation/select"
+                  ? "border-primary-300 ring-2 ring-primary-200"
+                  : "border-slate-100"
+              }`}
               style={{ boxShadow: "0 12px 20px rgba(15, 23, 42, 0.05)" }}
             >
-              <span className={`badge mb-3 text-white ${action.accent}`}>جاهزة</span>
+              <span className={`badge mb-3 text-white ${action.accent}`}>
+                {assignedTestsCount > 0 && action.href === "/student/simulation/select" ? "اختبارات معينة" : "جاهزة"}
+              </span>
               {action.label}
             </Link>
           ))}
