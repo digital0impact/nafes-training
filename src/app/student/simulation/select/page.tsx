@@ -44,7 +44,7 @@ function toClientModel(raw: {
     questionIds: Array.isArray(raw.questionIds) ? raw.questionIds : [],
     duration: raw.duration,
     skill: raw.skill,
-    testType: raw.testType ?? "normal",
+    testType: (raw.testType === "diagnostic" ? "diagnostic" : "normal"),
     year: raw.year,
   };
 }

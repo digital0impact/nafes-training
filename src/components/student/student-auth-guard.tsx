@@ -12,7 +12,7 @@ export function useStudentAuth() {
 
   // انتظار التحميل من localStorage قبل عرض المحتوى (لتجنب عرض القيم الافتراضية أو إعادة التوجيه بالخطأ)
   useEffect(() => {
-    useStudentStore.persist.rehydrate().then(() => setIsHydrated(true))
+    Promise.resolve(useStudentStore.persist.rehydrate()).then(() => setIsHydrated(true))
   }, [])
 
   const loading = !isHydrated
