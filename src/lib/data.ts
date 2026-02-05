@@ -1,39 +1,3 @@
-export const quickSkills = [
-  { name: "تركيب الخلية", level: "متقنة" as const, score: 88 },
-  { name: "قوانين نيوتن", level: "ضعيفة" as const, score: 42 },
-  { name: "التفاعلات الكيميائية", level: "متوسطة" as const, score: 64 }
-];
-
-export const students = [
-  {
-    name: "سارة محمد",
-    score: 84,
-    status: "متقدمة",
-    progress: 12
-  },
-  {
-    name: "نورة عبدالله",
-    score: 58,
-    status: "تحتاج دعم",
-    progress: 6
-  },
-  {
-    name: "جود خالد",
-    score: 71,
-    status: "متوسطة",
-    progress: 9
-  }
-];
-
-export const allowedStudents = [
-  { id: "STU-301", name: "سارة محمد", grade: "3/1", classCode: "SCI3A" },
-  { id: "STU-302", name: "جمانة خالد", grade: "3/1", classCode: "SCI3A" },
-  { id: "STU-303", name: "نورة عبدالله", grade: "3/2", classCode: "SCI3B" },
-  { id: "STU-304", name: "لمياء علي", grade: "3/2", classCode: "SCI3B" },
-  { id: "STU-305", name: "جود العتيبي", grade: "3/3", classCode: "SCI3C" },
-  { id: "STU-306", name: "غادة الحربي", grade: "3/3", classCode: "SCI3C" }
-];
-
 export type LearningOutcome = {
   week: string;
   period?: string; // الفترة الأولى أو الثانية

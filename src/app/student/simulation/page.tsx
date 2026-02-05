@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { getQuestionsForModel, getRelatedOutcomes, getPrebuiltTestModels, getAllTestModels, type TestModel } from "@/lib/test-models";
+import { getQuestionsForModel, getQuestionsFromIds, getPrebuiltTestModels, getPrebuiltDiagnosticTests, getAllTestModels, type TestModel } from "@/lib/test-models";
 import { type SimulationQuestion } from "@/lib/simulation-questions";
 import { useStudentStore } from "@/store/student-store";
 
@@ -28,29 +28,64 @@ export default function SimulationPage() {
   const [saving, setSaving] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load model and questions
+  // Load model and questions (من النماذج المحلية أو من API إن كان الاختبار مُشاراً)
   useEffect(() => {
-    if (modelId) {
-      // البحث في جميع النماذج (الجاهزة والمخصصة)
-      const prebuiltModels = getPrebuiltTestModels();
-      const customModels = getAllTestModels();
-      const allModels = [...prebuiltModels, ...customModels];
-      
-      const model = allModels.find((m) => m.id === modelId);
-      if (model) {
+    if (!modelId) {
+      router.push("/student/simulation/select");
+      return;
+    }
+
+    const prebuilt = getPrebuiltTestModels();
+    const diagnostic = getPrebuiltDiagnosticTests();
+    const custom = getAllTestModels();
+    const localModel = [...prebuilt, ...diagnostic, ...custom].find((m) => m.id === modelId);
+
+    if (localModel) {
+      setCurrentModel(localModel);
+      setQuestions(getQuestionsForModel(modelId));
+      setTimeRemaining(localModel.duration * 60);
+      setInitialTime(localModel.duration * 60);
+      return;
+    }
+
+    if (!student?.id) {
+      router.push("/student/simulation/select");
+      return;
+    }
+
+    let cancelled = false;
+    fetch(`/api/student/test-model/${encodeURIComponent(modelId)}?studentId=${encodeURIComponent(student.id)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((raw) => {
+        if (cancelled || !raw) {
+          if (!raw) router.push("/student/simulation/select");
+          return;
+        }
+        const model: TestModel = {
+          id: raw.id,
+          title: raw.title,
+          description: raw.description ?? "",
+          period: raw.period,
+          weeks: Array.isArray(raw.weeks) ? raw.weeks : [],
+          relatedOutcomes: Array.isArray(raw.relatedOutcomes) ? raw.relatedOutcomes : [],
+          questionIds: Array.isArray(raw.questionIds) ? raw.questionIds : [],
+          duration: raw.duration ?? 20,
+          skill: raw.skill,
+          testType: raw.testType ?? "normal",
+          year: raw.year,
+        };
         setCurrentModel(model);
-        const modelQuestions = getQuestionsForModel(modelId);
-        setQuestions(modelQuestions);
+        setQuestions(getQuestionsFromIds(model.questionIds));
         const duration = model.duration * 60;
         setTimeRemaining(duration);
         setInitialTime(duration);
-      } else {
-        router.push("/student/simulation/select");
-      }
-    } else {
-      router.push("/student/simulation/select");
-    }
-  }, [modelId, router]);
+      })
+      .catch(() => {
+        if (!cancelled) router.push("/student/simulation/select");
+      });
+
+    return () => { cancelled = true; };
+  }, [modelId, student?.id, router]);
 
   const currentQuestion = questions[currentQuestionIndex];
   const totalQuestions = questions.length;

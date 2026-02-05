@@ -158,6 +158,25 @@ export function getQuestionsForModel(modelId: string): SimulationQuestion[] {
   return questions;
 }
 
+/** بناء قائمة أسئلة من مصفوفة معرفات (للنماذج المُشارة من API) */
+export function getQuestionsFromIds(questionIds: string[]): SimulationQuestion[] {
+  let customQuestions: SimulationQuestion[] = [];
+  if (typeof window !== "undefined") {
+    try {
+      const saved = localStorage.getItem("customQuestions");
+      if (saved) customQuestions = JSON.parse(saved);
+    } catch {}
+  }
+  return questionIds
+    .map((id) => {
+      const customQ = customQuestions.find((q) => q.id === id);
+      if (customQ) return customQ;
+      return simulationQuestions.find((q) => q.id === id);
+    })
+    .filter((q): q is SimulationQuestion => q !== undefined)
+    .map((q, index) => ({ ...q, number: index + 1 }));
+}
+
 // دالة للحصول على نواتج التعلم المرتبطة بنموذج
 export function getRelatedOutcomes(modelId: string): LearningOutcome[] {
   let model: TestModel | undefined;

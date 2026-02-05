@@ -28,6 +28,7 @@ model User {
   activities       Activity[]
   classes          Class[]
   gameShares       GameShare[]
+  testShares       TestShare[]
   visitorProfiles  VisitorProfile[]  @relation("VisitorProfileAsVisitor")
   visitorComments  VisitorComment[]
   auditLogs        AuditLog[]
@@ -275,4 +276,21 @@ model GameShare {
   @@index([userId])
   @@index([classId])
   @@index([sharedAt])
+}
+
+// مشاركة نموذج اختبار مع الطالبات
+model TestShare {
+  id            String   @id @default(cuid())
+  modelId       String   // معرف النموذج (من DB أو النماذج الجاهزة)
+  userId        String   // المعلم الذي شارك الاختبار
+  shareToAll    Boolean  @default(false)
+  studentIds    String   // JSON array: قائمة id الطالبات (من جدول students)
+  sharedAt      DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, modelId])
+  @@map("test_shares")
+  @@index([userId])
+  @@index([modelId])
 }

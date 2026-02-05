@@ -1,42 +1,115 @@
 "use client";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getAllTestModels, getRelatedOutcomes, getQuestionsForModel, getPrebuiltTestModels, type TestModel } from "@/lib/test-models";
+import {
+  getRelatedOutcomes,
+  getQuestionsForModel,
+  getPrebuiltTestModels,
+  getPrebuiltDiagnosticTests,
+  type TestModel,
+} from "@/lib/test-models";
+import { useStudentStore } from "@/store/student-store";
 
 const skillColors: Record<string, string> = {
   "علوم الحياة": "bg-emerald-50 text-emerald-700 border-emerald-200",
   "العلوم الفيزيائية": "bg-blue-50 text-blue-700 border-blue-200",
   "علوم الأرض والفضاء": "bg-amber-50 text-amber-700 border-amber-200",
-  "جميع المجالات": "bg-purple-50 text-purple-700 border-purple-200"
+  "جميع المجالات": "bg-purple-50 text-purple-700 border-purple-200",
 };
 
-export default function SelectTestModelPage() {
-  const [availableModels, setAvailableModels] = useState<TestModel[]>([]);
+function toClientModel(raw: {
+  id: string;
+  title: string;
+  description?: string;
+  period: string;
+  weeks: string[] | unknown;
+  relatedOutcomes: string[] | unknown;
+  questionIds: string[] | unknown;
+  duration: number;
+  skill: string;
+  testType?: string;
+  year?: string;
+}): TestModel {
+  return {
+    id: raw.id,
+    title: raw.title,
+    description: raw.description ?? "",
+    period: raw.period,
+    weeks: Array.isArray(raw.weeks) ? raw.weeks : [],
+    relatedOutcomes: Array.isArray(raw.relatedOutcomes) ? raw.relatedOutcomes : [],
+    questionIds: Array.isArray(raw.questionIds) ? raw.questionIds : [],
+    duration: raw.duration,
+    skill: raw.skill,
+    testType: raw.testType ?? "normal",
+    year: raw.year,
+  };
+}
 
-  // Load shared models from localStorage
+export default function SelectTestModelPage() {
+  const student = useStudentStore((s) => s.student);
+  const [availableModels, setAvailableModels] = useState<TestModel[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // جلب النماذج المُرسلة من المعلمة عبر API
   useEffect(() => {
-    const saved = localStorage.getItem("sharedTestModels");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved) as string[];
-        const sharedSet = new Set(parsed);
-        
-        // الحصول على جميع النماذج (الجاهزة والمخصصة)
-        const prebuiltModels = getPrebuiltTestModels();
-        const customModels = getAllTestModels();
-        const allModels = [...prebuiltModels, ...customModels];
-        
-        // تصفية النماذج المشاركة فقط
-        const sharedModelsList = allModels.filter((model) => sharedSet.has(model.id));
-        setAvailableModels(sharedModelsList);
-      } catch (e) {
-        console.error("Error loading shared models", e);
-      }
+    if (!student?.id) {
+      setAvailableModels([]);
+      setLoading(false);
+      return;
     }
-  }, []);
+
+    let cancelled = false;
+    setLoading(true);
+
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/student/assigned-tests?studentId=${encodeURIComponent(student.id)}`
+        );
+        const data = await res.json().catch(() => ({}));
+        const modelIds: string[] = data.modelIds ?? [];
+        if (cancelled) return;
+
+        const prebuilt = getPrebuiltTestModels();
+        const diagnostic = getPrebuiltDiagnosticTests();
+        const models: TestModel[] = [];
+
+        for (const id of modelIds) {
+          const fromPrebuilt = prebuilt.find((m) => m.id === id);
+          const fromDiagnostic = diagnostic.find((m) => m.id === id);
+          if (fromPrebuilt) {
+            models.push(fromPrebuilt);
+            continue;
+          }
+          if (fromDiagnostic) {
+            models.push(fromDiagnostic);
+            continue;
+          }
+          const modelRes = await fetch(
+            `/api/student/test-model/${encodeURIComponent(id)}?studentId=${encodeURIComponent(student.id)}`
+          );
+          if (modelRes.ok) {
+            const raw = await modelRes.json();
+            models.push(toClientModel(raw));
+          }
+        }
+
+        if (!cancelled) setAvailableModels(models);
+      } catch (e) {
+        console.error("Error loading assigned tests", e);
+        if (!cancelled) setAvailableModels([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [student?.id]);
 
   return (
     <main className="space-y-6">
@@ -47,7 +120,11 @@ export default function SelectTestModelPage() {
         </p>
       </header>
 
-      {availableModels.length === 0 ? (
+      {loading ? (
+        <div className="card text-center py-12">
+          <p className="text-slate-500">جاري تحميل الاختبارات المتاحة...</p>
+        </div>
+      ) : availableModels.length === 0 ? (
         <div className="card text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
             <svg className="h-8 w-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -107,11 +184,11 @@ export default function SelectTestModelPage() {
                 </div>
 
                 {/* Related Outcomes Preview */}
-                {relatedOutcomes.length > 0 && (
+                {(relatedOutcomes.length > 0 || (model.relatedOutcomes && model.relatedOutcomes.length > 0)) && (
                   <div className="space-y-2 border-t border-slate-100 pt-3">
                     <p className="text-xs font-semibold text-slate-600">نواتج التعلم المرتبطة:</p>
                     <div className="flex flex-wrap gap-1">
-                      {relatedOutcomes.slice(0, 3).map((outcome) => (
+                      {(relatedOutcomes.length ? relatedOutcomes : model.relatedOutcomes!.map((lesson: string) => ({ lesson }))).slice(0, 3).map((outcome: { lesson: string }) => (
                         <span
                           key={outcome.lesson}
                           className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-600"
@@ -121,9 +198,9 @@ export default function SelectTestModelPage() {
                             : outcome.lesson}
                         </span>
                       ))}
-                      {relatedOutcomes.length > 3 && (
+                      {(relatedOutcomes.length || model.relatedOutcomes?.length || 0) > 3 && (
                         <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-600">
-                          +{relatedOutcomes.length - 3} أكثر
+                          +{(relatedOutcomes.length || model.relatedOutcomes?.length || 0) - 3} أكثر
                         </span>
                       )}
                     </div>

@@ -1,23 +1,67 @@
 "use client"
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic"
 
-import Link from "next/link";
-import { quickSkills } from "@/lib/data";
-import { SectionHeader } from "@/components/ui/section-header";
-import { SkillBadge } from "@/components/ui/skill-badge";
-import { ProgressCard } from "@/components/ui/progress-card";
-import { StudentAuthGuard, useStudentAuth } from "@/components/student";
+import { useState, useEffect, useMemo } from "react"
+import Link from "next/link"
+import { SectionHeader } from "@/components/ui/section-header"
+import { SkillBadge } from "@/components/ui/skill-badge"
+import { ProgressCard } from "@/components/ui/progress-card"
+import { StudentAuthGuard, useStudentAuth } from "@/components/student"
 
 const quickActions = [
   { label: "محاكاة اختبار نافس", href: "/student/simulation/select", accent: "bg-primary-600" },
   { label: "التدريب السريع", href: "/student/skills", accent: "bg-accent-500" },
   { label: "مهاراتي", href: "/student/skills", accent: "bg-emerald-500" },
-  { label: "الألعاب التعليمية", href: "/student/games", accent: "bg-purple-500" }
-];
+  { label: "الألعاب التعليمية", href: "/student/games", accent: "bg-purple-500" },
+]
+
+type SkillItem = { name: string; score: number; level: "متقنة" | "متوسطة" | "ضعيفة" }
 
 function StudentHomeContent() {
   const { student } = useStudentAuth()
+  const [mastery, setMastery] = useState<{ key: string; score: number | null; status: string }[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!student?.id) {
+      setLoading(false)
+      return
+    }
+    fetch(`/api/student/mastery?studentId=${encodeURIComponent(student.id)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setMastery(data.mastery || [])
+      })
+      .catch(() => setMastery([]))
+      .finally(() => setLoading(false))
+  }, [student?.id])
+
+  const quickSkills = useMemo((): SkillItem[] => {
+    const rows = mastery.filter((m) => m.key.startsWith("skill:"))
+    return rows.slice(0, 6).map((m) => {
+      const name = m.key.replace(/^skill:/, "")
+      const score = typeof m.score === "number" ? Math.round(m.score) : 0
+      const level: SkillItem["level"] =
+        score >= 80 ? "متقنة" : score >= 60 ? "متوسطة" : "ضعيفة"
+      return { name, score, level }
+    })
+  }, [mastery])
+
+  const avgScore = useMemo(() => {
+    if (quickSkills.length === 0) return null
+    const sum = quickSkills.reduce((a, s) => a + s.score, 0)
+    return Math.round(sum / quickSkills.length)
+  }, [quickSkills])
+
+  const readinessLabel =
+    avgScore === null
+      ? "ابدئي التدريب"
+      : avgScore >= 80
+        ? "متقدمة"
+        : avgScore >= 60
+          ? "متوسطة"
+          : "تحتاج دعم"
 
   return (
     <main className="space-y-10">
@@ -25,15 +69,23 @@ function StudentHomeContent() {
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm opacity-80">مرحبا {student?.name || "طالبة"}</p>
-            <h1 className="text-3xl font-bold">جاهزتك الحالية: متوسطة</h1>
+            <h1 className="text-3xl font-bold">جاهزتك الحالية: {readinessLabel}</h1>
             <p className="mt-2 text-white/80">
-              استمري في التدريب عبر الألعاب التعليمية لتحسين مهاراتك.
+              {quickSkills.length > 0
+                ? "استمري في التدريب عبر الألعاب التعليمية لتحسين مهاراتك."
+                : "ابدئي بالاختبارات والألعاب لرصد مهاراتك وتتبع تقدمك."}
             </p>
           </div>
           <div className="rounded-3xl bg-white/10 px-6 py-4 text-center">
-            <p className="text-sm">درجة المحاكاة الأخيرة</p>
-            <p className="text-4xl font-bold">68%</p>
-            <p className="text-emerald-200">+12% خلال أسبوع</p>
+            <p className="text-sm">متوسط المهارات المُسجّلة</p>
+            <p className="text-4xl font-bold">
+              {avgScore !== null ? `${avgScore}%` : "—"}
+            </p>
+            <p className="text-emerald-200">
+              {quickSkills.length > 0
+                ? `${quickSkills.length} مهارة مُتابعة`
+                : "لم تُسجّل بعد"}
+            </p>
           </div>
         </div>
       </header>
@@ -65,16 +117,33 @@ function StudentHomeContent() {
             </Link>
           }
         />
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {quickSkills.map((skill) => (
-            <SkillBadge
-              key={skill.name}
-              label={skill.name}
-              value={skill.score}
-              level={skill.level}
-            />
-          ))}
-        </div>
+        {loading ? (
+          <div className="card py-8 text-center text-slate-500">جاري تحميل المهارات...</div>
+        ) : quickSkills.length > 0 ? (
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {quickSkills.map((skill) => (
+              <SkillBadge
+                key={skill.name}
+                label={skill.name}
+                value={skill.score}
+                level={skill.level}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="card rounded-2xl border border-slate-200 bg-slate-50/50 py-8 text-center">
+            <p className="text-slate-600">لا توجد مهارات مسجّلة بعد.</p>
+            <p className="mt-1 text-sm text-slate-500">
+              ابدئي بالاختبارات أو الألعاب لرصد مستوى مهاراتك.
+            </p>
+            <Link
+              href="/student/simulation/select"
+              className="mt-4 inline-block rounded-2xl bg-primary-600 px-6 py-2 text-sm font-semibold text-white"
+            >
+              محاكاة اختبار نافس
+            </Link>
+          </div>
+        )}
       </section>
 
       <section className="grid gap-6 md:grid-cols-[2fr_1fr]">
@@ -107,14 +176,31 @@ function StudentHomeContent() {
           </div>
         </div>
         <div className="space-y-4">
-          <SectionHeader title="تقدم الأسبوع" />
-          <ProgressCard label="إنجاز الألعاب" value={76} />
-          <ProgressCard label="تغطية المهارات" value={62} accent="bg-accent-500" />
-          <ProgressCard label="الأسئلة المجابة" value={88} accent="bg-emerald-500" />
+          <SectionHeader title="تقدمك" />
+          <ProgressCard
+            label="المهارات المُتابعة"
+            value={quickSkills.length > 0 ? Math.min(100, quickSkills.length * 15) : 0}
+          />
+          <ProgressCard
+            label="متوسط الإتقان"
+            value={avgScore !== null ? avgScore : 0}
+            accent="bg-accent-500"
+          />
+          <ProgressCard
+            label="المهارات المتقنة"
+            value={
+              quickSkills.length > 0
+                ? Math.round(
+                    (quickSkills.filter((s) => s.level === "متقنة").length / quickSkills.length) * 100
+                  )
+                : 0
+            }
+            accent="bg-emerald-500"
+          />
         </div>
       </section>
     </main>
-  );
+  )
 }
 
 export default function StudentHome() {

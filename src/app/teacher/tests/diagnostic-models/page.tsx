@@ -16,7 +16,7 @@ const skillColors: Record<string, string> = {
 
 type Student = {
   id: string;
-  nickname: string;
+  name: string;
   classId: string;
   classCode?: string;
 };
@@ -35,6 +35,7 @@ export default function DiagnosticModelsPage() {
   const [selectedStudents, setSelectedStudents] = useState<Set<string>>(new Set());
   const [sendToAll, setSendToAll] = useState(false);
   const [loadingStudents, setLoadingStudents] = useState(false);
+  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -128,7 +129,7 @@ export default function DiagnosticModelsPage() {
     }
   };
 
-  // إرسال الاختبار
+  // إرسال الاختبار للطالبات (عبر API ليصل فعلياً للطالبات)
   const handleSendTest = async () => {
     if (!selectedModel) return;
 
@@ -137,28 +138,38 @@ export default function DiagnosticModelsPage() {
       return;
     }
 
+    setSending(true);
     try {
-      // حفظ معلومات الإرسال
-      const assignments = {
-        modelId: selectedModel.id,
-        students: Array.from(selectedStudents),
-        sentAt: new Date().toISOString()
-      };
+      const response = await fetch("/api/test-shares", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          modelId: selectedModel.id,
+          shareToAll,
+          studentIds: sendToAll ? [] : Array.from(selectedStudents),
+        }),
+      });
 
-      const saved = localStorage.getItem("testAssignments");
-      const allAssignments = saved ? JSON.parse(saved) : [];
-      allAssignments.push(assignments);
-      localStorage.setItem("testAssignments", JSON.stringify(allAssignments));
+      const data = await response.json().catch(() => ({}));
 
-      setMessage({ 
-        type: "success", 
-        text: `تم إرسال الاختبار إلى ${sendToAll ? 'جميع الطالبات' : selectedStudents.size + ' طالبة'}` 
+      if (!response.ok) {
+        setMessage({ type: "error", text: data.error || "حدث خطأ أثناء إرسال الاختبار" });
+        setTimeout(() => setMessage(null), 4000);
+        return;
+      }
+
+      setMessage({
+        type: "success",
+        text: `تم إرسال الاختبار إلى ${sendToAll ? "جميع الطالبات" : selectedStudents.size + " طالبة"}`,
       });
       closeSendModal();
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
       console.error("Error sending test:", error);
       setMessage({ type: "error", text: "حدث خطأ أثناء إرسال الاختبار" });
+      setTimeout(() => setMessage(null), 4000);
+    } finally {
+      setSending(false);
     }
   };
 
@@ -744,7 +755,7 @@ export default function DiagnosticModelsPage() {
                             className="h-4 w-4 rounded text-purple-600 disabled:opacity-50"
                           />
                           <div className="flex-1">
-                            <p className="font-medium text-slate-900">{student.nickname}</p>
+                            <p className="font-medium text-slate-900">{student.name}</p>
                             <p className="text-xs text-slate-500">رمز الفصل: {student.classCode}</p>
                           </div>
                         </label>
@@ -769,10 +780,10 @@ export default function DiagnosticModelsPage() {
               <div className="flex gap-3">
                 <button
                   onClick={handleSendTest}
-                  disabled={selectedStudents.size === 0 && !sendToAll}
+                  disabled={(selectedStudents.size === 0 && !sendToAll) || sending}
                   className="flex-1 rounded-2xl bg-purple-600 py-3 font-semibold text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  إرسال الاختبار
+                  {sending ? "جاري الإرسال..." : "إرسال الاختبار"}
                 </button>
                 <button
                   onClick={closeSendModal}

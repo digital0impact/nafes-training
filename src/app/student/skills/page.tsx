@@ -21,7 +21,7 @@ export default function SkillsPage() {
     async function load() {
       if (!student) return
       try {
-        const res = await fetch(`/api/students/${student.id}/mastery`)
+        const res = await fetch(`/api/student/mastery?studentId=${encodeURIComponent(student.id)}`)
         const data = await res.json()
         if (res.ok) {
           setMastery(data.mastery || [])
