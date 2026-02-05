@@ -8,6 +8,7 @@ import { SectionHeader } from "@/components/ui/section-header"
 import { SkillBadge } from "@/components/ui/skill-badge"
 import { ProgressCard } from "@/components/ui/progress-card"
 import { StudentAuthGuard, useStudentAuth } from "@/components/student"
+import { useStudentStore } from "@/store/student-store"
 
 const quickActions = [
   { label: "محاكاة اختبار نافس", href: "/student/simulation/select", accent: "bg-primary-600" },
@@ -20,6 +21,7 @@ type SkillItem = { name: string; score: number; level: "متقنة" | "متوس�
 
 function StudentHomeContent() {
   const { student } = useStudentAuth()
+  const setStudent = useStudentStore((s) => s.setStudent)
   const [mastery, setMastery] = useState<{ key: string; score: number | null; status: string }[]>([])
   const [assignedTestsCount, setAssignedTestsCount] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -36,10 +38,13 @@ function StudentHomeContent() {
       .then((res) => res.json())
       .then((data) => {
         setMastery(data.mastery || [])
+        if (data.student?.name?.trim() && (!student.name || !student.name.trim()) && student.id) {
+          setStudent({ ...student, name: data.student.name.trim() })
+        }
       })
       .catch(() => setMastery([]))
       .finally(() => setLoading(false))
-  }, [student?.id])
+  }, [student?.id, setStudent])
 
   // جلب عدد الاختبارات المعينة من المعلمة (بدون كاش لظهور الاختبارات الجديدة)
   useEffect(() => {
@@ -84,7 +89,9 @@ function StudentHomeContent() {
       <header className="card bg-primary-600 text-white">
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-sm opacity-80">مرحبا {student?.name || "طالبة"}</p>
+            <p className="text-sm opacity-80">
+              {student?.name?.trim() ? `مرحبا ${student.name.trim()}` : "مرحبا، أهلاً بكِ"}
+            </p>
             <h1 className="text-3xl font-bold">جاهزتك الحالية: {readinessLabel}</h1>
             <p className="mt-2 text-white/80">
               {quickSkills.length > 0
@@ -95,12 +102,12 @@ function StudentHomeContent() {
           <div className="rounded-3xl bg-white/10 px-6 py-4 text-center">
             <p className="text-sm">متوسط المهارات المُسجّلة</p>
             <p className="text-4xl font-bold">
-              {avgScore !== null ? `${avgScore}%` : "—"}
+              {avgScore !== null ? `${avgScore}%` : "0%"}
             </p>
             <p className="text-emerald-200">
               {quickSkills.length > 0
                 ? `${quickSkills.length} مهارة مُتابعة`
-                : "لم تُسجّل بعد"}
+                : "لا توجد مهارات مُسجّلة بعد"}
             </p>
           </div>
         </div>
