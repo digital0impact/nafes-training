@@ -5,7 +5,15 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { getQuestionsForModel, getQuestionsFromIds, getRelatedOutcomes, getPrebuiltTestModels, getPrebuiltDiagnosticTests, getAllTestModels, type TestModel } from "@/lib/test-models";
+import {
+  getQuestionsForModel,
+  getQuestionsFromIds,
+  getRelatedOutcomes,
+  getPrebuiltTestModels,
+  getPrebuiltDiagnosticTests,
+  getAllTestModels,
+  type TestModel,
+} from "@/lib/test-models";
 import { type SimulationQuestion } from "@/lib/simulation-questions";
 import { useStudentStore } from "@/store/student-store";
 
