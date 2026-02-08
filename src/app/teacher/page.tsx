@@ -84,21 +84,21 @@ export default function TeacherDashboard() {
   }
 
   return (
-    <main className="space-y-10">
-      <header className="card bg-white">
-        <div className="mb-4 flex items-center justify-between">
-          <div>
+    <main className="min-h-screen space-y-6 p-3 sm:p-4 md:space-y-10">
+      <header className="card bg-white p-4 sm:p-6">
+        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
             <p className="text-sm text-slate-500">لوحة المعلمة</p>
             {user && (
-              <h1 className="text-2xl font-bold text-slate-900 mt-1">
+              <h1 className="mt-1 text-xl font-bold text-slate-900 sm:text-2xl truncate">
                 مرحباً، {user.name}
               </h1>
             )}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <Link
               href="/teacher/subscription"
-              className={`text-sm font-semibold px-3 py-1.5 rounded-lg ${
+              className={`min-h-[44px] inline-flex items-center text-sm font-semibold px-3 py-2 rounded-lg touch-manipulation ${
                 subscriptionPlan === "premium"
                   ? "bg-emerald-100 text-emerald-700"
                   : "bg-amber-100 text-amber-700"
@@ -108,36 +108,36 @@ export default function TeacherDashboard() {
             </Link>
             <Link
               href="/teacher/subscription"
-              className="rounded-lg border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold text-purple-700 hover:bg-purple-100 transition"
+              className="min-h-[44px] inline-flex items-center rounded-lg border border-purple-200 bg-purple-50 px-3 py-2 text-sm font-semibold text-purple-700 hover:bg-purple-100 transition touch-manipulation"
             >
               إدارة الاشتراك
             </Link>
             <Link
               href="/teacher/visitors"
-              className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition"
+              className="min-h-[44px] inline-flex items-center rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition touch-manipulation"
             >
               إدارة الزوار
             </Link>
             <Link
               href="/teacher/audit-log"
-              className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition"
+              className="min-h-[44px] hidden sm:inline-flex items-center rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition touch-manipulation"
             >
               سجل التدقيق
             </Link>
             <button
               onClick={handleSignOut}
-              className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-100 transition"
+              className="min-h-[44px] inline-flex items-center rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-100 transition touch-manipulation"
             >
               تسجيل الخروج
             </button>
           </div>
         </div>
         
-        {/* Tabs */}
-        <div className="flex gap-2 border-b border-primary-200 overflow-x-auto">
+        {/* Tabs - scroll on mobile */}
+        <div className="flex gap-1 border-b border-primary-200 overflow-x-auto pb-px -mx-1 px-1 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
           <button
             onClick={() => setActiveTab("overview")}
-            className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${
+            className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
               activeTab === "overview"
                 ? "text-primary-700 border-primary-600"
                 : "text-slate-500 border-transparent hover:text-primary-600"
@@ -147,7 +147,7 @@ export default function TeacherDashboard() {
           </button>
           <button
             onClick={() => setActiveTab("outcomes")}
-            className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${
+            className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
               activeTab === "outcomes"
                 ? "text-primary-700 border-primary-600"
                 : "text-slate-500 border-transparent hover:text-primary-600"
@@ -157,7 +157,7 @@ export default function TeacherDashboard() {
           </button>
           <button
             onClick={() => setActiveTab("tests")}
-            className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${
+            className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
               activeTab === "tests"
                 ? "text-primary-700 border-primary-600"
                 : "text-slate-500 border-transparent hover:text-primary-600"
@@ -167,7 +167,7 @@ export default function TeacherDashboard() {
           </button>
           <button
             onClick={() => setActiveTab("games")}
-            className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${
+            className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
               activeTab === "games"
                 ? "text-purple-700 border-purple-600"
                 : "text-slate-500 border-transparent hover:text-purple-600"
@@ -177,7 +177,7 @@ export default function TeacherDashboard() {
           </button>
           <button
             onClick={() => setActiveTab("classes")}
-            className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${
+            className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
               activeTab === "classes"
                 ? "text-emerald-700 border-emerald-600"
                 : "text-slate-500 border-transparent hover:text-emerald-600"
@@ -192,7 +192,7 @@ export default function TeacherDashboard() {
       {activeTab === "overview" && (
         <>
           {/* Stats Cards - المطلوبة من المتطلبات */}
-          <section className="grid gap-4 md:grid-cols-3">
+          <section className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-3">
             <KpiCard
               label="عدد الفصول"
               value={loadingStats ? "..." : stats?.classesCount?.toString() || "0"}
@@ -211,7 +211,7 @@ export default function TeacherDashboard() {
           </section>
 
           {/* Additional Stats Cards */}
-          <section className="grid gap-4 md:grid-cols-4">
+          <section className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
             <KpiCard
               label="متوسط الصف"
               value={loadingStats ? "..." : stats?.averageScore ? `${stats.averageScore}%` : "0%"}
@@ -248,15 +248,15 @@ export default function TeacherDashboard() {
                   </Link>
                 }
               />
-              <div className="mt-4 overflow-hidden rounded-3xl border border-slate-100 bg-white">
-                <table className="w-full text-right text-sm">
+              <div className="mt-4 overflow-x-auto overflow-y-hidden rounded-3xl border border-slate-100 bg-white">
+                <table className="w-full min-w-[480px] text-right text-sm">
                   <thead className="bg-slate-50 text-slate-500">
                     <tr>
-                      <th className="px-6 py-3 font-semibold">الطالبة</th>
-                      <th className="px-6 py-3 font-semibold">الدرجة</th>
-                      <th className="px-6 py-3 font-semibold">الحالة</th>
-                      <th className="px-6 py-3 font-semibold">التحسن</th>
-                      <th className="px-6 py-3 font-semibold">الإجراءات</th>
+                      <th className="px-3 py-2.5 font-semibold sm:px-6 sm:py-3">الطالبة</th>
+                      <th className="px-3 py-2.5 font-semibold sm:px-6 sm:py-3">الدرجة</th>
+                      <th className="px-3 py-2.5 font-semibold sm:px-6 sm:py-3">الحالة</th>
+                      <th className="px-3 py-2.5 font-semibold sm:px-6 sm:py-3">التحسن</th>
+                      <th className="px-3 py-2.5 font-semibold sm:px-6 sm:py-3">الإجراءات</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -278,22 +278,22 @@ export default function TeacherDashboard() {
                       
                       return (
                         <tr key={student.id} className="border-t border-slate-100">
-                          <td className="px-6 py-4 font-semibold text-slate-900">
+                          <td className="px-3 py-3 font-semibold text-slate-900 sm:px-6 sm:py-4">
                             {student.nickname}
                           </td>
-                          <td className="px-6 py-4">{latestScore}%</td>
-                          <td className="px-6 py-4">
+                          <td className="px-3 py-3 sm:px-6 sm:py-4">{latestScore}%</td>
+                          <td className="px-3 py-3 sm:px-6 sm:py-4">
                             <span className={`badge ${statusColor}`}>
                               {status}
                             </span>
                           </td>
-                          <td className={`px-6 py-4 ${trend >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                          <td className={`px-3 py-3 sm:px-6 sm:py-4 ${trend >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                             {trend >= 0 ? '+' : ''}{trend}%
                           </td>
-                          <td className="px-6 py-4">
+                          <td className="px-3 py-3 sm:px-6 sm:py-4">
                             <Link
                               href={`/teacher/reports?student=${student.id}`}
-                              className="text-primary-600 underline"
+                              className="text-primary-600 underline touch-manipulation"
                             >
                               عرض التقرير
                             </Link>
@@ -314,7 +314,7 @@ export default function TeacherDashboard() {
         <div className="card p-0 overflow-hidden">
           <iframe
             src="/teacher/outcomes"
-            className="w-full h-[800px] border-0"
+            className="w-full min-h-[70vh] sm:h-[800px] border-0"
             title="خطة نافس"
           />
         </div>
@@ -367,7 +367,7 @@ export default function TeacherDashboard() {
               </div>
               <iframe
                 src="/teacher/classes"
-                className="w-full h-[600px] border-0"
+                className="w-full min-h-[60vh] sm:h-[600px] border-0"
                 title="إدارة الفصول"
               />
             </div>
@@ -379,7 +379,7 @@ export default function TeacherDashboard() {
               </div>
               <iframe
                 src="/teacher/students"
-                className="w-full h-[600px] border-0"
+                className="w-full min-h-[60vh] sm:h-[600px] border-0"
                 title="إدارة الطالبات"
               />
             </div>
@@ -391,7 +391,7 @@ export default function TeacherDashboard() {
         <div className="card p-0 overflow-hidden">
           <iframe
             src="/teacher/games"
-            className="w-full h-[800px] border-0"
+            className="w-full min-h-[70vh] sm:h-[800px] border-0"
             title="الألعاب التعليمية"
           />
         </div>
@@ -401,7 +401,7 @@ export default function TeacherDashboard() {
         <div className="card p-0 overflow-hidden">
           <iframe
             src="/teacher/tests"
-            className="w-full h-[800px] border-0"
+            className="w-full min-h-[70vh] sm:h-[800px] border-0"
             title="إدارة الاختبارات"
           />
         </div>

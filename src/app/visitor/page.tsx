@@ -114,36 +114,36 @@ export default function VisitorDashboard() {
   }
 
   return (
-    <main className="space-y-6 p-6">
+    <main className="min-h-screen space-y-4 p-3 sm:space-y-6 sm:p-6">
       <header className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
-          <div>
+        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <div className="min-w-0">
             <p className="text-sm text-slate-500">واجهة الزائر – مشاهدة وتعليق فقط</p>
-            <h1 className="mt-1 text-2xl font-bold text-slate-900">
+            <h1 className="mt-1 text-xl font-bold text-slate-900 sm:text-2xl truncate">
               مرحباً، {user.name}
             </h1>
           </div>
           <button
             type="button"
             onClick={handleSignOut}
-            className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-100"
+            className="min-h-[44px] self-start rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-100 touch-manipulation"
           >
             تسجيل الخروج
           </button>
         </div>
-        <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+        <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2.5 text-sm text-amber-800 sm:px-4 sm:py-3">
           <strong>صلاحية مشاهدة وتعليق فقط.</strong> لا يمكنك تعديل أو حذف أو إضافة محتوى، أو رفع ملفات، أو الوصول إلى إعدادات الحساب أو إدارة الصفوف والطلاب.
         </div>
         {profile && (
-          <p className="mt-3 text-sm text-slate-600">
+          <p className="mt-3 text-xs text-slate-600 sm:text-sm line-clamp-2 sm:line-clamp-none">
             المعلم المرتبط: {profile.teacherName} • نطاق العرض: {profile.scope.map((s) => SCOPE_LABELS[s] || s).join("، ")}
           </p>
         )}
-        <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
+        <div className="mt-4 flex gap-2 overflow-x-auto pb-1 border-t border-slate-100 pt-4 -mx-1 px-1 flex-wrap">
           <button
             type="button"
             onClick={() => setActiveTab("overview")}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold ${
+            className={`min-h-[44px] flex-shrink-0 rounded-lg px-4 py-2.5 text-sm font-semibold touch-manipulation ${
               activeTab === "overview"
                 ? "bg-primary-100 text-primary-700"
                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -155,7 +155,7 @@ export default function VisitorDashboard() {
             <button
               type="button"
               onClick={() => setActiveTab("nafes_plan")}
-              className={`rounded-lg px-4 py-2 text-sm font-semibold ${
+              className={`min-h-[44px] flex-shrink-0 rounded-lg px-4 py-2.5 text-sm font-semibold touch-manipulation ${
                 activeTab === "nafes_plan"
                   ? "bg-primary-100 text-primary-700"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -168,7 +168,7 @@ export default function VisitorDashboard() {
             <button
               type="button"
               onClick={() => setActiveTab("activities")}
-              className={`rounded-lg px-4 py-2 text-sm font-semibold ${
+              className={`min-h-[44px] flex-shrink-0 rounded-lg px-4 py-2.5 text-sm font-semibold touch-manipulation ${
                 activeTab === "activities"
                   ? "bg-primary-100 text-primary-700"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -181,7 +181,7 @@ export default function VisitorDashboard() {
             <button
               type="button"
               onClick={() => setActiveTab("results")}
-              className={`rounded-lg px-4 py-2 text-sm font-semibold ${
+              className={`min-h-[44px] flex-shrink-0 rounded-lg px-4 py-2.5 text-sm font-semibold touch-manipulation ${
                 activeTab === "results"
                   ? "bg-primary-100 text-primary-700"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -194,7 +194,7 @@ export default function VisitorDashboard() {
             <button
               type="button"
               onClick={() => setActiveTab("indicators")}
-              className={`rounded-lg px-4 py-2 text-sm font-semibold ${
+              className={`min-h-[44px] flex-shrink-0 rounded-lg px-4 py-2.5 text-sm font-semibold touch-manipulation ${
                 activeTab === "indicators"
                   ? "bg-primary-100 text-primary-700"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -207,7 +207,7 @@ export default function VisitorDashboard() {
       </header>
 
       {activeTab === "overview" && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
           <h2 className="mb-4 text-xl font-bold text-slate-900">نظرة عامة</h2>
           <p className="text-slate-600">
             اختر أحد التبويبات أعلاه لعرض المحتوى المسموح لك بمشاهدته. يمكنك إضافة تعليقات نصية على العناصر المعروضة من خلال واجهة التعليقات عند فتح كل قسم.
@@ -221,7 +221,7 @@ export default function VisitorDashboard() {
       )}
 
       {activeTab === "nafes_plan" && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
           <h2 className="mb-4 text-xl font-bold text-slate-900">خطة نافس (عرض فقط)</h2>
           {loadingTab ? (
             <p className="text-slate-500">جاري التحميل...</p>
@@ -248,7 +248,7 @@ export default function VisitorDashboard() {
       )}
 
       {activeTab === "activities" && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
           <h2 className="mb-4 text-xl font-bold text-slate-900">الأنشطة (عرض فقط)</h2>
           {loadingTab ? (
             <p className="text-slate-500">جاري التحميل...</p>
@@ -270,7 +270,7 @@ export default function VisitorDashboard() {
       )}
 
       {activeTab === "results" && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
           <h2 className="mb-4 text-xl font-bold text-slate-900">النتائج المجمعة (بدون أسماء طلاب)</h2>
           {loadingTab ? (
             <p className="text-slate-500">جاري التحميل...</p>
@@ -294,7 +294,7 @@ export default function VisitorDashboard() {
       )}
 
       {activeTab === "indicators" && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
           <h2 className="mb-4 text-xl font-bold text-slate-900">مؤشرات التعلم (مجمعة)</h2>
           {loadingTab ? (
             <p className="text-slate-500">جاري التحميل...</p>

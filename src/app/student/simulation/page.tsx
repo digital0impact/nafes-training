@@ -188,6 +188,7 @@ export default function SimulationPage() {
             studentDbId: student.id,
             testModelId: currentModel?.id,
             testModelTitle: currentModel?.title,
+            skill: currentModel?.skill,
             answers,
             score: score.correct,
             totalQuestions: score.total,

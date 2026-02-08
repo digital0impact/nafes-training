@@ -450,17 +450,6 @@ export default function ShareTestModelsPage() {
             </div>
           )
         )}
-
-        {/* Info Section */}
-        <div className="card bg-blue-50 border-blue-200">
-          <h3 className="mb-2 text-lg font-semibold text-blue-900">💡 معلومات مهمة</h3>
-          <ul className="space-y-1 text-sm text-blue-800">
-            <li>• يمكنك معاينة النموذج قبل إرساله للطالبات</li>
-            <li>• يمكنك تعديل النموذج حسب احتياجات فصلك</li>
-            <li>• يمكنك إرسال الاختبار لطالبة محددة أو لجميع الطالبات</li>
-            <li>• النماذج المعدلة تُحفظ في تبويب "نماذجي"</li>
-          </ul>
-        </div>
       </div>
 
       {/* Preview Modal */}

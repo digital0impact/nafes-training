@@ -39,6 +39,7 @@ const createTrainingAttemptSchema = z.object({
   studentDbId: z.string().min(1, "معرف الطالبة مطلوب"),
   testModelId: z.string().optional(),
   testModelTitle: z.string().optional(),
+  skill: z.string().optional(), // مجال الاختبار (لتحديث المهارة عند النماذج غير المخزنة في DB)
   answers: z.record(z.string(), z.string()),
   score: z.number().int().min(0),
   totalQuestions: z.number().int().min(1),
@@ -72,6 +73,7 @@ export async function POST(request: Request) {
       studentDbId,
       testModelId,
       testModelTitle,
+      skill: bodySkill,
       answers,
       score,
       totalQuestions,
@@ -129,15 +131,16 @@ export async function POST(request: Request) {
         sourceId: testModelId,
       })
 
-      // إن كان للاختبار skill، سجله كمؤشر عام أيضًا
+      // إن كان للاختبار skill (من DB أو من الجسم للنماذج الجاهزة)، سجله كمؤشر عام أيضًا
       const model = await prisma.testModel.findUnique({
         where: { id: testModelId },
         select: { skill: true },
       })
-      if (model?.skill) {
+      const skillToUse = model?.skill ?? (bodySkill?.trim() || null)
+      if (skillToUse) {
         await upsertMastery({
           studentDbId: student.id,
-          key: `skill:${model.skill}`,
+          key: `skill:${skillToUse}`,
           status,
           score: percentage,
           sourceType: "training",

@@ -9,22 +9,22 @@ export default function TeacherTestsPage() {
   const [activeTab, setActiveTab] = useState<"diagnostic" | "simulation">("diagnostic");
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#faf9f7]">
+    <main className="relative min-h-screen overflow-x-hidden bg-[#faf9f7]">
       <PageBackground />
-      <div className="relative z-10 space-y-6 p-4 py-8">
-      <header className="card bg-gradient-to-br from-white to-primary-50">
+      <div className="relative z-10 space-y-4 p-3 py-6 sm:space-y-6 sm:p-4 sm:py-8">
+      <header className="card bg-gradient-to-br from-white to-primary-50 p-4 sm:p-6">
         <div className="mb-4">
-          <h1 className="text-3xl font-bold text-slate-900">إدارة نماذج الاختبارات</h1>
-          <p className="mt-2 text-slate-600">
+          <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">إدارة نماذج الاختبارات</h1>
+          <p className="mt-2 text-sm text-slate-600 sm:text-base">
             قومي بإدارة النماذج المتاحة ومشاركتها مع الطالبات
           </p>
         </div>
         
-        {/* Tabs */}
-        <div className="flex gap-2 border-b border-primary-200">
+        {/* Tabs - scroll on narrow screens */}
+        <div className="flex gap-1 border-b border-primary-200 overflow-x-auto pb-px -mx-1 px-1">
           <button
             onClick={() => setActiveTab("diagnostic")}
-            className={`px-6 py-3 font-semibold transition-colors border-b-2 ${
+            className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
               activeTab === "diagnostic"
                 ? "text-purple-700 border-purple-600"
                 : "text-slate-500 border-transparent hover:text-purple-600"
@@ -34,7 +34,7 @@ export default function TeacherTestsPage() {
           </button>
           <button
             onClick={() => setActiveTab("simulation")}
-            className={`px-6 py-3 font-semibold transition-colors border-b-2 ${
+            className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
               activeTab === "simulation"
                 ? "text-blue-700 border-blue-600"
                 : "text-slate-500 border-transparent hover:text-blue-600"
@@ -47,7 +47,7 @@ export default function TeacherTestsPage() {
 
       {/* Tab Content */}
       {activeTab === "diagnostic" && (
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
           {/* إنشاء اختبار جديد */}
           <div className="card group hover:shadow-lg transition-all cursor-pointer" onClick={() => window.location.href = '/teacher/tests/create-diagnostic'}>
             <div className="text-center space-y-4">
@@ -95,7 +95,7 @@ export default function TeacherTestsPage() {
       )}
 
       {activeTab === "simulation" && (
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
           {/* إنشاء اختبار جديد */}
           <div className="card group hover:shadow-lg transition-all cursor-pointer" onClick={() => window.location.href = '/teacher/tests/create'}>
             <div className="text-center space-y-4">

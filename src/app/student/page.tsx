@@ -84,15 +84,26 @@ function StudentHomeContent() {
           ? "متوسطة"
           : "تحتاج دعم"
 
+  // عدد مجالات المهارات المعروفة (علوم الحياة، العلوم الفيزيائية، علوم الأرض والفضاء، جميع المجالات)
+  const SKILL_DOMAINS_COUNT = 4
+  // نسبة تغطية المجالات حسب نتائج الطالبة (كل مهارة لها سجل = من اختبارات/ألعاب)
+  const skillsFollowedPercent =
+    quickSkills.length > 0
+      ? Math.min(100, Math.round((quickSkills.length / SKILL_DOMAINS_COUNT) * 100))
+      : 0
+  const masteredCount = quickSkills.filter((s) => s.level === "متقنة").length
+  const masteredPercent =
+    quickSkills.length > 0 ? Math.round((masteredCount / quickSkills.length) * 100) : 0
+
   return (
-    <main className="space-y-10">
-      <header className="card bg-primary-600 text-white">
-        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <div>
+    <main className="space-y-6 p-3 sm:space-y-10 sm:p-4">
+      <header className="card bg-primary-600 text-white p-4 sm:p-6">
+        <div className="flex flex-col gap-4 sm:gap-6 md:flex-row md:items-center md:justify-between">
+          <div className="min-w-0">
             <p className="text-sm opacity-80">
               {student?.name?.trim() ? `مرحبا ${student.name.trim()}` : "مرحبا، أهلاً بكِ"}
             </p>
-            <h1 className="text-3xl font-bold">جاهزتك الحالية: {readinessLabel}</h1>
+            <h1 className="text-xl font-bold sm:text-3xl">جاهزتك الحالية: {readinessLabel}</h1>
             <p className="mt-2 text-white/80">
               {quickSkills.length > 0
                 ? "استمري في التدريب عبر الألعاب التعليمية لتحسين مهاراتك."
@@ -126,12 +137,12 @@ function StudentHomeContent() {
 
       <section>
         <SectionHeader title="إجراءات سريعة" subtitle="اختاري ما يناسبك لبدء التدريب الآن" />
-        <div className="mt-6 grid gap-4 md:grid-cols-4">
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4 md:grid-cols-4">
           {quickActions.map((action) => (
             <Link
               key={action.label}
               href={action.href}
-              className={`rounded-3xl border bg-white p-6 text-center font-semibold text-slate-900 shadow-soft transition hover:-translate-y-1 ${
+              className={`rounded-2xl sm:rounded-3xl border bg-white p-4 text-center font-semibold text-slate-900 shadow-soft transition hover:-translate-y-1 touch-manipulation sm:p-6 ${
                 assignedTestsCount > 0 && action.href === "/student/simulation/select"
                   ? "border-primary-300 ring-2 ring-primary-200"
                   : "border-slate-100"
@@ -160,7 +171,7 @@ function StudentHomeContent() {
         {loading ? (
           <div className="card py-8 text-center text-slate-500">جاري تحميل المهارات...</div>
         ) : quickSkills.length > 0 ? (
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4 md:grid-cols-3">
             {quickSkills.map((skill) => (
               <SkillBadge
                 key={skill.name}
@@ -216,10 +227,13 @@ function StudentHomeContent() {
           </div>
         </div>
         <div className="space-y-4">
-          <SectionHeader title="تقدمك" />
+          <SectionHeader
+            title="تقدمك"
+            subtitle="مستمد من نتائج الاختبارات والألعاب"
+          />
           <ProgressCard
             label="المهارات المُتابعة"
-            value={quickSkills.length > 0 ? Math.min(100, quickSkills.length * 15) : 0}
+            value={skillsFollowedPercent}
           />
           <ProgressCard
             label="متوسط الإتقان"
@@ -228,13 +242,7 @@ function StudentHomeContent() {
           />
           <ProgressCard
             label="المهارات المتقنة"
-            value={
-              quickSkills.length > 0
-                ? Math.round(
-                    (quickSkills.filter((s) => s.level === "متقنة").length / quickSkills.length) * 100
-                  )
-                : 0
-            }
+            value={masteredPercent}
             accent="bg-emerald-500"
           />
         </div>

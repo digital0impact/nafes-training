@@ -389,24 +389,24 @@ export default function TeacherOutcomesPage() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#faf9f7]">
+    <main className="relative min-h-screen overflow-x-hidden bg-[#faf9f7]">
       <PageBackground />
-      <div className="relative z-10 space-y-8 p-4 py-8">
-        <header className="card bg-gradient-to-br from-white to-primary-50">
+      <div className="relative z-10 space-y-4 p-3 py-6 sm:space-y-8 sm:p-4 sm:py-8">
+        <header className="card bg-gradient-to-br from-white to-primary-50 p-4 sm:p-6">
           <div className="mb-4">
-            <h1 className="text-3xl font-bold text-slate-900">
+            <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">
               خطة نافس
             </h1>
-            <p className="mt-2 text-slate-600">
+            <p className="mt-2 text-sm text-slate-600 sm:text-base">
               إدارة وتخطيط نواتج التعلم على الاسابيع الدراسية
             </p>
           </div>
 
-          {/* Tabs in header */}
-          <div className="flex gap-2 border-b border-primary-200 overflow-x-auto">
+          {/* Tabs in header - scroll on mobile */}
+          <div className="flex gap-1 border-b border-primary-200 overflow-x-auto pb-px -mx-1 px-1">
             <button
               onClick={() => setActiveTab("view")}
-              className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${
+              className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
                 activeTab === "view"
                   ? "text-primary-700 border-primary-600"
                   : "text-slate-500 border-transparent hover:text-primary-600"
@@ -416,7 +416,7 @@ export default function TeacherOutcomesPage() {
             </button>
             <button
               onClick={() => setActiveTab("edit")}
-              className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${
+              className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
                 activeTab === "edit"
                   ? "text-amber-700 border-amber-600"
                   : "text-slate-500 border-transparent hover:text-amber-600"
@@ -429,13 +429,13 @@ export default function TeacherOutcomesPage() {
 
         {/* فلاتر البحث + التحكم في الأسابيع */}
         {activeTab === "edit" && (
-          <section className="card space-y-4">
-            <div className="flex items-center justify-between">
+          <section className="card space-y-4 p-4 sm:p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <SectionHeader
                 title="تعديل وتخصيص الخطة"
                 subtitle="أعيدي ترتيب الفترات والأسابيع ونواتج التعلم حسب احتياج صفك"
               />
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-shrink-0">
                 <button
                   onClick={() => {
                     if (confirm("هل أنت متأكدة من إعادة تعيين جميع التغييرات؟")) {
@@ -544,7 +544,7 @@ export default function TeacherOutcomesPage() {
               <h2 className="text-center text-lg font-bold text-amber-900">الأسابيع</h2>
             </div>
 
-            <div className="p-4 md:p-6 space-y-6">
+            <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
               {periods.filter(Boolean).map((period) => {
                 const weekCount = weekCounts[period] || 8
                 const generatedWeeks = generateWeekNames(period, weekCount)
@@ -562,7 +562,7 @@ export default function TeacherOutcomesPage() {
                     </div>
 
                     {/* صف صناديق الأسابيع */}
-                    <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+                    <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-3">
                       {generatedWeeks.map((weekKey, weekIndex) => {
                         const itemsInSlot = getItemsForWeekSlot(period, weekKey)
                         const weekLabel = weekIndex === 0 ? "الأسبوع الأول" : `الأسبوع ${weekIndex + 1}`
@@ -621,15 +621,17 @@ export default function TeacherOutcomesPage() {
             {/* تلميح */}
             <div className="p-3 bg-amber-50 border-b border-amber-200">
               <p className="text-sm text-amber-800">
-                <span className="font-semibold">💡</span> اسحبي بطاقات نواتج التعلم من القائمة أدناه وأفلتيها داخل مربع الأسبوع المناسب. يمكنك وضع أكثر من بطاقة في الأسبوع الواحد.
+                <span className="font-semibold">💡</span> اسحبي بطاقات نواتج التعلم من القائمة أدناه وأفلتيها داخل مربع الأسبوع المناسب. يمكنك وضع أكثر من بطاقة في الأسبوع الواحد. كل بطاقة نافس تظهر في أسبوع واحد فقط — بعد تعيينها تختفي من القائمة ولا يمكن تكرارها في أسبوع آخر.
               </p>
             </div>
 
-            {/* بطاقات نواتج التعلم — تظهر هنا لسحبها وإفلاتها */}
+            {/* بطاقات نواتج التعلم — تظهر هنا لسحبها وإفلاتها (فقط غير المعيّنة لأسبوع حتى لا تُكرَّر في أكثر من أسبوع) */}
             <div className="p-4 bg-slate-50 border-b border-slate-200">
-              <h3 className="text-sm font-bold text-slate-800 mb-3">بطاقات نواتج التعلم — اسحبي وأفلتي في الأسابيع</h3>
+              <h3 className="text-sm font-bold text-slate-800 mb-3">بطاقات نواتج التعلم — اسحبي وأفلتي في الأسابيع (كل بطاقة في أسبوع واحد فقط)</h3>
               <div className="flex flex-wrap gap-3 overflow-x-auto pb-2 min-h-[88px]">
-                {modifiedOutcomes.map((item) => {
+                {modifiedOutcomes
+                  .filter((item) => !weekAssignments[getTopicKey(item)])
+                  .map((item) => {
                   const topicKey = getTopicKey(item)
                   const isDragging = draggedItem === topicKey
                   return (
@@ -638,7 +640,7 @@ export default function TeacherOutcomesPage() {
                       draggable
                       onDragStart={(e) => handleDragStart(e, topicKey)}
                       onDragEnd={handleDragEnd}
-                      className={`flex-shrink-0 w-[180px] rounded-xl border-2 p-3 bg-white shadow-md cursor-grab active:cursor-grabbing transition-all hover:shadow-lg hover:border-primary-300 ${
+                      className={`flex-shrink-0 w-[160px] min-w-[140px] sm:w-[180px] rounded-xl border-2 p-3 bg-white shadow-md cursor-grab active:cursor-grabbing transition-all hover:shadow-lg hover:border-primary-300 touch-manipulation ${
                         isDragging
                           ? "opacity-50 border-primary-400 bg-primary-50"
                           : "border-slate-200"
@@ -666,7 +668,7 @@ export default function TeacherOutcomesPage() {
               <h2 className="text-center text-lg font-bold text-amber-900">الأسابيع</h2>
             </div>
 
-            <div className="p-4 md:p-6 space-y-6">
+            <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
               {periods.filter(Boolean).map((period) => {
                 const weekCount = weekCounts[period] || 8
                 const generatedWeeks = generateWeekNames(period, weekCount)
@@ -684,7 +686,7 @@ export default function TeacherOutcomesPage() {
                     </div>
 
                     {/* صف صناديق الأسابيع */}
-                    <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+                    <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-3">
                       {generatedWeeks.map((weekKey, weekIndex) => {
                         const isDragOver = dragOverWeek === weekKey
                         const itemsInSlot = getItemsForWeekSlot(period, weekKey)
@@ -699,7 +701,7 @@ export default function TeacherOutcomesPage() {
                             }}
                             onDragLeave={handleDragLeave}
                             onDrop={(e) => handleDrop(e, weekKey, period)}
-                            className={`rounded-xl border-2 min-h-[120px] p-3 flex flex-col transition-colors ${
+                            className={`rounded-xl border-2 min-h-[100px] sm:min-h-[120px] p-2 sm:p-3 flex flex-col transition-colors ${
                               isDragOver
                                 ? "bg-violet-200 border-violet-400 border-dashed"
                                 : "bg-violet-50 border-violet-200"

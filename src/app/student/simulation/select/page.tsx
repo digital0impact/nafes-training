@@ -260,18 +260,6 @@ function SelectTestModelContent() {
           })}
         </div>
       )}
-
-      {/* Info Section */}
-      <div className="card bg-blue-50 border-blue-200">
-        <h3 className="mb-2 text-lg font-semibold text-blue-900">معلومات مهمة</h3>
-        <ul className="space-y-1 text-sm text-blue-800">
-          <li>• كل نموذج يحتوي على 20 سؤالاً مختارة بعناية</li>
-          <li>• الأسئلة مرتبطة بنواتج التعلم المحددة في خطة الصف</li>
-          <li>• مدة كل اختبار 20 دقيقة</li>
-          <li>• يمكنك مراجعة الأسئلة لاحقاً قبل إنهاء الاختبار</li>
-          <li>• سيتم عرض النتائج التفصيلية بعد إنهاء الاختبار</li>
-        </ul>
-      </div>
     </main>
   );
 }

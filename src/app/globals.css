@@ -17,6 +17,8 @@ html {
 body {
   background-color: theme("colors.surface");
   min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
 }
 
 @layer base {
@@ -31,11 +33,19 @@ body {
 
 @layer components {
   .card {
-    @apply rounded-3xl bg-white p-6 shadow-soft;
+    @apply rounded-2xl sm:rounded-3xl bg-white p-4 sm:p-6 shadow-soft;
   }
 
   .badge {
     @apply inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium;
+  }
+}
+
+/* تحسين سكرول التبويبات على الجوال */
+@layer utilities {
+  .scrollbar-thin {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
   }
 }
 

@@ -302,18 +302,18 @@ export default function StudentsPage() {
   }, [studentsByGrade])
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#faf9f7]">
+    <main className="relative min-h-screen overflow-x-hidden bg-[#faf9f7]">
       <PageBackground />
-      <div className="relative z-10 space-y-6 p-4 py-8">
-        <div className="card bg-gradient-to-br from-white to-primary-50">
-          {/* Tabs */}
-          <div className="flex gap-2 border-b border-primary-200 overflow-x-auto">
+      <div className="relative z-10 space-y-4 p-3 py-6 sm:space-y-6 sm:p-4 sm:py-8">
+        <div className="card bg-gradient-to-br from-white to-primary-50 p-4 sm:p-6">
+          {/* Tabs - scroll on mobile */}
+          <div className="flex gap-1 border-b border-primary-200 overflow-x-auto pb-px -mx-1 px-1">
             <button
               onClick={() => {
                 setActiveTab("all")
                 handleCancel()
               }}
-              className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${
+              className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
                 activeTab === "all"
                   ? "text-primary-700 border-primary-600"
                   : "text-slate-500 border-transparent hover:text-primary-600"
@@ -326,17 +326,17 @@ export default function StudentsPage() {
                 setActiveTab("add")
                 handleCancel()
               }}
-              className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${
+              className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
                 activeTab === "add"
                   ? "text-emerald-700 border-emerald-600"
                   : "text-slate-500 border-transparent hover:text-emerald-600"
               }`}
             >
-              {editingId ? "تعديل طالبة" : "إضافة طالبة جديدة"}
+              {editingId ? "تعديل طالبة" : "إضافة طالبة"}
             </button>
             <button
               onClick={() => setActiveTab("import")}
-              className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${
+              className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
                 activeTab === "import"
                   ? "text-blue-700 border-blue-600"
                   : "text-slate-500 border-transparent hover:text-blue-600"
@@ -346,7 +346,7 @@ export default function StudentsPage() {
             </button>
             <button
               onClick={() => setActiveTab("reports")}
-              className={`px-6 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap ${
+              className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
                 activeTab === "reports"
                   ? "text-slate-700 border-slate-600"
                   : "text-slate-500 border-transparent hover:text-slate-600"
@@ -401,41 +401,41 @@ export default function StudentsPage() {
                         {studentsByGrade[grade].length} طالبة
                       </span>
                     </div>
-                    <div className="overflow-hidden rounded-3xl border border-slate-100 bg-white">
-                      <table className="w-full text-right text-sm">
+                    <div className="overflow-x-auto overflow-y-hidden rounded-3xl border border-slate-100 bg-white">
+                      <table className="w-full min-w-[400px] text-right text-sm">
                         <thead className="bg-slate-50 text-slate-500">
                           <tr>
-                            <th className="px-6 py-3 font-semibold">رقم الطالبة</th>
-                            <th className="px-6 py-3 font-semibold">اسم الطالبة</th>
-                            <th className="px-6 py-3 font-semibold">رمز الفصل</th>
-                            <th className="px-6 py-3 font-semibold">الإجراءات</th>
+                            <th className="px-3 py-2.5 font-semibold sm:px-6 sm:py-3">رقم الطالبة</th>
+                            <th className="px-3 py-2.5 font-semibold sm:px-6 sm:py-3">اسم الطالبة</th>
+                            <th className="px-3 py-2.5 font-semibold sm:px-6 sm:py-3">رمز الفصل</th>
+                            <th className="px-3 py-2.5 font-semibold sm:px-6 sm:py-3">الإجراءات</th>
                           </tr>
                         </thead>
                         <tbody>
                           {studentsByGrade[grade].map((student) => (
                             <tr key={student.id} className="border-t border-slate-100">
-                              <td className="px-6 py-4 font-semibold text-slate-900">
+                              <td className="px-3 py-3 font-semibold text-slate-900 sm:px-6 sm:py-4">
                                 {student.studentId || student.id}
                               </td>
-                              <td className="px-6 py-4 font-semibold text-slate-900">
+                              <td className="px-3 py-3 font-semibold text-slate-900 sm:px-6 sm:py-4">
                                 {student.name}
                               </td>
-                              <td className="px-6 py-4">
+                              <td className="px-3 py-3 sm:px-6 sm:py-4">
                                 <span className="badge bg-slate-100 text-slate-600">
                                   {student.classCode}
                                 </span>
                               </td>
-                              <td className="px-6 py-4">
-                                <div className="flex gap-2">
+                              <td className="px-3 py-3 sm:px-6 sm:py-4">
+                                <div className="flex flex-wrap gap-2">
                                   <button
                                     onClick={() => handleEdit(student)}
-                                    className="text-primary-600 underline hover:text-primary-700"
+                                    className="text-primary-600 underline hover:text-primary-700 touch-manipulation"
                                   >
                                     تعديل
                                   </button>
                                   <button
                                     onClick={() => handleDelete(student.id)}
-                                    className="text-rose-600 underline hover:text-rose-700"
+                                    className="text-rose-600 underline hover:text-rose-700 touch-manipulation"
                                   >
                                     حذف
                                   </button>
