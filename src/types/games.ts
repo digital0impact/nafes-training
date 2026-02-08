@@ -38,6 +38,9 @@ export type GameType =
   | "periodic_family_comparison"
   | "volcano_types"
   | "geological_faults"
+  | "chemical_bond_lab"
+  | "valence_electron_patterns"
+  | "atom_electron_map"
 
 // ============================================
 // واجهات لعبة الاختيار من متعدد (Multiple Choice)
@@ -388,6 +391,25 @@ export interface FaultsGameData {
 }
 
 // ============================================
+// واجهات لعبة مختبر الروابط الكيميائية (5 مستويات)
+// ============================================
+
+/** بيانات لعبة مختبر الروابط الكيميائية – Chemical Bond Lab */
+export interface ChemicalBondLabGameData {
+  type: "chemical_bond_lab"
+}
+
+/** بيانات لعبة سر العائلة الدورية – Valence Electron Patterns */
+export interface ValenceElectronPatternsGameData {
+  type: "valence_electron_patterns"
+}
+
+/** بيانات لعبة خريطة إلكترونات الذرة – التوزيع الإلكتروني والتمثيل النقطي */
+export interface AtomElectronMapGameData {
+  type: "atom_electron_map"
+}
+
+// ============================================
 // واجهة موحدة لبيانات الألعاب
 // ============================================
 
@@ -406,6 +428,9 @@ export type GameData =
   | PeriodicFamilyGameData
   | VolcanoTypesGameData
   | FaultsGameData
+  | ChemicalBondLabGameData
+  | ValenceElectronPatternsGameData
+  | AtomElectronMapGameData
 
 // ============================================
 // واجهات إضافية للبيانات المعقدة
@@ -593,6 +618,10 @@ export function isFaultsGame(data: GameData): data is FaultsGameData {
   return data.type === "geological_faults"
 }
 
+export function isAtomElectronMapGame(data: GameData): data is AtomElectronMapGameData {
+  return data.type === "atom_electron_map"
+}
+
 // ============================================
 // Helper Types
 // ============================================
@@ -612,6 +641,9 @@ export type GameDataByType<T extends GameType> =
   T extends "periodic_family_comparison" ? PeriodicFamilyGameData :
   T extends "volcano_types" ? VolcanoTypesGameData :
   T extends "geological_faults" ? FaultsGameData :
+  T extends "chemical_bond_lab" ? ChemicalBondLabGameData :
+  T extends "valence_electron_patterns" ? ValenceElectronPatternsGameData :
+  T extends "atom_electron_map" ? AtomElectronMapGameData :
   never
 
 /**
@@ -629,4 +661,7 @@ export type GameStateByType<T extends GameType> =
   T extends "periodic_family_comparison" ? PeriodicFamilyGameState :
   T extends "volcano_types" ? Record<string, unknown> :
   T extends "geological_faults" ? Record<string, unknown> :
+  T extends "chemical_bond_lab" ? Record<string, unknown> :
+  T extends "valence_electron_patterns" ? Record<string, unknown> :
+  T extends "atom_electron_map" ? Record<string, unknown> :
   never

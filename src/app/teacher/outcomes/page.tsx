@@ -9,7 +9,7 @@ import { PageBackground } from "@/components/layout/page-background"
 import { learningOutcomes } from "@/lib/data"
 import { TeacherHeader } from "@/features/classes/components/teacher-header"
 
-type TabType = "view" | "edit"
+type TabType = "view" | "edit" | "outcomes"
 
 export default function TeacherOutcomesPage() {
   const [selectedPeriod, setSelectedPeriod] = useState<string>("all")
@@ -424,8 +424,38 @@ export default function TeacherOutcomesPage() {
             >
               تصميم الخطة
             </button>
+            <button
+              onClick={() => setActiveTab("outcomes")}
+              className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
+                activeTab === "outcomes"
+                  ? "text-violet-700 border-violet-600"
+                  : "text-slate-500 border-transparent hover:text-violet-600"
+              }`}
+            >
+              نواتج التعلم
+            </button>
           </div>
         </header>
+
+        {/* تبويب نواتج التعلم — استعراض جميع النواتج */}
+        {activeTab === "outcomes" && (
+          <section className="space-y-4">
+            <div className="rounded-2xl bg-violet-50 border border-violet-200 p-4">
+              <h2 className="text-lg font-bold text-violet-900">جميع نواتج التعلم</h2>
+              <p className="mt-1 text-sm text-violet-700">
+                استعراض كامل لنواتج التعلم والمؤشرات حسب المجال والفترة والأسبوع
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {modifiedOutcomes.map((item, index) => {
+                const topicKey = getTopicKey(item);
+                return (
+                  <LearningOutcomeCard key={`${topicKey}-${index}`} item={item} />
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* فلاتر البحث + التحكم في الأسابيع */}
         {activeTab === "edit" && (

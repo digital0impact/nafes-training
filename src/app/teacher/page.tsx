@@ -72,6 +72,106 @@ export default function TeacherDashboard() {
     router.refresh();
   };
 
+  /** بيانات الجدول للطباعة/التصدير */
+  const getStudentsTableData = () =>
+    (stats?.recentStudents ?? []).map((s) => {
+      const score = s.latestScore ?? 0;
+      const trend = s.trend ?? 0;
+      const status =
+        score >= 80 ? "متقدمة" : score >= 60 ? "جيدة" : "بحاجة لدعم";
+      const trendStr = (trend >= 0 ? "+" : "") + trend + "%";
+      return {
+        nickname: s.nickname ?? "",
+        score: `${score}%`,
+        status,
+        trend: trendStr,
+      };
+    });
+
+  /** طباعة جدول ملخص الطالبات فقط */
+  const printStudentsTableOnly = () => {
+    const data = getStudentsTableData();
+    if (!data.length) return;
+    const rows = data
+      .map(
+        (r) =>
+          `<tr><td>${escapeHtml(r.nickname)}</td><td>${escapeHtml(r.score)}</td><td>${escapeHtml(r.status)}</td><td>${escapeHtml(r.trend)}</td></tr>`
+      )
+      .join("");
+    const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"/><title>ملخص الطالبات</title><style>
+      body{font-family:Cairo,sans-serif;padding:1rem;color:#0f172a;}
+      h1{font-size:1.25rem;margin-bottom:1rem;}
+      .hint{font-size:0.75rem;color:#64748b;margin-bottom:0.5rem;}
+      table{width:100%;border-collapse:collapse;text-align:right;}
+      th,td{padding:0.5rem 0.75rem;border:1px solid #e2e8f0;}
+      th{background:#f8fafc;font-weight:600;}
+    </style></head><body><h1>ملخص الطالبات</h1><p class="hint">لحفظ كـ PDF: من نافذة الطباعة اختر الوجهة «حفظ كـ PDF»</p><table><thead><tr><th>الطالبة</th><th>الدرجة</th><th>الحالة</th><th>التحسن</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+    openPrintWindow(html);
+  };
+
+  /** تصدير جدول ملخص الطالبات كـ PDF (فتح نافذة طباعة → حفظ كـ PDF) */
+  const exportStudentsTablePdf = () => {
+    const data = getStudentsTableData();
+    if (!data.length) return;
+    const rows = data
+      .map(
+        (r) =>
+          `<tr><td>${escapeHtml(r.nickname)}</td><td>${escapeHtml(r.score)}</td><td>${escapeHtml(r.status)}</td><td>${escapeHtml(r.trend)}</td></tr>`
+      )
+      .join("");
+    const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"/><title>ملخص الطالبات - PDF</title><style>
+      body{font-family:Cairo,sans-serif;padding:1rem;color:#0f172a;}
+      h1{font-size:1.25rem;margin-bottom:1rem;}
+      .hint{font-size:0.75rem;color:#64748b;margin-bottom:0.5rem;}
+      table{width:100%;border-collapse:collapse;text-align:right;}
+      th,td{padding:0.5rem 0.75rem;border:1px solid #e2e8f0;}
+      th{background:#f8fafc;font-weight:600;}
+    </style></head><body><h1>ملخص الطالبات</h1><p class="hint">اختر «حفظ كـ PDF» ثم احفظ الملف.</p><table><thead><tr><th>الطالبة</th><th>الدرجة</th><th>الحالة</th><th>التحسن</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+    openPrintWindow(html);
+  };
+
+  /** تصدير جدول ملخص الطالبات كـ Excel (ملف CSV يفتح في Excel) */
+  const exportStudentsTableExcel = () => {
+    const data = getStudentsTableData();
+    if (!data.length) return;
+    const escapeCsv = (v: string) => {
+      const s = String(v);
+      if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+      return s;
+    };
+    const headers = ["الطالبة", "الدرجة", "الحالة", "التحسن"];
+    const csvRows = [
+      headers.map(escapeCsv).join(","),
+      ...data.map((r) =>
+        [r.nickname, r.score, r.status, r.trend].map(escapeCsv).join(",")
+      ),
+    ];
+    const csv = "\uFEFF" + csvRows.join("\r\n"); // BOM for UTF-8 in Excel
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ملخص-الطالبات.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  function openPrintWindow(html: string) {
+    const win = window.open("", "_blank", "noopener,noreferrer");
+    if (!win) return;
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    win.addEventListener("afterprint", () => win.close());
+    setTimeout(() => win.print(), 300);
+  }
+
+  function escapeHtml(text: string): string {
+    const el = document.createElement("div");
+    el.textContent = text;
+    return el.innerHTML;
+  }
+
   // عرض شاشة تحميل أثناء التهيئة
   if (!mounted) {
     return (
@@ -240,12 +340,47 @@ export default function TeacherDashboard() {
                 title="ملخص الطالبات"
                 subtitle="تابعي أداء كل طالبة ومقدار التحسن"
                 action={
-                  <Link
-                    href="/teacher/reports"
-                    className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold hover:bg-slate-50"
-                  >
-                    عرض جميع التقارير
-                  </Link>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={printStudentsTableOnly}
+                      className="inline-flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 touch-manipulation"
+                      title="طباعة الجدول"
+                    >
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                      </svg>
+                      طباعة
+                    </button>
+                    <button
+                      type="button"
+                      onClick={exportStudentsTablePdf}
+                      className="inline-flex items-center gap-1.5 rounded-2xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-100 touch-manipulation"
+                      title="تصدير كـ PDF (حفظ من نافذة الطباعة)"
+                    >
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      </svg>
+                      تصدير PDF
+                    </button>
+                    <button
+                      type="button"
+                      onClick={exportStudentsTableExcel}
+                      className="inline-flex items-center gap-1.5 rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 touch-manipulation"
+                      title="تحميل ملف Excel (CSV)"
+                    >
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-8a2 2 0 00-2-2H9a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      تصدير Excel
+                    </button>
+                    <Link
+                      href="/teacher/reports"
+                      className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold hover:bg-slate-50"
+                    >
+                      عرض جميع التقارير
+                    </Link>
+                  </div>
                 }
               />
               <div className="mt-4 overflow-x-auto overflow-y-hidden rounded-3xl border border-slate-100 bg-white">
@@ -260,7 +395,7 @@ export default function TeacherDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {stats.recentStudents.map((student) => {
+                    {stats.recentStudents.map((student, index) => {
                       const latestScore = student.latestScore ?? 0
                       const trend = student.trend ?? 0
                       const status =
@@ -275,9 +410,9 @@ export default function TeacherDashboard() {
                           : latestScore >= 60
                             ? "bg-blue-100 text-blue-700"
                             : "bg-rose-100 text-rose-700"
-                      
+                      const rowKey = `student-${student.id ?? index}-${index}`
                       return (
-                        <tr key={student.id} className="border-t border-slate-100">
+                        <tr key={rowKey} className="border-t border-slate-100">
                           <td className="px-3 py-3 font-semibold text-slate-900 sm:px-6 sm:py-4">
                             {student.nickname}
                           </td>

@@ -11,6 +11,9 @@ import AtomBuilderEnhanced from "@/components/games/AtomBuilderEnhanced"
 import PeriodicFamilyComparison from "@/components/games/PeriodicFamilyComparison"
 import VolcanoTypesGame from "@/components/games/VolcanoTypesGame"
 import GeologicalFaultsGame from "@/components/games/GeologicalFaultsGame"
+import ChemicalBondLab from "@/components/games/ChemicalBondLab"
+import ValenceElectronPatterns from "@/components/games/ValenceElectronPatterns"
+import AtomElectronMap from "@/components/games/AtomElectronMap"
 
 type EducationalGame = {
   game_id: string
@@ -662,6 +665,159 @@ export default function GamePlayPage() {
           />
         )}
 
+        {/* لعبة مختبر الروابط الكيميائية – Chemical Bond Lab */}
+        {gameData.type === "chemical_bond_lab" && (
+          <ChemicalBondLab
+            gameData={gameData}
+            game={{
+              game_id: game.game_id,
+              title: game.title,
+              chapter: game.chapter,
+              objective: game.objective,
+              points: game.points,
+            }}
+            onComplete={async (result) => {
+              if (student) {
+                setSaving(true)
+                try {
+                  await fetch("/api/game-attempts", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      nickname: student.name,
+                      classCode: student.classCode,
+                      studentDbId: student.id,
+                      gameId,
+                      gameTitle: game.title,
+                      gameType: game.game_type,
+                      chapter: game.chapter,
+                      answers: result.answers,
+                      score: Math.round((result.score / 100) * game.points),
+                      totalScore: game.points,
+                      percentage: result.score,
+                      timeSpent: result.timeSpent,
+                    }),
+                  })
+                } catch (e) {
+                  console.error("Error saving chemical bond lab attempt", e)
+                } finally {
+                  setSaving(false)
+                }
+              }
+              setShowFeedback(true)
+              setFeedbackMessage(
+                result.score === 100 ? "ممتاز! أتقنتِ مختبر الروابط الكيميائية" : result.score >= 70 ? "جيد جداً! حاولي مرة أخرى لتحسين النتيجة" : "حاولي مرة أخرى"
+              )
+              setTimeout(() => {
+                setShowFeedback(false)
+                router.push(`/student/games/${gameId}/result?score=${result.score}`)
+              }, 2000)
+            }}
+          />
+        )}
+
+        {/* لعبة سر العائلة الدورية – Valence Electron Patterns */}
+        {gameData.type === "valence_electron_patterns" && (
+          <ValenceElectronPatterns
+            gameData={gameData}
+            game={{
+              game_id: game.game_id,
+              title: game.title,
+              chapter: game.chapter,
+              objective: game.objective,
+              points: game.points,
+            }}
+            onComplete={async (result) => {
+              if (student) {
+                setSaving(true)
+                try {
+                  await fetch("/api/game-attempts", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      nickname: student.name,
+                      classCode: student.classCode,
+                      studentDbId: student.id,
+                      gameId,
+                      gameTitle: game.title,
+                      gameType: game.game_type,
+                      chapter: game.chapter,
+                      answers: result.answers,
+                      score: Math.round((result.score / 100) * game.points),
+                      totalScore: game.points,
+                      percentage: result.score,
+                      timeSpent: result.timeSpent,
+                    }),
+                  })
+                } catch (e) {
+                  console.error("Error saving valence patterns attempt", e)
+                } finally {
+                  setSaving(false)
+                }
+              }
+              setShowFeedback(true)
+              setFeedbackMessage(
+                result.score === 100 ? "ممتاز! أتقنتِ سر العائلة الدورية" : result.score >= 70 ? "جيد جداً! حاولي مرة أخرى لتحسين النتيجة" : "حاولي مرة أخرى"
+              )
+              setTimeout(() => {
+                setShowFeedback(false)
+                router.push(`/student/games/${gameId}/result?score=${result.score}`)
+              }, 2000)
+            }}
+          />
+        )}
+
+        {/* لعبة خريطة إلكترونات الذرة – Atom Electron Map */}
+        {gameData.type === "atom_electron_map" && (
+          <AtomElectronMap
+            gameData={gameData}
+            game={{
+              game_id: game.game_id,
+              title: game.title,
+              chapter: game.chapter,
+              objective: game.objective,
+              points: game.points,
+            }}
+            onComplete={async (result) => {
+              if (student) {
+                setSaving(true)
+                try {
+                  await fetch("/api/game-attempts", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      nickname: student.name,
+                      classCode: student.classCode,
+                      studentDbId: student.id,
+                      gameId,
+                      gameTitle: game.title,
+                      gameType: game.game_type,
+                      chapter: game.chapter,
+                      answers: result.answers,
+                      score: Math.round((result.score / 100) * game.points),
+                      totalScore: game.points,
+                      percentage: result.score,
+                      timeSpent: result.timeSpent,
+                    }),
+                  })
+                } catch (e) {
+                  console.error("Error saving atom electron map attempt", e)
+                } finally {
+                  setSaving(false)
+                }
+              }
+              setShowFeedback(true)
+              setFeedbackMessage(
+                result.score >= 90 ? "ممتاز! أتقنتِ خريطة إلكترونات الذرة" : result.score >= 70 ? "جيد جداً! راجعي التوزيع والتمثيل النقطي" : "حاولي مرة أخرى"
+              )
+              setTimeout(() => {
+                setShowFeedback(false)
+                router.push(`/student/games/${gameId}/result?score=${result.score}`)
+              }, 2000)
+            }}
+          />
+        )}
+
         {/* Game Area - Ordering */}
         {gameData.type === "ordering" && (
           <div className="card">
@@ -1133,7 +1289,7 @@ export default function GamePlayPage() {
         )}
 
         {/* Action Buttons - لا تظهر لألعاب متعددة المراحل التي تنتهي تلقائياً */}
-        {gameData.type !== "volcano_types" && gameData.type !== "geological_faults" && (
+        {gameData.type !== "volcano_types" && gameData.type !== "geological_faults" && gameData.type !== "chemical_bond_lab" && gameData.type !== "valence_electron_patterns" && gameData.type !== "atom_electron_map" && (
         <div className="card">
           <div className="flex gap-3">
             <button

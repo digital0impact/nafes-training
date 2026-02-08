@@ -21,7 +21,10 @@ export type {
   PeriodicFamilyElement,
   VolcanoTypesGameData,
   VolcanoTypeData,
-  FaultsGameData
+  FaultsGameData,
+  ChemicalBondLabGameData,
+  ValenceElectronPatternsGameData,
+  AtomElectronMapGameData
 } from "@/types/games"
 
 import type { GameData } from "@/types/games"
@@ -77,6 +80,21 @@ const baseGamesData: Record<string, GameData> = {
   // game_faults_001: الصدوع الجيولوجية (3 مراحل: مفهوم، محاكاة، تمييز بالرسم)
   game_faults_001: {
     type: "geological_faults",
+  } as GameData,
+
+  // game_bond_lab: مختبر الروابط الكيميائية – Chemical Bond Lab (5 مستويات)
+  game_bond_lab: {
+    type: "chemical_bond_lab",
+  } as GameData,
+
+  // game_valence_001: سر العائلة الدورية – Valence Electron Patterns (5 مراحل)
+  game_valence_001: {
+    type: "valence_electron_patterns",
+  } as GameData,
+
+  // game_electron_map_001: خريطة إلكترونات الذرة – التوزيع الإلكتروني والتمثيل النقطي (5 مراحل)
+  game_electron_map_001: {
+    type: "atom_electron_map",
   } as GameData,
 
   // game_005: ربط حدود الصفائح بنتائجها (matching)
