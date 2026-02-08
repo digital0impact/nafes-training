@@ -103,7 +103,7 @@ function EnergyLevelsStage1({
       <div className="flex flex-col items-center gap-4">
         <div className="relative flex items-center justify-center min-h-[140px]">
           {/* دوائر المستويات من الداخل للخارج: K, L, M, N */}
-          {(["N", "M", "L", "K"] as const).reverse().map((level, idx) => {
+          {(["K", "L", "M", "N"] as const).map((level, idx) => {
             const cap = LEVEL_CAPACITY[level]
             const count = distribution[level]
             const radius = 22 + idx * 26

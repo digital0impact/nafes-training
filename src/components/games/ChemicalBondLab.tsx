@@ -403,9 +403,11 @@ export default function ChemicalBondLab({ gameData, game, onComplete }: Chemical
                 } touch-manipulation`}
               >
                 {p.text}
-                {level3Placements[p.id] && (
-                  <span className="mr-1 text-xs">→ {BOND_EXPLANATIONS[level3Placements[p.id]].title}</span>
-                )}
+                {(() => {
+                  const bond = level3Placements[p.id]
+                  if (!bond) return null
+                  return <span className="mr-1 text-xs">→ {BOND_EXPLANATIONS[bond].title}</span>
+                })()}
               </div>
             ))}
           </div>
