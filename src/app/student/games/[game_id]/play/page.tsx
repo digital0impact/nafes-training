@@ -128,7 +128,7 @@ export default function GamePlayPage() {
 
   /** حفظ محاولة اللعبة في الخادم — يُستخدم عند انتهاء أي لعبة */
   const saveGameAttempt = async (payload: {
-    answers: Record<string, unknown>
+    answers?: Record<string, unknown>
     score: number
     totalScore: number
     percentage: number
@@ -148,7 +148,7 @@ export default function GamePlayPage() {
           gameTitle: game.title,
           gameType: game.game_type,
           chapter: game.chapter,
-          answers: payload.answers,
+          answers: payload.answers ?? {},
           score: Math.round((payload.percentage / 100) * game.points),
           totalScore: game.points,
           percentage: payload.percentage,
@@ -598,7 +598,7 @@ export default function GamePlayPage() {
             }}
             onComplete={async (result) => {
               await saveGameAttempt({
-                answers: result.answers,
+                answers: (result.answers ?? {}) as Record<string, unknown>,
                 score: Math.round((result.score / 100) * game.points),
                 totalScore: game.points,
                 percentage: result.score,
@@ -629,7 +629,7 @@ export default function GamePlayPage() {
             }}
             onComplete={async (result) => {
               await saveGameAttempt({
-                answers: result.answers,
+                answers: (result.answers ?? {}) as Record<string, unknown>,
                 score: Math.round((result.score / 100) * game.points),
                 totalScore: game.points,
                 percentage: result.score,
@@ -660,7 +660,7 @@ export default function GamePlayPage() {
             }}
             onComplete={async (result) => {
               await saveGameAttempt({
-                answers: result.answers,
+                answers: (result.answers ?? {}) as Record<string, unknown>,
                 score: Math.round((result.score / 100) * game.points),
                 totalScore: game.points,
                 percentage: result.score,
@@ -691,7 +691,7 @@ export default function GamePlayPage() {
             }}
             onComplete={async (result) => {
               await saveGameAttempt({
-                answers: result.answers,
+                answers: (result.answers ?? {}) as Record<string, unknown>,
                 score: Math.round((result.score / 100) * game.points),
                 totalScore: game.points,
                 percentage: result.score,
@@ -722,7 +722,7 @@ export default function GamePlayPage() {
             }}
             onComplete={async (result) => {
               await saveGameAttempt({
-                answers: result.answers,
+                answers: (result.answers ?? {}) as Record<string, unknown>,
                 score: Math.round((result.score / 100) * game.points),
                 totalScore: game.points,
                 percentage: result.score,
