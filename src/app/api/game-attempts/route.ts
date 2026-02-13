@@ -104,35 +104,65 @@ export async function POST(request: Request) {
       )
     }
 
-    // حفظ المحاولة
-    const attempt = await prisma.gameAttempt.create({
-      data: {
-        nickname,
-        classCode: classCode.toUpperCase(),
-        classId: classData?.id || null,
-        studentDbId: student.id,
-        gameId,
-        gameTitle,
-        gameType,
-        chapter,
-        answers: JSON.stringify(answers),
-        score,
-        totalScore,
-        percentage,
-        timeSpent,
-      },
-    })
+    // حفظ المحاولة (أولاً حتى تظهر اللعبة في «الألعاب المنجزة»)
+    let attempt
+    try {
+      attempt = await prisma.gameAttempt.create({
+        data: {
+          nickname,
+          classCode: classCode.toUpperCase(),
+          classId: classData?.id || null,
+          studentDbId: student.id,
+          gameId,
+          gameTitle,
+          gameType,
+          chapter,
+          answers: JSON.stringify(answers),
+          score,
+          totalScore,
+          percentage,
+          timeSpent,
+        },
+      })
+    } catch (createError) {
+      const message =
+        createError instanceof Error ? createError.message : String(createError)
+      console.error("Error creating game attempt:", createError)
+      return NextResponse.json(
+        {
+          error: "حدث خطأ أثناء حفظ محاولة اللعبة",
+          details: message,
+        },
+        { status: 500 }
+      )
+    }
 
-    // تحديث إتقان الطالبة (مبدئيًا: حسب اللعبة نفسها)
+    // تحديث إتقان الطالبة (إن فشل لا نُفشّل الاستجابة — المحاولة محفوظة)
     const status = percentage >= 80 ? "mastered" : "not_mastered"
-    await upsertMastery({
-      studentDbId: student.id,
-      key: `game:${gameId}`,
-      status,
-      score: percentage,
-      sourceType: "game",
-      sourceId: gameId,
-    })
+    try {
+      await upsertMastery({
+        studentDbId: student.id,
+        key: `game:${gameId}`,
+        status,
+        score: percentage,
+        sourceType: "game",
+        sourceId: gameId,
+      })
+      const SKILL_DOMAINS = ["علوم الحياة", "العلوم الفيزيائية", "علوم الأرض والفضاء", "جميع المجالات"]
+      const chapterAsSkill = SKILL_DOMAINS.includes(chapter.trim()) ? chapter.trim() : null
+      if (chapterAsSkill) {
+        await upsertMastery({
+          studentDbId: student.id,
+          key: `skill:${chapterAsSkill}`,
+          status,
+          score: percentage,
+          sourceType: "game",
+          sourceId: gameId,
+        })
+      }
+    } catch (masteryError) {
+      console.error("Error updating mastery (game attempt was saved):", masteryError)
+    }
 
     return NextResponse.json(
       {
@@ -147,9 +177,13 @@ export async function POST(request: Request) {
       { status: 201 }
     )
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
     console.error("Error creating game attempt:", error)
     return NextResponse.json(
-      { error: "حدث خطأ أثناء حفظ محاولة اللعبة" },
+      {
+        error: "حدث خطأ أثناء حفظ محاولة اللعبة",
+        details: message,
+      },
       { status: 500 }
     )
   }

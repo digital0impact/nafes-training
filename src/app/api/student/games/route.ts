@@ -64,13 +64,11 @@ export async function GET(request: Request) {
     const sharedGameIds = new Set<string>()
     shares.forEach((share) => {
       if (share.shareToAll) {
-        // إذا كانت المشاركة لجميع الطلاب، أضف جميع الألعاب
-        allGames.forEach((game: any) => sharedGameIds.add(game.game_id))
-      } else {
-        // حالياً: نعتمد على مشاركة الفصل فقط (studentIds تتطلب هوية طالبة ثابتة وليست nickname)
-        if (share.class?.code === classCode.toUpperCase()) {
-          sharedGameIds.add(share.gameId)
-        }
+        // مشاركة مع الجميع = هذه اللعبة تظهر لجميع طلاب المعلم
+        sharedGameIds.add(share.gameId)
+      } else if (share.class?.code === classCode.toUpperCase()) {
+        // مشاركة مع فصل معين
+        sharedGameIds.add(share.gameId)
       }
     })
 

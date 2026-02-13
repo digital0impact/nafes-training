@@ -87,7 +87,7 @@ const baseGamesData: Record<string, GameData> = {
     type: "chemical_bond_lab",
   } as GameData,
 
-  // game_valence_001: سر العائلة الدورية – Valence Electron Patterns (5 مراحل)
+  // game_valence_001: سر العائلة الدورية – Valence Electron Patterns (4 مراحل)
   game_valence_001: {
     type: "valence_electron_patterns",
   } as GameData,

@@ -23,7 +23,7 @@ export default function TeacherOutcomesPage() {
     "الفترة الثانية": 8,
   })
   const [weekAssignments, setWeekAssignments] = useState<Record<string, string>>({})
-  const [activeTab, setActiveTab] = useState<TabType>("view")
+  const [activeTab, setActiveTab] = useState<TabType>("outcomes")
   const [draggedItem, setDraggedItem] = useState<string | null>(null)
   const [dragOverWeek, setDragOverWeek] = useState<string | null>(null)
 
@@ -73,15 +73,43 @@ export default function TeacherOutcomesPage() {
     const savedWeekAssignments = localStorage.getItem("weekAssignments")
     if (savedWeekAssignments) {
       try {
-        setWeekAssignments(JSON.parse(savedWeekAssignments))
+        const parsed = JSON.parse(savedWeekAssignments) as Record<string, string>
+        // ترحيل المفاتيح القديمة (أول 30 حرفاً) إلى المفتاح الفريد (ناتج كامل) لظهور كل البطاقات
+        const migrated: Record<string, string> = {}
+        let needsSave = false
+        for (const [key, week] of Object.entries(parsed)) {
+          const isNewKey = learningOutcomes.some(
+            (item) => getTopicKey(item) === key
+          )
+          if (isNewKey) {
+            migrated[key] = week
+          } else {
+            needsSave = true
+            const matches = learningOutcomes.filter(
+              (item) => getTopicKeyLegacy(item) === key
+            )
+            matches.forEach((item) => {
+              migrated[getTopicKey(item)] = week
+            })
+          }
+        }
+        setWeekAssignments(Object.keys(migrated).length ? migrated : parsed)
+        if (needsSave && Object.keys(migrated).length > 0) {
+          localStorage.setItem("weekAssignments", JSON.stringify(migrated))
+        }
       } catch (e) {
         console.error("خطأ في تحميل توزيع الأسابيع", e)
       }
     }
   }, [])
 
-  // دالة مساعدة للحصول على مفتاح فريد للموضوع
+  // دالة مساعدة للحصول على مفتاح فريد للموضوع (ناتج كامل لتفادي تكرار المفتاح واختفاء البطاقات)
   const getTopicKey = (item: (typeof learningOutcomes)[0]): string => {
+    return `${item.domain}-${item.lesson}-${item.outcome}`
+  }
+
+  // المفتاح القديم (أول 30 حرفاً) للترحيل من التخزين المحلي
+  const getTopicKeyLegacy = (item: (typeof learningOutcomes)[0]): string => {
     return `${item.domain}-${item.lesson}-${item.outcome.substring(0, 30)}`
   }
 
@@ -437,23 +465,71 @@ export default function TeacherOutcomesPage() {
           </div>
         </header>
 
-        {/* تبويب نواتج التعلم — استعراض جميع النواتج */}
+        {/* تبويب نواتج التعلم — مقسّم إلى ثلاثة أقسام حسب المجال */}
         {activeTab === "outcomes" && (
-          <section className="space-y-4">
+          <section className="space-y-8">
             <div className="rounded-2xl bg-violet-50 border border-violet-200 p-4">
               <h2 className="text-lg font-bold text-violet-900">جميع نواتج التعلم</h2>
               <p className="mt-1 text-sm text-violet-700">
                 استعراض كامل لنواتج التعلم والمؤشرات حسب المجال والفترة والأسبوع
               </p>
             </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {modifiedOutcomes.map((item, index) => {
-                const topicKey = getTopicKey(item);
-                return (
-                  <LearningOutcomeCard key={`${topicKey}-${index}`} item={item} />
-                );
-              })}
-            </div>
+
+            {[
+              { domain: "علوم الحياة", color: "emerald" },
+              { domain: "العلوم الفيزيائية", color: "blue" },
+              { domain: "علوم الأرض والفضاء", color: "amber" },
+            ].map(({ domain, color }) => {
+              const items = modifiedOutcomes.filter((item) => item.domain === domain);
+              if (items.length === 0) return null;
+              return (
+                <div key={domain} className="space-y-3">
+                  <div
+                    className={`rounded-2xl border p-4 ${
+                      color === "emerald"
+                        ? "bg-emerald-50 border-emerald-200"
+                        : color === "blue"
+                          ? "bg-blue-50 border-blue-200"
+                          : "bg-amber-50 border-amber-200"
+                    }`}
+                  >
+                    <h3
+                      className={`text-lg font-bold ${
+                        color === "emerald"
+                          ? "text-emerald-900"
+                          : color === "blue"
+                            ? "text-blue-900"
+                            : "text-amber-900"
+                      }`}
+                    >
+                      {domain}
+                    </h3>
+                    <p
+                      className={`mt-1 text-sm ${
+                        color === "emerald"
+                          ? "text-emerald-700"
+                          : color === "blue"
+                            ? "text-blue-700"
+                            : "text-amber-700"
+                      }`}
+                    >
+                      {items.length} ناتج تعلم
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {items.map((item, index) => {
+                      const topicKey = getTopicKey(item);
+                      return (
+                        <LearningOutcomeCard
+                          key={`${topicKey}-${index}`}
+                          item={item}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </section>
         )}
 
@@ -472,9 +548,11 @@ export default function TeacherOutcomesPage() {
                       setPeriodChanges({})
                       setWeekOrder({})
                       setTopicOrder({})
+                      setWeekAssignments({})
                       localStorage.removeItem("periodChanges")
                       localStorage.removeItem("weekOrder")
                       localStorage.removeItem("topicOrder")
+                      localStorage.removeItem("weekAssignments")
                     }
                   }}
                   className="rounded-2xl bg-rose-100 px-4 py-2.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-200"
@@ -566,37 +644,30 @@ export default function TeacherOutcomesPage() {
           </section>
         )}
 
-        {/* عرض الخطة — نفس تصميم تصميم الخطة (شبكة أسابيع + بطاقات بدون سحب) */}
-        {activeTab === "view" ? (
+        {/* عرض الخطة — جدول أسابيع للعرض فقط */}
+        {activeTab === "view" && (
           <section className="card overflow-hidden p-0" dir="rtl">
-            {/* رأس: الأسابيع */}
             <div className="rounded-t-2xl bg-amber-100 border-b border-amber-200 px-4 py-3">
               <h2 className="text-center text-lg font-bold text-amber-900">الأسابيع</h2>
             </div>
-
             <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
               {periods.filter(Boolean).map((period) => {
                 const weekCount = weekCounts[period] || 8
                 const generatedWeeks = generateWeekNames(period, weekCount)
-
                 return (
                   <div
                     key={period}
                     className="flex flex-col md:flex-row gap-3 md:gap-4 items-stretch"
                   >
-                    {/* تسمية الفترة */}
                     <div className="flex md:flex-col md:w-24 flex-shrink-0 rounded-xl bg-amber-100 border border-amber-200 px-4 py-3 md:py-6 flex items-center justify-center min-h-[48px] md:min-h-[140px]">
                       <span className="text-base font-bold text-amber-900 text-center">
                         {period}
                       </span>
                     </div>
-
-                    {/* صف صناديق الأسابيع */}
                     <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-3">
                       {generatedWeeks.map((weekKey, weekIndex) => {
                         const itemsInSlot = getItemsForWeekSlot(period, weekKey)
                         const weekLabel = weekIndex === 0 ? "الأسبوع الأول" : `الأسبوع ${weekIndex + 1}`
-
                         return (
                           <div
                             key={weekKey}
@@ -606,7 +677,7 @@ export default function TeacherOutcomesPage() {
                               {weekLabel}
                             </p>
                             <div className="flex-1 space-y-2 overflow-y-auto">
-                              {itemsInSlot.map((item, itemIndex) => {
+                              {itemsInSlot.map((item) => {
                                 const topicKey = getTopicKey(item)
                                 return (
                                   <div
@@ -619,7 +690,7 @@ export default function TeacherOutcomesPage() {
                                     <p className="text-[10px] text-slate-500 truncate" title={item.domain}>
                                       {item.domain}
                                     </p>
-                                    {item.indicators && item.indicators.length > 0 && (
+                                    {item.indicators?.length > 0 && (
                                       <p className="text-[10px] text-primary-600 mt-0.5">
                                         {item.indicators.length} مؤشر
                                       </p>
@@ -645,8 +716,10 @@ export default function TeacherOutcomesPage() {
               })}
             </div>
           </section>
-        ) : (
-          // تصميم الخطة: شبكة أسابيع مع سحب وإفلات بطاقات المؤشرات (حسب المخطط المرفق)
+        )}
+
+        {/* تصميم الخطة: شبكة أسابيع مع سحب وإفلات */}
+        {activeTab === "edit" && (
           <section className="card overflow-hidden p-0" dir="rtl">
             {/* تلميح */}
             <div className="p-3 bg-amber-50 border-b border-amber-200">

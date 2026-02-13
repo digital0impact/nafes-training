@@ -640,3 +640,17 @@ export const learningOutcomes: LearningOutcome[] = [
     ]
   }
 ];
+
+/** عدد مؤشرات نواتج التعلم الإجمالي (لحساب تقدم الطالب) */
+export const TOTAL_LEARNING_INDICATORS = learningOutcomes.reduce(
+  (sum, item) => sum + item.indicators.length,
+  0
+);
+
+/** عدد المؤشرات لكل مجال (علوم الحياة، العلوم الفيزيائية، علوم الأرض والفضاء) */
+export const INDICATOR_COUNTS_BY_DOMAIN: Record<string, number> =
+  learningOutcomes.reduce<Record<string, number>>((acc, item) => {
+    const d = item.domain;
+    acc[d] = (acc[d] ?? 0) + item.indicators.length;
+    return acc;
+  }, {});

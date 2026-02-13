@@ -14,6 +14,19 @@ import {
 import { useStudentStore } from "@/store/student-store";
 import { StudentAuthGuard } from "@/components/student";
 
+type TestTab = "new" | "completed";
+
+type CompletedAttempt = {
+  id: string;
+  testModelId: string | null;
+  testModelTitle: string | null;
+  score: number;
+  totalQuestions: number;
+  percentage: number;
+  timeSpent: number;
+  completedAt: string;
+};
+
 const skillColors: Record<string, string> = {
   "علوم الحياة": "bg-emerald-50 text-emerald-700 border-emerald-200",
   "العلوم الفيزيائية": "bg-blue-50 text-blue-700 border-blue-200",
@@ -51,11 +64,12 @@ function toClientModel(raw: {
 
 function SelectTestModelContent() {
   const student = useStudentStore((s) => s.student);
+  const [activeTab, setActiveTab] = useState<TestTab>("new");
   const [availableModels, setAvailableModels] = useState<TestModel[]>([]);
+  const [completedAttempts, setCompletedAttempts] = useState<CompletedAttempt[]>([]);
   const [loading, setLoading] = useState(true);
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [debugReason, setDebugReason] = useState<string | null>(null);
-  const [loadingDebug, setLoadingDebug] = useState(false);
+  const [loadingCompleted, setLoadingCompleted] = useState(false);
+  const [refreshKey] = useState(0);
 
   const loadAssignedTests = useCallback(async () => {
     if (!student?.id) {
@@ -112,74 +126,145 @@ function SelectTestModelContent() {
     loadAssignedTests();
   }, [loadAssignedTests, refreshKey]);
 
+  // جلب الاختبارات المنجزة (عند فتح الصفحة وعند تغيير التبويب) لاستخدامها في فلترة "الجديدة" وعرض "المنجزة"
+  useEffect(() => {
+    if (!student?.id) return;
+    setLoadingCompleted(true);
+    fetch(`/api/student/training-attempts?studentId=${encodeURIComponent(student.id)}`, {
+      cache: "no-store",
+    })
+      .then((res) => res.json())
+      .then((data) => setCompletedAttempts(data.attempts ?? []))
+      .catch(() => setCompletedAttempts([]))
+      .finally(() => setLoadingCompleted(false));
+  }, [student?.id, activeTab, refreshKey]);
+
+  // الاختبارات الجديدة فقط = المعينة من المعلمة والتي لم تُحل بعد (بعد الحل تنتقل إلى المنجزة)
+  const newTestsOnly = availableModels.filter(
+    (model) => !completedAttempts.some((a) => a.testModelId === model.id)
+  );
+
   return (
     <main className="space-y-6">
       <header className="card bg-gradient-to-br from-white to-primary-50">
-        <h1 className="text-3xl font-bold text-slate-900">محاكاة اختبار نافس</h1>
+        <h1 className="text-3xl font-bold text-slate-900">اختباراتي</h1>
         <p className="mt-2 text-slate-600">
-          اختر نموذج الاختبار المناسب لك. كل نموذج يحتوي على 20 سؤالاً مرتبطاً بنواتج التعلم المحددة.
+          الاختبارات الجديدة للبدء بها أو المنجزة لمتابعة نتائجك.
         </p>
+        <div className="mt-4 flex gap-1 overflow-x-auto border-b border-slate-200 pb-px sm:mt-6">
+          <button
+            type="button"
+            onClick={() => setActiveTab("new")}
+            className={`min-h-[44px] flex-shrink-0 border-b-2 px-4 py-2.5 text-sm font-semibold transition touch-manipulation ${
+              activeTab === "new"
+                ? "border-primary-600 text-primary-700"
+                : "border-transparent text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            الاختبارات الجديدة
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("completed")}
+            className={`min-h-[44px] flex-shrink-0 border-b-2 px-4 py-2.5 text-sm font-semibold transition touch-manipulation ${
+              activeTab === "completed"
+                ? "border-primary-600 text-primary-700"
+                : "border-transparent text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            الاختبارات المنجزة
+          </button>
+        </div>
       </header>
 
-      {loading ? (
+      {/* تبويب الاختبارات المنجزة */}
+      {activeTab === "completed" && (
+        <section className="card overflow-hidden p-0">
+          {loadingCompleted ? (
+            <div className="p-8 text-center text-slate-500">جاري تحميل الاختبارات المنجزة...</div>
+          ) : completedAttempts.length === 0 ? (
+            <div className="p-8 text-center">
+              <p className="text-slate-600">لا توجد اختبارات منجزة بعد.</p>
+              <p className="mt-1 text-sm text-slate-500">
+                ابدئي من تبويب &quot;الاختبارات الجديدة&quot; لأداء اختبار.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3">
+              {completedAttempts.map((a) => (
+                <div
+                  key={a.id}
+                  className="flex flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md"
+                >
+                  <h3 className="font-bold text-slate-900">
+                    {a.testModelTitle || "اختبار محاكاة"}
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {new Date(a.completedAt).toLocaleDateString("ar-SA", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                  <div className="mt-4 border-t border-slate-100 pt-4">
+                    <p className="mb-2 text-xs font-semibold text-slate-600">مدى الدرجة / النسبة</p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className={`inline-flex items-center rounded-full px-3 py-1.5 text-sm font-bold ${
+                          a.percentage >= 80
+                            ? "bg-emerald-100 text-emerald-700"
+                            : a.percentage >= 60
+                              ? "bg-amber-100 text-amber-700"
+                              : "bg-rose-100 text-rose-700"
+                        }`}
+                      >
+                        {a.percentage}%
+                      </span>
+                      <span className="text-sm text-slate-600">
+                        ({a.score} / {a.totalQuestions} سؤال)
+                      </span>
+                    </div>
+                  </div>
+                  {a.testModelId && (
+                    <Link
+                      href={`/student/simulation?model=${a.testModelId}`}
+                      className="mt-4 block w-full rounded-2xl bg-primary-600 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-primary-700"
+                    >
+                      إعادة الاختبار
+                    </Link>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* تبويب الاختبارات الجديدة: فقط ما أرسلته المعلمة ولم تُحله الطالبة بعد */}
+      {activeTab === "new" && (
+      loading ? (
         <div className="card text-center py-12">
           <p className="text-slate-500">جاري تحميل الاختبارات المتاحة...</p>
         </div>
-      ) : availableModels.length === 0 ? (
+      ) : newTestsOnly.length === 0 ? (
         <div className="card text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
             <svg className="h-8 w-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-slate-900">لا توجد نماذج متاحة حالياً</h3>
-          <p className="mt-2 text-slate-600">
-            لم تقم معلمتك بمشاركة أي نماذج اختبارات بعد، أو أن الاختبار لم يصل بعد. تواصلي معها للتأكد، ثم حدّثي القائمة أدناه.
-          </p>
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-            <button
-              type="button"
-              onClick={() => setRefreshKey((k) => k + 1)}
-              className="rounded-2xl bg-primary-600 px-6 py-2.5 font-semibold text-white transition hover:bg-primary-700"
-            >
-              تحديث القائمة
-            </button>
-            <button
-              type="button"
-              disabled={loadingDebug || !student?.id}
-              onClick={async () => {
-                if (!student?.id) return
-                setLoadingDebug(true)
-                setDebugReason(null)
-                try {
-                  const res = await fetch(
-                    `/api/student/assigned-tests?studentId=${encodeURIComponent(student.id)}&debug=1`,
-                    { cache: "no-store" }
-                  )
-                  const data = await res.json().catch(() => ({}))
-                  const d = data.debug
-                  if (d?.reason) setDebugReason(d.reason)
-                  else setDebugReason("لا توجد معلومات تشخيص إضافية.")
-                } catch {
-                  setDebugReason("حدث خطأ أثناء التحقق.")
-                } finally {
-                  setLoadingDebug(false)
-                }
-              }}
-              className="rounded-2xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-            >
-              {loadingDebug ? "جاري التحقق..." : "لماذا لا أرى اختبارات؟"}
-            </button>
-          </div>
-          {debugReason && (
-            <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-              {debugReason}
+          <h3 className="text-lg font-semibold text-slate-900">لا توجد اختبارات جديدة حالياً</h3>
+          {availableModels.length === 0 && (
+            <p className="mt-2 text-slate-600">
+              لم تقم معلمتك بمشاركة أي نماذج اختبارات بعد. تواصلي معها للتأكد.
             </p>
           )}
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {availableModels.map((model) => {
+          {newTestsOnly.map((model) => {
             const relatedOutcomes = getRelatedOutcomes(model.id);
             const skillColor = skillColors[model.skill] || "bg-slate-50 text-slate-700 border-slate-200";
 
@@ -259,6 +344,7 @@ function SelectTestModelContent() {
             );
           })}
         </div>
+      )
       )}
     </main>
   );

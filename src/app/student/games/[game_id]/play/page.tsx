@@ -126,6 +126,50 @@ export default function GamePlayPage() {
   const [startTime, setStartTime] = useState<number>(Date.now())
   const [saving, setSaving] = useState(false)
 
+  /** حفظ محاولة اللعبة في الخادم — يُستخدم عند انتهاء أي لعبة */
+  const saveGameAttempt = async (payload: {
+    answers: Record<string, unknown>
+    score: number
+    totalScore: number
+    percentage: number
+    timeSpent: number
+  }): Promise<boolean> => {
+    if (!student || !game) return false
+    setSaving(true)
+    try {
+      const res = await fetch("/api/game-attempts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nickname: student.name,
+          classCode: student.classCode,
+          studentDbId: student.id,
+          gameId,
+          gameTitle: game.title,
+          gameType: game.game_type,
+          chapter: game.chapter,
+          answers: payload.answers,
+          score: Math.round((payload.percentage / 100) * game.points),
+          totalScore: game.points,
+          percentage: payload.percentage,
+          timeSpent: payload.timeSpent,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        const details = (err as { details?: string }).details ?? (err as { error?: string }).error ?? ""
+        console.error("فشل حفظ محاولة اللعبة:", res.status, details || err)
+        return false
+      }
+      return true
+    } catch (e) {
+      console.error("Error saving game attempt", e)
+      return false
+    } finally {
+      setSaving(false)
+    }
+  }
+
   useEffect(() => {
     async function loadGame() {
       try {
@@ -456,36 +500,14 @@ export default function GamePlayPage() {
       return
     }
 
-    // حفظ النتيجة في قاعدة البيانات
-    if (student) {
-      setSaving(true)
-      try {
-        await fetch("/api/game-attempts", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            nickname: student.name,
-            classCode: student.classCode,
-            studentDbId: student.id,
-            gameId: gameId,
-            gameTitle: game.title,
-            gameType: game.game_type,
-            chapter: game.chapter,
-            answers: answersData,
-            score: Math.round((percentage / 100) * game.points),
-            totalScore: game.points,
-            percentage: percentage,
-            timeSpent: timeSpent,
-          }),
-        })
-      } catch (error) {
-        console.error("Error saving game attempt:", error)
-      } finally {
-        setSaving(false)
-      }
-    }
+    // حفظ النتيجة في قاعدة البيانات قبل التحويل لصفحة النتيجة
+    await saveGameAttempt({
+      answers: answersData,
+      score: Math.round((percentage / 100) * game.points),
+      totalScore: game.points,
+      percentage,
+      timeSpent: timeSpent,
+    })
 
     // رسالة التغذية الراجعة
     if (percentage === 100) {
@@ -575,33 +597,13 @@ export default function GamePlayPage() {
               points: game.points,
             }}
             onComplete={async (result) => {
-              if (student) {
-                setSaving(true)
-                try {
-                  await fetch("/api/game-attempts", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      nickname: student.name,
-                      classCode: student.classCode,
-                      studentDbId: student.id,
-                      gameId,
-                      gameTitle: game.title,
-                      gameType: game.game_type,
-                      chapter: game.chapter,
-                      answers: result.answers,
-                      score: Math.round((result.score / 100) * game.points),
-                      totalScore: game.points,
-                      percentage: result.score,
-                      timeSpent: result.timeSpent,
-                    }),
-                  })
-                } catch (e) {
-                  console.error("Error saving volcano game attempt", e)
-                } finally {
-                  setSaving(false)
-                }
-              }
+              await saveGameAttempt({
+                answers: result.answers,
+                score: Math.round((result.score / 100) * game.points),
+                totalScore: game.points,
+                percentage: result.score,
+                timeSpent: result.timeSpent,
+              })
               setShowFeedback(true)
               setFeedbackMessage(
                 result.score === 100 ? "ممتاز! لقد أتقنت الإجابة" : result.score >= 70 ? "جيد جداً! حاولي مرة أخرى لتحسين النتيجة" : "حاولي مرة أخرى"
@@ -626,33 +628,13 @@ export default function GamePlayPage() {
               points: game.points,
             }}
             onComplete={async (result) => {
-              if (student) {
-                setSaving(true)
-                try {
-                  await fetch("/api/game-attempts", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      nickname: student.name,
-                      classCode: student.classCode,
-                      studentDbId: student.id,
-                      gameId,
-                      gameTitle: game.title,
-                      gameType: game.game_type,
-                      chapter: game.chapter,
-                      answers: result.answers,
-                      score: Math.round((result.score / 100) * game.points),
-                      totalScore: game.points,
-                      percentage: result.score,
-                      timeSpent: result.timeSpent,
-                    }),
-                  })
-                } catch (e) {
-                  console.error("Error saving faults game attempt", e)
-                } finally {
-                  setSaving(false)
-                }
-              }
+              await saveGameAttempt({
+                answers: result.answers,
+                score: Math.round((result.score / 100) * game.points),
+                totalScore: game.points,
+                percentage: result.score,
+                timeSpent: result.timeSpent,
+              })
               setShowFeedback(true)
               setFeedbackMessage(
                 result.score === 100 ? "ممتاز! أتقنتِ الصدوع الجيولوجية" : result.score >= 70 ? "جيد جداً! حاولي مرة أخرى لتحسين النتيجة" : "حاولي مرة أخرى"
@@ -677,33 +659,13 @@ export default function GamePlayPage() {
               points: game.points,
             }}
             onComplete={async (result) => {
-              if (student) {
-                setSaving(true)
-                try {
-                  await fetch("/api/game-attempts", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      nickname: student.name,
-                      classCode: student.classCode,
-                      studentDbId: student.id,
-                      gameId,
-                      gameTitle: game.title,
-                      gameType: game.game_type,
-                      chapter: game.chapter,
-                      answers: result.answers,
-                      score: Math.round((result.score / 100) * game.points),
-                      totalScore: game.points,
-                      percentage: result.score,
-                      timeSpent: result.timeSpent,
-                    }),
-                  })
-                } catch (e) {
-                  console.error("Error saving chemical bond lab attempt", e)
-                } finally {
-                  setSaving(false)
-                }
-              }
+              await saveGameAttempt({
+                answers: result.answers,
+                score: Math.round((result.score / 100) * game.points),
+                totalScore: game.points,
+                percentage: result.score,
+                timeSpent: result.timeSpent,
+              })
               setShowFeedback(true)
               setFeedbackMessage(
                 result.score === 100 ? "ممتاز! أتقنتِ مختبر الروابط الكيميائية" : result.score >= 70 ? "جيد جداً! حاولي مرة أخرى لتحسين النتيجة" : "حاولي مرة أخرى"
@@ -728,33 +690,13 @@ export default function GamePlayPage() {
               points: game.points,
             }}
             onComplete={async (result) => {
-              if (student) {
-                setSaving(true)
-                try {
-                  await fetch("/api/game-attempts", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      nickname: student.name,
-                      classCode: student.classCode,
-                      studentDbId: student.id,
-                      gameId,
-                      gameTitle: game.title,
-                      gameType: game.game_type,
-                      chapter: game.chapter,
-                      answers: result.answers,
-                      score: Math.round((result.score / 100) * game.points),
-                      totalScore: game.points,
-                      percentage: result.score,
-                      timeSpent: result.timeSpent,
-                    }),
-                  })
-                } catch (e) {
-                  console.error("Error saving valence patterns attempt", e)
-                } finally {
-                  setSaving(false)
-                }
-              }
+              await saveGameAttempt({
+                answers: result.answers,
+                score: Math.round((result.score / 100) * game.points),
+                totalScore: game.points,
+                percentage: result.score,
+                timeSpent: result.timeSpent,
+              })
               setShowFeedback(true)
               setFeedbackMessage(
                 result.score === 100 ? "ممتاز! أتقنتِ سر العائلة الدورية" : result.score >= 70 ? "جيد جداً! حاولي مرة أخرى لتحسين النتيجة" : "حاولي مرة أخرى"
@@ -779,33 +721,13 @@ export default function GamePlayPage() {
               points: game.points,
             }}
             onComplete={async (result) => {
-              if (student) {
-                setSaving(true)
-                try {
-                  await fetch("/api/game-attempts", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      nickname: student.name,
-                      classCode: student.classCode,
-                      studentDbId: student.id,
-                      gameId,
-                      gameTitle: game.title,
-                      gameType: game.game_type,
-                      chapter: game.chapter,
-                      answers: result.answers,
-                      score: Math.round((result.score / 100) * game.points),
-                      totalScore: game.points,
-                      percentage: result.score,
-                      timeSpent: result.timeSpent,
-                    }),
-                  })
-                } catch (e) {
-                  console.error("Error saving atom electron map attempt", e)
-                } finally {
-                  setSaving(false)
-                }
-              }
+              await saveGameAttempt({
+                answers: result.answers,
+                score: Math.round((result.score / 100) * game.points),
+                totalScore: game.points,
+                percentage: result.score,
+                timeSpent: result.timeSpent,
+              })
               setShowFeedback(true)
               setFeedbackMessage(
                 result.score >= 90 ? "ممتاز! أتقنتِ خريطة إلكترونات الذرة" : result.score >= 70 ? "جيد جداً! راجعي التوزيع والتمثيل النقطي" : "حاولي مرة أخرى"

@@ -4,26 +4,55 @@ export const dynamic = "force-dynamic"
 
 import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
-import { SectionHeader } from "@/components/ui/section-header"
-import { SkillBadge } from "@/components/ui/skill-badge"
-import { ProgressCard } from "@/components/ui/progress-card"
 import { StudentAuthGuard, useStudentAuth } from "@/components/student"
-import { useStudentStore } from "@/store/student-store"
+import {
+  TOTAL_LEARNING_INDICATORS,
+  INDICATOR_COUNTS_BY_DOMAIN,
+} from "@/lib/data"
 
-const quickActions = [
-  { label: "محاكاة اختبار نافس", href: "/student/simulation/select", accent: "bg-primary-600" },
-  { label: "التدريب السريع", href: "/student/skills", accent: "bg-accent-500" },
-  { label: "مهاراتي", href: "/student/skills", accent: "bg-emerald-500" },
-  { label: "الألعاب التعليمية", href: "/student/games", accent: "bg-purple-500" },
+type MasteryRow = {
+  id: string
+  key: string
+  status: string
+  score: number | null
+  updatedAt: string
+}
+
+const DOMAINS = ["علوم الحياة", "العلوم الفيزيائية", "علوم الأرض والفضاء"] as const
+
+const tiles = [
+  {
+    label: "الاختبارات",
+    href: "/student/simulation/select",
+    description: "محاكاة اختبار نافس والاختبارات المعينة",
+    icon: "📋",
+    accent: "from-primary-600 to-primary-700",
+    border: "border-primary-200",
+    disabled: false,
+  },
+  {
+    label: "مهاراتي",
+    href: "/student/skills",
+    description: "نواتج التعلم وتقدمك",
+    icon: "📊",
+    accent: "from-emerald-600 to-emerald-700",
+    border: "border-emerald-200",
+    disabled: false,
+  },
+  {
+    label: "التدريب السريع",
+    href: "/student/games",
+    description: "ألعاب تعليمية مشتركة من المعلم — الجديدة والمنجزة",
+    icon: "⚡",
+    accent: "from-amber-500 to-amber-600",
+    border: "border-amber-200",
+    disabled: false,
+  },
 ]
-
-type SkillItem = { name: string; score: number; level: "متقنة" | "متوسطة" | "ضعيفة" }
 
 function StudentHomeContent() {
   const { student } = useStudentAuth()
-  const setStudent = useStudentStore((s) => s.setStudent)
-  const [mastery, setMastery] = useState<{ key: string; score: number | null; status: string }[]>([])
-  const [assignedTestsCount, setAssignedTestsCount] = useState(0)
+  const [mastery, setMastery] = useState<MasteryRow[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -31,221 +60,162 @@ function StudentHomeContent() {
       setLoading(false)
       return
     }
-    setLoading(true)
     fetch(`/api/student/mastery?studentId=${encodeURIComponent(student.id)}`, {
       cache: "no-store",
     })
       .then((res) => res.json())
-      .then((data) => {
-        setMastery(data.mastery || [])
-        if (data.student?.name?.trim() && (!student.name || !student.name.trim()) && student.id) {
-          setStudent({ ...student, name: data.student.name.trim() })
-        }
-      })
+      .then((data) => setMastery(data.mastery || []))
       .catch(() => setMastery([]))
       .finally(() => setLoading(false))
-  }, [student?.id, setStudent])
-
-  // جلب عدد الاختبارات المعينة من المعلمة (بدون كاش لظهور الاختبارات الجديدة)
-  useEffect(() => {
-    if (!student?.id) return
-    fetch(`/api/student/assigned-tests?studentId=${encodeURIComponent(student.id)}`, { cache: "no-store" })
-      .then((res) => res.json())
-      .then((data) => {
-        const ids = data.modelIds ?? []
-        setAssignedTestsCount(ids.length)
-      })
-      .catch(() => setAssignedTestsCount(0))
   }, [student?.id])
 
-  const quickSkills = useMemo((): SkillItem[] => {
-    const rows = mastery.filter((m) => m.key.startsWith("skill:"))
-    return rows.slice(0, 6).map((m) => {
-      const name = m.key.replace(/^skill:/, "")
-      const score = typeof m.score === "number" ? Math.round(m.score) : 0
-      const level: SkillItem["level"] =
-        score >= 80 ? "متقنة" : score >= 60 ? "متوسطة" : "ضعيفة"
-      return { name, score, level }
+  // إتقان المجالات الثلاثة (مفتاح skill:المجال) — مرتبط بمؤشرات نواتج التعلم الـ 166
+  const progressStats = useMemo(() => {
+    const totalIndicators = TOTAL_LEARNING_INDICATORS
+    const domainMastery = DOMAINS.reduce<Record<string, { status: string; score: number }>>(
+      (acc, domain) => {
+        const key = `skill:${domain}`
+        const row = mastery.find((m) => m.key === key)
+        const status = row?.status ?? "not_mastered"
+        const score = typeof row?.score === "number" ? row.score : 0
+        const isMastered = status === "mastered" || score >= 80
+        acc[domain] = { status: isMastered ? "mastered" : "not_mastered", score }
+        return acc
+      },
+      {}
+    )
+    let masteredIndicators = 0
+    DOMAINS.forEach((domain) => {
+      if (domainMastery[domain]?.status === "mastered") {
+        masteredIndicators += INDICATOR_COUNTS_BY_DOMAIN[domain] ?? 0
+      }
     })
+    const avgScore =
+      DOMAINS.length > 0
+        ? Math.round(
+            DOMAINS.reduce((s, d) => s + (domainMastery[d]?.score ?? 0), 0) / DOMAINS.length
+          )
+        : 0
+    const masteredPercent =
+      totalIndicators > 0
+        ? Math.round((masteredIndicators / totalIndicators) * 100)
+        : 0
+    return {
+      totalIndicators,
+      masteredIndicators,
+      avgScore,
+      masteredPercent,
+    }
   }, [mastery])
 
-  const avgScore = useMemo(() => {
-    if (quickSkills.length === 0) return null
-    const sum = quickSkills.reduce((a, s) => a + s.score, 0)
-    return Math.round(sum / quickSkills.length)
-  }, [quickSkills])
-
-  const readinessLabel =
-    avgScore === null
-      ? "ابدئي التدريب"
-      : avgScore >= 80
-        ? "متقدمة"
-        : avgScore >= 60
-          ? "متوسطة"
-          : "تحتاج دعم"
-
-  // عدد مجالات المهارات المعروفة (علوم الحياة، العلوم الفيزيائية، علوم الأرض والفضاء، جميع المجالات)
-  const SKILL_DOMAINS_COUNT = 4
-  // نسبة تغطية المجالات حسب نتائج الطالبة (كل مهارة لها سجل = من اختبارات/ألعاب)
-  const skillsFollowedPercent =
-    quickSkills.length > 0
-      ? Math.min(100, Math.round((quickSkills.length / SKILL_DOMAINS_COUNT) * 100))
-      : 0
-  const masteredCount = quickSkills.filter((s) => s.level === "متقنة").length
-  const masteredPercent =
-    quickSkills.length > 0 ? Math.round((masteredCount / quickSkills.length) * 100) : 0
-
   return (
-    <main className="space-y-6 p-3 sm:space-y-10 sm:p-4">
-      <header className="card bg-primary-600 text-white p-4 sm:p-6">
-        <div className="flex flex-col gap-4 sm:gap-6 md:flex-row md:items-center md:justify-between">
-          <div className="min-w-0">
-            <p className="text-sm opacity-80">
-              {student?.name?.trim() ? `مرحبا ${student.name.trim()}` : "مرحبا، أهلاً بكِ"}
-            </p>
-            <h1 className="text-xl font-bold sm:text-3xl">جاهزتك الحالية: {readinessLabel}</h1>
-            <p className="mt-2 text-white/80">
-              {quickSkills.length > 0
-                ? "استمري في التدريب عبر الألعاب التعليمية لتحسين مهاراتك."
-                : "ابدئي بالاختبارات والألعاب لرصد مهاراتك وتتبع تقدمك."}
-            </p>
-          </div>
-          <div className="rounded-3xl bg-white/10 px-6 py-4 text-center">
-            <p className="text-sm">متوسط المهارات المُسجّلة</p>
-            <p className="text-4xl font-bold">
-              {avgScore !== null ? `${avgScore}%` : "0%"}
-            </p>
-            <p className="text-emerald-200">
-              {quickSkills.length > 0
-                ? `${quickSkills.length} مهارة مُتابعة`
-                : "لا توجد مهارات مُسجّلة بعد"}
-            </p>
-          </div>
-        </div>
+    <main className="min-h-screen space-y-6 p-3 sm:space-y-8 sm:p-4">
+      {/* الشريط العلوي */}
+      <header className="card bg-gradient-to-r from-primary-600 to-primary-700 text-white p-4 shadow-lg sm:p-6">
+        <p className="text-sm opacity-90">
+          {student?.name?.trim() ? `مرحبا، ${student.name.trim()}` : "مرحبا، أهلاً بكِ"}
+        </p>
+        <h1 className="mt-1 text-xl font-bold sm:text-2xl">
+          منصة تدريب نافس — علوم ثالث متوسط
+        </h1>
+        <p className="mt-2 text-sm text-white/85">
+          اختاري من الخيارات أدناه لبدء التدريب أو متابعة تقدمك.
+        </p>
       </header>
 
-      {assignedTestsCount > 0 && (
-        <div className="rounded-2xl border border-primary-200 bg-primary-50 p-4 text-primary-800">
-          <p className="font-semibold">
-            لديك {assignedTestsCount} اختبار{assignedTestsCount > 1 ? "ات" : ""} معين من معلمتك.
-          </p>
-          <p className="mt-1 text-sm opacity-90">
-            ادخلي من &quot;محاكاة اختبار نافس&quot; أدناه لبدء الاختبار.
-          </p>
-        </div>
-      )}
-
-      <section>
-        <SectionHeader title="إجراءات سريعة" subtitle="اختاري ما يناسبك لبدء التدريب الآن" />
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4 md:grid-cols-4">
-          {quickActions.map((action) => (
-            <Link
-              key={action.label}
-              href={action.href}
-              className={`rounded-2xl sm:rounded-3xl border bg-white p-4 text-center font-semibold text-slate-900 shadow-soft transition hover:-translate-y-1 touch-manipulation sm:p-6 ${
-                assignedTestsCount > 0 && action.href === "/student/simulation/select"
-                  ? "border-primary-300 ring-2 ring-primary-200"
-                  : "border-slate-100"
-              }`}
-              style={{ boxShadow: "0 12px 20px rgba(15, 23, 42, 0.05)" }}
-            >
-              <span className={`badge mb-3 text-white ${action.accent}`}>
-                {assignedTestsCount > 0 && action.href === "/student/simulation/select" ? "اختبارات معينة" : "جاهزة"}
-              </span>
-              {action.label}
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <SectionHeader
-          title="ملف مهاراتي"
-          subtitle="تابعي مستوى كل مهارة ومعرفة الأنشطة المقترحة"
-          action={
-            <Link href="/student/skills" className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold">
-              عرض جميع المهارات
-            </Link>
-          }
-        />
+      {/* تقدمك — مرتبط بتحقيق مؤشرات نواتج التعلم (166 مؤشرًا في ثلاثة مجالات) */}
+      <section className="card border-primary-100 bg-white p-4 sm:p-6">
+        <h2 className="text-lg font-bold text-slate-900 sm:text-xl">تقدمك</h2>
+        <p className="mt-1 text-sm text-slate-500">
+          مؤشرات نواتج التعلم: علوم الحياة، العلوم الفيزيائية، علوم الأرض والفضاء
+        </p>
         {loading ? (
-          <div className="card py-8 text-center text-slate-500">جاري تحميل المهارات...</div>
-        ) : quickSkills.length > 0 ? (
-          <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4 md:grid-cols-3">
-            {quickSkills.map((skill) => (
-              <SkillBadge
-                key={skill.name}
-                label={skill.name}
-                value={skill.score}
-                level={skill.level}
-              />
-            ))}
-          </div>
+          <p className="mt-2 text-sm text-slate-500">جاري تحميل التقدم...</p>
         ) : (
-          <div className="card rounded-2xl border border-slate-200 bg-slate-50/50 py-8 text-center">
-            <p className="text-slate-600">لا توجد مهارات مسجّلة بعد.</p>
-            <p className="mt-1 text-sm text-slate-500">
-              ابدئي بالاختبارات أو الألعاب لرصد مستوى مهاراتك.
-            </p>
-            <Link
-              href="/student/simulation/select"
-              className="mt-4 inline-block rounded-2xl bg-primary-600 px-6 py-2 text-sm font-semibold text-white"
-            >
-              محاكاة اختبار نافس
-            </Link>
+          <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div className="rounded-2xl bg-primary-50 p-4 text-center">
+              <p className="text-2xl font-bold text-primary-700 sm:text-3xl">
+                {progressStats.totalIndicators}
+              </p>
+              <p className="mt-1 text-xs font-medium text-primary-600 sm:text-sm">
+                إجمالي المؤشرات
+              </p>
+            </div>
+            <div className="rounded-2xl bg-slate-50 p-4 text-center">
+              <p className="text-2xl font-bold text-slate-800 sm:text-3xl">
+                {progressStats.avgScore}%
+              </p>
+              <p className="mt-1 text-xs font-medium text-slate-600 sm:text-sm">
+                متوسط الإتقان
+              </p>
+            </div>
+            <div className="rounded-2xl bg-emerald-50 p-4 text-center">
+              <p className="text-2xl font-bold text-emerald-700 sm:text-3xl">
+                {progressStats.masteredIndicators}
+              </p>
+              <p className="mt-1 text-xs font-medium text-emerald-600 sm:text-sm">
+                مؤشرات متقنة
+              </p>
+            </div>
+            <div className="rounded-2xl bg-amber-50 p-4 text-center">
+              <p className="text-2xl font-bold text-amber-700 sm:text-3xl">
+                {progressStats.masteredPercent}%
+              </p>
+              <p className="mt-1 text-xs font-medium text-amber-600 sm:text-sm">
+                نسبة الإنجاز
+              </p>
+            </div>
           </div>
+        )}
+        {!loading && progressStats.masteredIndicators === 0 && (
+          <p className="mt-2 text-sm text-slate-500">
+            ابدئي بالاختبارات أو التدريب السريع لرصد تقدمك في مؤشرات نواتج التعلم.
+          </p>
         )}
       </section>
 
-      <section className="grid gap-6 md:grid-cols-[2fr_1fr]">
-        <div className="space-y-4">
-          <SectionHeader
-            title="الألعاب التعليمية"
-            subtitle="ابدئي من هنا واستمتعي بالتعلم"
-            action={
-              <Link href="/student/games" className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold">
-                عرض جميع الألعاب
-              </Link>
-            }
-          />
-          <div className="card bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200">
-            <div className="flex items-start gap-3">
-              <span className="text-3xl">🎮</span>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-slate-900">جاهزة للبدء</h3>
-                <p className="mt-1 text-sm text-slate-700">
-                  اختاري فصلًا ثم ابدئي اللعب. كل لعبة قصيرة وتساعدك على فهم الدرس بسرعة.
-                </p>
-                <Link
-                  href="/student/games"
-                  className="mt-4 inline-block rounded-2xl bg-purple-600 px-6 py-3 font-semibold text-white hover:bg-purple-700"
-                >
-                  ابدئي اللعب الآن
-                </Link>
-              </div>
+      {/* أربع مربعات */}
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+        {tiles.map((tile) =>
+          tile.disabled ? (
+            <div
+              key={tile.label}
+              className={`flex flex-col rounded-2xl border-2 border-slate-200 bg-slate-100 p-6 text-center opacity-75 sm:rounded-3xl sm:p-8 cursor-not-allowed`}
+            >
+              <span className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-300 text-2xl sm:h-16 sm:w-16 sm:text-3xl">
+                {tile.icon}
+              </span>
+              <h2 className="text-lg font-bold text-slate-500 sm:text-xl">
+                {tile.label}
+              </h2>
+              <p className="mt-2 text-sm text-slate-500">
+                {tile.description}
+              </p>
+              <p className="mt-2 text-xs font-semibold text-amber-600">
+                معطلة مؤقتاً
+              </p>
             </div>
-          </div>
-        </div>
-        <div className="space-y-4">
-          <SectionHeader
-            title="تقدمك"
-            subtitle="مستمد من نتائج الاختبارات والألعاب"
-          />
-          <ProgressCard
-            label="المهارات المُتابعة"
-            value={skillsFollowedPercent}
-          />
-          <ProgressCard
-            label="متوسط الإتقان"
-            value={avgScore !== null ? avgScore : 0}
-            accent="bg-accent-500"
-          />
-          <ProgressCard
-            label="المهارات المتقنة"
-            value={masteredPercent}
-            accent="bg-emerald-500"
-          />
-        </div>
+          ) : (
+            <Link
+              key={tile.label}
+              href={tile.href}
+              className={`group flex flex-col rounded-2xl border-2 bg-white p-6 text-center shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-xl sm:rounded-3xl sm:p-8 ${tile.border}`}
+            >
+              <span
+                className={`mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br text-2xl shadow-inner sm:h-16 sm:w-16 sm:text-3xl ${tile.accent}`}
+                style={{ filter: "brightness(1.05)" }}
+              >
+                {tile.icon}
+              </span>
+              <h2 className="text-lg font-bold text-slate-900 sm:text-xl">
+                {tile.label}
+              </h2>
+              <p className="mt-2 text-sm text-slate-600">
+                {tile.description}
+              </p>
+            </Link>
+          )
+        )}
       </section>
     </main>
   )
@@ -256,5 +226,5 @@ export default function StudentHome() {
     <StudentAuthGuard>
       <StudentHomeContent />
     </StudentAuthGuard>
-  );
+  )
 }

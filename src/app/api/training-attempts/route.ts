@@ -119,9 +119,10 @@ export async function POST(request: Request) {
       },
     })
 
-    // تحديث إتقان الطالبة (مبدئيًا: حسب الاختبار نفسه)
+    // تحديث إتقان الطالبة حسب الاختبار — قيم حقيقية تظهر في صفحة الطالبة (مهاراتي)
+    const status = percentage >= 80 ? "mastered" : "not_mastered"
+
     if (testModelId) {
-      const status = percentage >= 80 ? "mastered" : "not_mastered"
       await upsertMastery({
         studentDbId: student.id,
         key: `testModel:${testModelId}`,
@@ -130,23 +131,25 @@ export async function POST(request: Request) {
         sourceType: "training",
         sourceId: testModelId,
       })
+    }
 
-      // إن كان للاختبار skill (من DB أو من الجسم للنماذج الجاهزة)، سجله كمؤشر عام أيضًا
-      const model = await prisma.testModel.findUnique({
-        where: { id: testModelId },
-        select: { skill: true },
-      })
-      const skillToUse = model?.skill ?? (bodySkill?.trim() || null)
-      if (skillToUse) {
-        await upsertMastery({
-          studentDbId: student.id,
-          key: `skill:${skillToUse}`,
-          status,
-          score: percentage,
-          sourceType: "training",
-          sourceId: testModelId,
+    // ربط المهارة بقيم الطالبة الحقيقية: من نموذج الاختبار في DB أو من الجسم (محاكاة/نماذج جاهزة)
+    const model = testModelId
+      ? await prisma.testModel.findUnique({
+          where: { id: testModelId },
+          select: { skill: true },
         })
-      }
+      : null
+    const skillToUse = model?.skill ?? (bodySkill?.trim() || null)
+    if (skillToUse) {
+      await upsertMastery({
+        studentDbId: student.id,
+        key: `skill:${skillToUse}`,
+        status,
+        score: percentage,
+        sourceType: "training",
+        sourceId: testModelId || null,
+      })
     }
 
     return NextResponse.json(

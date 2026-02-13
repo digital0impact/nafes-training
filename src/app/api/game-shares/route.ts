@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const { gameId, shareToAll, studentIds, classId } = validationResult.data
+    let { gameId, shareToAll, studentIds, classId } = validationResult.data
 
     // إن تم إرسال classId: يجب أن يكون الفصل تابعًا للمعلم
     if (classId) {
@@ -47,19 +47,51 @@ export async function POST(request: Request) {
       }
     }
 
-    // إن تم إرسال studentIds: يجب أن تكون الطالبات ضمن فصول هذا المعلم
+    // إن تم إرسال studentIds: التحقق من أن الطالبات تابعات للمعلم، واستنتاج classId إن لزم
     if (studentIds && studentIds.length > 0) {
-      const count = await prisma.student.count({
-        where: {
-          id: { in: studentIds },
-          class: { userId: user.id },
-        },
+      const teacherClasses = await prisma.class.findMany({
+        where: { userId: user.id },
+        select: { id: true, code: true },
       })
-      if (count !== studentIds.length) {
+      if (teacherClasses.length === 0) {
+        return NextResponse.json(
+          { error: "لا يوجد فصول لديك. أنشئي فصلاً ثم أضيفي الطالبات قبل المشاركة." },
+          { status: 400 }
+        )
+      }
+      const teacherClassIds = teacherClasses.map((c) => c.id)
+      const teacherClassCodesSet = new Set(
+        teacherClasses.map((c) => c.code.toUpperCase().trim())
+      )
+
+      const studentsToCheck = await prisma.student.findMany({
+        where: { id: { in: studentIds } },
+        select: { id: true, classId: true, classCode: true },
+      })
+      const allBelongToTeacher = studentsToCheck.every(
+        (s) =>
+          (s.classId && teacherClassIds.includes(s.classId)) ||
+          (s.classCode &&
+            teacherClassCodesSet.has(String(s.classCode).toUpperCase().trim()))
+      )
+      if (!allBelongToTeacher || studentsToCheck.length !== studentIds.length) {
         return NextResponse.json(
           { error: "توجد طالبات غير تابعة لهذا المعلم ضمن القائمة" },
           { status: 400 }
         )
+      }
+      if (!classId && studentsToCheck.length > 0) {
+        const first = studentsToCheck[0]
+        if (first.classId) {
+          classId = first.classId
+        } else if (first.classCode) {
+          const cls = teacherClasses.find(
+            (c) =>
+              c.code.toUpperCase().trim() ===
+              String(first.classCode).toUpperCase().trim()
+          )
+          if (cls) classId = cls.id
+        }
       }
     }
 
@@ -110,9 +142,10 @@ export async function POST(request: Request) {
       { status: 201 }
     )
   } catch (error) {
+    const message = error instanceof Error ? error.message : "حدث خطأ غير متوقع"
     console.error("Error sharing game:", error)
     return NextResponse.json(
-      { error: "حدث خطأ أثناء مشاركة اللعبة" },
+      { error: "حدث خطأ أثناء مشاركة اللعبة", details: message },
       { status: 500 }
     )
   }

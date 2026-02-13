@@ -19,7 +19,7 @@ export const VOLCANO_TYPES: VolcanoTypeData[] = [
     example_location: "هاواي، الولايات المتحدة",
     difficulty: "easy",
     level: "standard",
-    imagePath: "/images/activities/بركان درعي.gif",
+    imagePath: "/images/activities/انواع البراكين/بركان درعي.gif",
     matchCharacteristic: "تدفقات لابة سائلة",
   },
   {
@@ -36,7 +36,7 @@ export const VOLCANO_TYPES: VolcanoTypeData[] = [
     example_location: "ولاية واشنطن، الولايات المتحدة",
     difficulty: "medium",
     level: "standard",
-    imagePath: "/images/activities/بركان مخروطي.gif",
+    imagePath: "/images/activities/انواع البراكين/بركان مخروطي.gif",
     matchCharacteristic: "انفجارات عنيفة",
   },
   {
@@ -53,7 +53,7 @@ export const VOLCANO_TYPES: VolcanoTypeData[] = [
     example_location: "إيطاليا",
     difficulty: "medium",
     level: "standard",
-    imagePath: "/images/activities/بركان مركب.gif",
+    imagePath: "/images/activities/انواع البراكين/بركان مركب.gif",
     matchCharacteristic: "طبقات من الرماد واللابة",
   },
   {
@@ -70,7 +70,7 @@ export const VOLCANO_TYPES: VolcanoTypeData[] = [
     example_location: "آيسلندا",
     difficulty: "hard",
     level: "advanced",
-    imagePath: "/images/activities/ثوران الشقوق.gif",
+    imagePath: "/images/activities/انواع البراكين/ثوران الشقوق.gif",
     matchCharacteristic: "خروج الحمم من شقوق طويلة",
   },
 ]

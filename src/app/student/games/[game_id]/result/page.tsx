@@ -211,7 +211,7 @@ export default function GameResultPage() {
               </button>
             )}
             <Link
-              href="/student/games"
+              href="/student/games?tab=completed"
               className="w-full text-center rounded-2xl bg-slate-100 py-3 font-semibold text-slate-700 hover:bg-slate-200 transition"
             >
               العودة إلى قائمة الألعاب

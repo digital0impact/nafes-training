@@ -252,13 +252,15 @@ export default function TeacherGamesPage() {
         closeShareModal()
         setTimeout(() => setMessage(null), 3000)
       } else {
-        const data = await response.json()
-        setMessage({ type: "error", text: data.error || "حدث خطأ أثناء مشاركة اللعبة" })
-        setTimeout(() => setMessage(null), 3000)
+        const data = await response.json().catch(() => ({}))
+        const text = data.error || "حدث خطأ أثناء مشاركة اللعبة"
+        const details = data.details ? ` (${data.details})` : ""
+        setMessage({ type: "error", text: text + details })
+        setTimeout(() => setMessage(null), 5000)
       }
     } catch (error) {
       console.error("Error sharing game:", error)
-      setMessage({ type: "error", text: "حدث خطأ أثناء مشاركة اللعبة" })
+      setMessage({ type: "error", text: "حدث خطأ أثناء مشاركة اللعبة. تحققي من الاتصال وحاولي مرة أخرى." })
       setTimeout(() => setMessage(null), 3000)
     } finally {
       setSharing(false)
