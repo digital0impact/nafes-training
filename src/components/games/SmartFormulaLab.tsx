@@ -497,13 +497,17 @@ export default function SmartFormulaLab({ gameData, game, onComplete }: SmartFor
                     const raw = e.target.value
                     const v = raw === "" ? undefined : parseInt(raw, 10)
                     const num = typeof v === "number" && !isNaN(v) ? v : undefined
-                    setLevel3Answers((prev) => ({
-                      ...prev,
-                      [q.id]: {
-                        ...prev[q.id],
-                        atomCounts: { ...(prev[q.id]?.atomCounts ?? {}), [a.symbol]: num },
-                      },
-                    }))
+                    setLevel3Answers((prev) => {
+                      const prevEntry = prev[q.id]
+                      const prevCounts = prevEntry?.atomCounts ?? {}
+                      const nextCounts: Record<string, number> = { ...prevCounts }
+                      if (num !== undefined) nextCounts[a.symbol] = num
+                      else delete nextCounts[a.symbol]
+                      return {
+                        ...prev,
+                        [q.id]: { ...prevEntry, atomCounts: nextCounts },
+                      }
+                    })
                   }}
                   disabled={level3Submitted}
                   className="w-20 rounded-lg border-2 border-slate-200 px-2 py-1 text-center"
