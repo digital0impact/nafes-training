@@ -41,6 +41,10 @@ export type GameType =
   | "chemical_bond_lab"
   | "valence_electron_patterns"
   | "atom_electron_map"
+  | "smart_formula_lab"
+  | "chemical_reactions_energy_lab"
+  | "reaction_rates_lab"
+  | "plate_tectonics_journey"
 
 // ============================================
 // واجهات لعبة الاختيار من متعدد (Multiple Choice)
@@ -409,6 +413,26 @@ export interface AtomElectronMapGameData {
   type: "atom_electron_map"
 }
 
+/** بيانات لعبة مختبر الصيغ الذكية – أيونات، جزيئات، مركبات */
+export interface SmartFormulaLabGameData {
+  type: "smart_formula_lab"
+}
+
+/** بيانات لعبة مختبر التفاعلات والطاقة – تفاعلات كيميائية، حفظ الكتلة، تغيّر الطاقة */
+export interface ChemicalReactionsEnergyLabGameData {
+  type: "chemical_reactions_energy_lab"
+}
+
+/** بيانات لعبة سرعة التفاعلات وطاقة التنشيط والمحفزات */
+export interface ReactionRatesLabGameData {
+  type: "reaction_rates_lab"
+}
+
+/** بيانات لعبة رحلة في الصفائح التكتونية – نظرية الصفائح وحركتها */
+export interface PlateTectonicsJourneyGameData {
+  type: "plate_tectonics_journey"
+}
+
 // ============================================
 // واجهة موحدة لبيانات الألعاب
 // ============================================
@@ -431,6 +455,10 @@ export type GameData =
   | ChemicalBondLabGameData
   | ValenceElectronPatternsGameData
   | AtomElectronMapGameData
+  | SmartFormulaLabGameData
+  | ChemicalReactionsEnergyLabGameData
+  | ReactionRatesLabGameData
+  | PlateTectonicsJourneyGameData
 
 // ============================================
 // واجهات إضافية للبيانات المعقدة
@@ -622,6 +650,22 @@ export function isAtomElectronMapGame(data: GameData): data is AtomElectronMapGa
   return data.type === "atom_electron_map"
 }
 
+export function isSmartFormulaLabGame(data: GameData): data is SmartFormulaLabGameData {
+  return data.type === "smart_formula_lab"
+}
+
+export function isChemicalReactionsEnergyLabGame(data: GameData): data is ChemicalReactionsEnergyLabGameData {
+  return data.type === "chemical_reactions_energy_lab"
+}
+
+export function isReactionRatesLabGame(data: GameData): data is ReactionRatesLabGameData {
+  return data.type === "reaction_rates_lab"
+}
+
+export function isPlateTectonicsJourneyGame(data: GameData): data is PlateTectonicsJourneyGameData {
+  return data.type === "plate_tectonics_journey"
+}
+
 // ============================================
 // Helper Types
 // ============================================
@@ -644,6 +688,10 @@ export type GameDataByType<T extends GameType> =
   T extends "chemical_bond_lab" ? ChemicalBondLabGameData :
   T extends "valence_electron_patterns" ? ValenceElectronPatternsGameData :
   T extends "atom_electron_map" ? AtomElectronMapGameData :
+  T extends "smart_formula_lab" ? SmartFormulaLabGameData :
+  T extends "chemical_reactions_energy_lab" ? ChemicalReactionsEnergyLabGameData :
+  T extends "reaction_rates_lab" ? ReactionRatesLabGameData :
+  T extends "plate_tectonics_journey" ? PlateTectonicsJourneyGameData :
   never
 
 /**
@@ -664,4 +712,8 @@ export type GameStateByType<T extends GameType> =
   T extends "chemical_bond_lab" ? Record<string, unknown> :
   T extends "valence_electron_patterns" ? Record<string, unknown> :
   T extends "atom_electron_map" ? Record<string, unknown> :
+  T extends "smart_formula_lab" ? Record<string, unknown> :
+  T extends "chemical_reactions_energy_lab" ? Record<string, unknown> :
+  T extends "reaction_rates_lab" ? Record<string, unknown> :
+  T extends "plate_tectonics_journey" ? Record<string, unknown> :
   never

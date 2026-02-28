@@ -14,6 +14,10 @@ import GeologicalFaultsGame from "@/components/games/GeologicalFaultsGame"
 import ChemicalBondLab from "@/components/games/ChemicalBondLab"
 import ValenceElectronPatterns from "@/components/games/ValenceElectronPatterns"
 import AtomElectronMap from "@/components/games/AtomElectronMap"
+import SmartFormulaLab from "@/components/games/SmartFormulaLab"
+import ChemicalReactionsEnergyLab from "@/components/games/ChemicalReactionsEnergyLab"
+import ReactionRatesLab from "@/components/games/ReactionRatesLab"
+import PlateTectonicsJourney from "@/components/games/PlateTectonicsJourney"
 
 type EducationalGame = {
   game_id: string
@@ -47,6 +51,7 @@ export default function TeacherGamesPage() {
   const [loadingStudents, setLoadingStudents] = useState(false)
   const [sharing, setSharing] = useState(false)
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
+  const [linkCopiedGameId, setLinkCopiedGameId] = useState<string | null>(null)
 
   const [previewData, setPreviewData] = useState<any>(null)
   const [submitted, setSubmitted] = useState(false)
@@ -184,6 +189,19 @@ export default function TeacherGamesPage() {
     setSelectedGame(null)
     setSelectedStudents(new Set())
     setShareToAll(false)
+  }
+
+  /** نسخ رابط اللعبة إلى الحافظة (للمشاركة كرابط) */
+  const copyGameLink = async (gameId: string) => {
+    const url = `${typeof window !== "undefined" ? window.location.origin : ""}/student/games/${gameId}/play`
+    try {
+      await navigator.clipboard.writeText(url)
+      setLinkCopiedGameId(gameId)
+      setMessage({ type: "success", text: "تم نسخ رابط اللعبة. يمكنك مشاركته مع الطالبات." })
+      setTimeout(() => setLinkCopiedGameId(null), 2000)
+    } catch {
+      setMessage({ type: "error", text: "تعذر نسخ الرابط. جرّبي تحديد الرابط ونسخه يدوياً." })
+    }
   }
 
   const fetchStudents = async () => {
@@ -440,18 +458,26 @@ export default function TeacherGamesPage() {
                       <span className="text-2xl">🎮</span>
                     </div>
                     <p className="text-xs text-slate-500">المستوى: {g.level} • النقاط: {g.points}</p>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => openPreview(g)}
-                        className="flex-1 rounded-2xl bg-purple-600 py-2.5 font-semibold text-white hover:bg-purple-700"
+                        className="flex-1 min-w-[120px] rounded-2xl bg-purple-600 py-2.5 font-semibold text-white hover:bg-purple-700"
                       >
                         معاينة اللعبة
                       </button>
                       <button
                         onClick={() => openShareModal(g)}
-                        className="flex-1 rounded-2xl bg-emerald-600 py-2.5 font-semibold text-white hover:bg-emerald-700"
+                        className="flex-1 min-w-[120px] rounded-2xl bg-emerald-600 py-2.5 font-semibold text-white hover:bg-emerald-700"
                       >
                         مشاركة اللعبة
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => copyGameLink(g.game_id)}
+                        className="flex-1 min-w-[120px] rounded-2xl border-2 border-slate-300 bg-white py-2.5 font-semibold text-slate-700 hover:bg-slate-50"
+                        title="نسخ رابط اللعبة لمشاركته"
+                      >
+                        {linkCopiedGameId === g.game_id ? "✓ تم النسخ" : "نسخ الرابط"}
                       </button>
                     </div>
                   </div>
@@ -644,6 +670,118 @@ export default function TeacherGamesPage() {
                         </div>
                       ) : (
                         <AtomElectronMap
+                          gameData={previewData}
+                          game={{
+                            game_id: selectedGame.game_id,
+                            title: selectedGame.title,
+                            chapter: selectedGame.chapter,
+                            objective: selectedGame.objective,
+                            points: selectedGame.points,
+                          }}
+                          onComplete={(result) => {
+                            setScore(result.score)
+                            setSubmitted(true)
+                          }}
+                        />
+                      )
+                    ) : previewData.type === "smart_formula_lab" ? (
+                      submitted ? (
+                        <div className="rounded-xl border-2 border-emerald-200 p-6 text-center bg-emerald-50">
+                          <p className="font-semibold text-emerald-900">انتهيت من المعاينة</p>
+                          <p className="text-lg font-bold text-emerald-800 mt-2">النتيجة: {score}%</p>
+                          <button
+                            onClick={closePreview}
+                            className="mt-4 px-6 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700"
+                          >
+                            إغلاق
+                          </button>
+                        </div>
+                      ) : (
+                        <SmartFormulaLab
+                          gameData={previewData}
+                          game={{
+                            game_id: selectedGame.game_id,
+                            title: selectedGame.title,
+                            chapter: selectedGame.chapter,
+                            objective: selectedGame.objective,
+                            points: selectedGame.points,
+                          }}
+                          onComplete={(result) => {
+                            setScore(result.score)
+                            setSubmitted(true)
+                          }}
+                        />
+                      )
+                    ) : previewData.type === "chemical_reactions_energy_lab" ? (
+                      submitted ? (
+                        <div className="rounded-xl border-2 border-emerald-200 p-6 text-center bg-emerald-50">
+                          <p className="font-semibold text-emerald-900">انتهيت من المعاينة</p>
+                          <p className="text-lg font-bold text-emerald-800 mt-2">النتيجة: {score}%</p>
+                          <button
+                            onClick={closePreview}
+                            className="mt-4 px-6 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700"
+                          >
+                            إغلاق
+                          </button>
+                        </div>
+                      ) : (
+                        <ChemicalReactionsEnergyLab
+                          gameData={previewData}
+                          game={{
+                            game_id: selectedGame.game_id,
+                            title: selectedGame.title,
+                            chapter: selectedGame.chapter,
+                            objective: selectedGame.objective,
+                            points: selectedGame.points,
+                          }}
+                          onComplete={(result) => {
+                            setScore(result.score)
+                            setSubmitted(true)
+                          }}
+                        />
+                      )
+                    ) : previewData.type === "reaction_rates_lab" ? (
+                      submitted ? (
+                        <div className="rounded-xl border-2 border-emerald-200 p-6 text-center bg-emerald-50">
+                          <p className="font-semibold text-emerald-900">انتهيت من المعاينة</p>
+                          <p className="text-lg font-bold text-emerald-800 mt-2">النتيجة: {score}%</p>
+                          <button
+                            onClick={closePreview}
+                            className="mt-4 px-6 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700"
+                          >
+                            إغلاق
+                          </button>
+                        </div>
+                      ) : (
+                        <ReactionRatesLab
+                          gameData={previewData}
+                          game={{
+                            game_id: selectedGame.game_id,
+                            title: selectedGame.title,
+                            chapter: selectedGame.chapter,
+                            objective: selectedGame.objective,
+                            points: selectedGame.points,
+                          }}
+                          onComplete={(result) => {
+                            setScore(result.score)
+                            setSubmitted(true)
+                          }}
+                        />
+                      )
+                    ) : previewData.type === "plate_tectonics_journey" ? (
+                      submitted ? (
+                        <div className="rounded-xl border-2 border-emerald-200 p-6 text-center bg-emerald-50">
+                          <p className="font-semibold text-emerald-900">انتهيت من المعاينة</p>
+                          <p className="text-lg font-bold text-emerald-800 mt-2">النتيجة: {score}%</p>
+                          <button
+                            onClick={closePreview}
+                            className="mt-4 px-6 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700"
+                          >
+                            إغلاق
+                          </button>
+                        </div>
+                      ) : (
+                        <PlateTectonicsJourney
                           gameData={previewData}
                           game={{
                             game_id: selectedGame.game_id,
@@ -1001,6 +1139,19 @@ export default function TeacherGamesPage() {
                     {message.text}
                   </div>
                 )}
+
+                {/* مشاركة كرابط */}
+                <div className="rounded-xl border-2 border-slate-200 bg-slate-50 p-4">
+                  <p className="font-semibold text-slate-900 mb-2">مشاركة اللعبة كرابط</p>
+                  <p className="text-sm text-slate-600 mb-3">انسخي الرابط وشاركيه مع الطالبات (واتساب، Teams، إلخ).</p>
+                  <button
+                    type="button"
+                    onClick={() => selectedGame && copyGameLink(selectedGame.game_id)}
+                    className="w-full rounded-xl border-2 border-slate-300 bg-white py-2.5 font-semibold text-slate-700 hover:bg-slate-100"
+                  >
+                    {selectedGame && linkCopiedGameId === selectedGame.game_id ? "✓ تم نسخ الرابط" : "نسخ رابط اللعبة"}
+                  </button>
+                </div>
 
                 {/* Share Options */}
                 <div className="space-y-4">

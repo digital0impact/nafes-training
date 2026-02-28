@@ -47,7 +47,7 @@ export default function TeacherTestsPage() {
 
       {/* Tab Content */}
       {activeTab === "diagnostic" && (
-        <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* إنشاء اختبار جديد */}
           <div className="card group hover:shadow-lg transition-all cursor-pointer" onClick={() => window.location.href = '/teacher/tests/create-diagnostic'}>
             <div className="text-center space-y-4">
@@ -91,11 +91,33 @@ export default function TeacherTestsPage() {
               </div>
             </div>
           </div>
+
+          {/* الاختبارات المرسلة - تشخيصية */}
+          <div className="card group hover:shadow-lg transition-all cursor-pointer" onClick={() => window.location.href = '/teacher/tests/sent?type=diagnostic'}>
+            <div className="text-center space-y-4">
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-amber-100 group-hover:bg-amber-200 transition">
+                <svg className="h-10 w-10 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">الاختبارات المرسلة</h3>
+                <p className="mt-2 text-sm text-slate-600">
+                  الاختبارات التشخيصية التي تمت مشاركتها مع الطالبات
+                </p>
+              </div>
+              <div className="pt-4 border-t border-slate-100">
+                <span className="text-amber-600 font-semibold group-hover:text-amber-700">
+                  عرض المرسلة ←
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
       {activeTab === "simulation" && (
-        <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* إنشاء اختبار جديد */}
           <div className="card group hover:shadow-lg transition-all cursor-pointer" onClick={() => window.location.href = '/teacher/tests/create'}>
             <div className="text-center space-y-4">
@@ -135,6 +157,28 @@ export default function TeacherTestsPage() {
               <div className="pt-4 border-t border-slate-100">
                 <span className="text-emerald-600 font-semibold group-hover:text-emerald-700">
                   تصفح النماذج ←
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* الاختبارات المرسلة - محاكية */}
+          <div className="card group hover:shadow-lg transition-all cursor-pointer" onClick={() => window.location.href = '/teacher/tests/sent?type=simulation'}>
+            <div className="text-center space-y-4">
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-amber-100 group-hover:bg-amber-200 transition">
+                <svg className="h-10 w-10 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">الاختبارات المرسلة</h3>
+                <p className="mt-2 text-sm text-slate-600">
+                  الاختبارات المحاكية التي تمت مشاركتها مع الطالبات
+                </p>
+              </div>
+              <div className="pt-4 border-t border-slate-100">
+                <span className="text-amber-600 font-semibold group-hover:text-amber-700">
+                  عرض المرسلة ←
                 </span>
               </div>
             </div>

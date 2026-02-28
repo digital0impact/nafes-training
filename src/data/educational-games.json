@@ -63,6 +63,18 @@
       "points": 40
     },
     {
+      "game_id": "game_plate_tectonics_journey",
+      "chapter": "الفصل الثالث: الصفائح الأرضية",
+      "title": "رحلة في الصفائح التكتونية – Journey Through Tectonic Plates",
+      "game_type": "plate_tectonics_journey",
+      "learning_indicator": "تعريف نظرية الصفائح، مكونات الصفائح، صفائح قارية ومحيطية، الغلاف الصخري واللدن، حدود الصفائح (تقاربية، تباعدية، انزلاقية)، علاقة الحدود بالبراكين والزلازل، الوديان المتصدعة، أسباب حركة الصفائح",
+      "objective": "ستة مستويات: بنية الأرض، أنواع الصفائح، حدود الصفائح، خريطة الزلازل والبراكين، الوديان المتصدعة، لماذا تتحرك الصفائح",
+      "level": "متوسط",
+      "difficulty": 2,
+      "remedial": false,
+      "points": 40
+    },
+    {
       "game_id": "game_005",
       "chapter": "الفصل الثالث: الصفائح الأرضية",
       "title": "ربط حدود الصفائح بنتائجها",
@@ -171,76 +183,28 @@
       "points": 15
     },
     {
-      "game_id": "game_react_001",
+      "game_id": "game_chemical_reactions_lab",
       "chapter": "الفصل 8: التفاعلات الكيميائية",
-      "title": "موازنة المعادلات الكيميائية",
-      "game_type": "ordering",
-      "learning_indicator": "يوازن معادلات كيميائية بسيطة وفق قانون حفظ الكتلة من خلال ترتيب المعاملات",
-      "objective": "تطبيق قانون حفظ الكتلة في موازنة المعادلات",
-      "level": "صعب",
-      "difficulty": 3,
-      "remedial": false,
-      "points": 20
-    },
-    {
-      "game_id": "game_react_002",
-      "chapter": "الفصل 8: التفاعلات الكيميائية",
-      "title": "تمييز المواد المتفاعلة والناتجة",
-      "game_type": "drag_drop",
-      "learning_indicator": "يميز بين المواد المتفاعلة والمواد الناتجة في معادلة كيميائية معطاة",
-      "objective": "فهم بنية المعادلة الكيميائية وتمييز أجزائها",
-      "level": "سهل",
-      "difficulty": 1,
-      "remedial": true,
-      "points": 10
-    },
-    {
-      "game_id": "game_react_003",
-      "chapter": "الفصل 8: التفاعلات الكيميائية",
-      "title": "ربط المعادلة بالظاهرة",
-      "game_type": "multiple_choice",
-      "learning_indicator": "يربط التفاعلات الكيميائية بظواهر حياتية واقعية من خلال اختيار المعادلة المناسبة",
-      "objective": "ربط المفاهيم النظرية بالتطبيقات العملية",
+      "title": "مختبر التفاعلات والطاقة – Chemical Reactions & Energy Lab",
+      "game_type": "chemical_reactions_energy_lab",
+      "learning_indicator": "تفسير بيانات قبل وبعد التفاعل، أدلة التفاعل، المعادلات اللفظية والرمزية المتزنة، حفظ الكتلة، الطاقة الممتصة والمطلقة، التفاعلات الطاردة والماصة للحرارة، تمثيل الطاقة في المعادلة",
+      "objective": "خمسة مستويات: هل سيحدث التفاعل؟، أدلة التفاعل، موازنة المعادلة (حفظ الكتلة)، تغيّر الطاقة (طارد/ماص)، وضع الطاقة في المعادلة",
       "level": "متوسط",
       "difficulty": 2,
       "remedial": false,
-      "points": 15
+      "points": 35
     },
     {
-      "game_id": "game_react_004",
+      "game_id": "game_reaction_rates_lab",
       "chapter": "الفصل 8: التفاعلات الكيميائية",
-      "title": "تحديد العوامل المؤثرة في السرعة",
-      "game_type": "multiple_choice",
-      "learning_indicator": "يحدد العوامل المؤثرة في سرعة التفاعل الكيميائي من خلال تحليل السيناريوهات",
-      "objective": "فهم العوامل المختلفة التي تؤثر في سرعة التفاعلات",
+      "title": "مختبر سرعة التفاعلات – Reaction Rates, Activation Energy & Catalysts",
+      "game_type": "reaction_rates_lab",
+      "learning_indicator": "تعريف سرعة التفاعل وقياسها، التمييز بين التفاعل التلقائي وغير التلقائي، تحديد العوامل المؤثرة في السرعة (تركيز، حرارة، ضغط، مساحة سطح، محفزات)، طاقة التنشيط، تعريف المحفز والتمييز بين المحفز والمثبط",
+      "objective": "خمسة مستويات: تعريف سرعة التفاعل وقياسها، التلقائي وغير التلقائي، العوامل المؤثرة، طاقة التنشيط، المحفزات والتمييز",
       "level": "متوسط",
       "difficulty": 2,
       "remedial": false,
-      "points": 15
-    },
-    {
-      "game_id": "game_react_005",
-      "chapter": "الفصل 8: التفاعلات الكيميائية",
-      "title": "مقارنة سرعات التفاعلات",
-      "game_type": "matching",
-      "learning_indicator": "يقارن بين تفاعلين كيميائيين من حيث السرعة بناءً على العوامل المؤثرة",
-      "objective": "تحليل وتقييم العوامل المؤثرة في السرعة",
-      "level": "صعب",
-      "difficulty": 3,
-      "remedial": false,
-      "points": 20
-    },
-    {
-      "game_id": "game_react_006",
-      "chapter": "الفصل 8: التفاعلات الكيميائية",
-      "title": "اختيار طريقة زيادة السرعة",
-      "game_type": "multiple_choice",
-      "learning_indicator": "يستنتج الطريقة الأنسب لزيادة سرعة تفاعل كيميائي معطى",
-      "objective": "تطبيق المعرفة في حل مشكلات عملية",
-      "level": "صعب",
-      "difficulty": 3,
-      "remedial": false,
-      "points": 20
+      "points": 30
     },
     {
       "game_id": "game_motion_001",
@@ -625,6 +589,18 @@
       "difficulty": 2,
       "remedial": false,
       "points": 35
+    },
+    {
+      "game_id": "game_smart_formula_lab",
+      "chapter": "الفصل 7: البناء الذري والروابط الكيميائية",
+      "title": "مختبر الصيغ الذكية – Smart Formula Lab",
+      "game_type": "smart_formula_lab",
+      "learning_indicator": "يميز بين الأيون والجزيء والمركب، ويذكر أمثلة صحيحة (Na⁺، Cl⁻، O₂، H₂O، CO₂)، ويشرح معنى الصيغة الكيميائية من حيث نوع وعدد الذرات والشحنة إن وُجدت",
+      "objective": "التمييز بين أيون وجزيء ومركب، تصنيف الصيغ، قراءة الصيغة (عدد الذرات والشحنة)، واختيار الصيغة الصحيحة من الوصف",
+      "level": "متوسط",
+      "difficulty": 2,
+      "remedial": false,
+      "points": 30
     }
   ]
 }

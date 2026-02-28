@@ -14,6 +14,10 @@ import GeologicalFaultsGame from "@/components/games/GeologicalFaultsGame"
 import ChemicalBondLab from "@/components/games/ChemicalBondLab"
 import ValenceElectronPatterns from "@/components/games/ValenceElectronPatterns"
 import AtomElectronMap from "@/components/games/AtomElectronMap"
+import SmartFormulaLab from "@/components/games/SmartFormulaLab"
+import ChemicalReactionsEnergyLab from "@/components/games/ChemicalReactionsEnergyLab"
+import ReactionRatesLab from "@/components/games/ReactionRatesLab"
+import PlateTectonicsJourney from "@/components/games/PlateTectonicsJourney"
 
 type EducationalGame = {
   game_id: string
@@ -740,6 +744,130 @@ export default function GamePlayPage() {
           />
         )}
 
+        {/* لعبة مختبر الصيغ الذكية – Smart Formula Lab */}
+        {gameData.type === "smart_formula_lab" && (
+          <SmartFormulaLab
+            gameData={gameData}
+            game={{
+              game_id: game.game_id,
+              title: game.title,
+              chapter: game.chapter,
+              objective: game.objective,
+              points: game.points,
+            }}
+            onComplete={async (result) => {
+              await saveGameAttempt({
+                answers: (result.answers ?? {}) as Record<string, unknown>,
+                score: Math.round((result.score / 100) * game.points),
+                totalScore: game.points,
+                percentage: result.score,
+                timeSpent: result.timeSpent,
+              })
+              setShowFeedback(true)
+              setFeedbackMessage(
+                result.score === 100 ? "ممتاز! أتقنتِ مختبر الصيغ الذكية" : result.score >= 70 ? "جيد جداً! راجعي الأيون والجزيء والمركب" : "حاولي مرة أخرى"
+              )
+              setTimeout(() => {
+                setShowFeedback(false)
+                router.push(`/student/games/${gameId}/result?score=${result.score}`)
+              }, 2000)
+            }}
+          />
+        )}
+
+        {/* لعبة مختبر التفاعلات والطاقة – Chemical Reactions & Energy Lab */}
+        {gameData.type === "chemical_reactions_energy_lab" && (
+          <ChemicalReactionsEnergyLab
+            gameData={gameData}
+            game={{
+              game_id: game.game_id,
+              title: game.title,
+              chapter: game.chapter,
+              objective: game.objective,
+              points: game.points,
+            }}
+            onComplete={async (result) => {
+              await saveGameAttempt({
+                answers: (result.answers ?? {}) as Record<string, unknown>,
+                score: Math.round((result.score / 100) * game.points),
+                totalScore: game.points,
+                percentage: result.score,
+                timeSpent: result.timeSpent,
+              })
+              setShowFeedback(true)
+              setFeedbackMessage(
+                result.score === 100 ? "ممتاز! أتقنتِ مختبر التفاعلات والطاقة" : result.score >= 70 ? "جيد جداً! راجعي التفاعلات والطاقة" : "حاولي مرة أخرى"
+              )
+              setTimeout(() => {
+                setShowFeedback(false)
+                router.push(`/student/games/${gameId}/result?score=${result.score}`)
+              }, 2000)
+            }}
+          />
+        )}
+
+        {/* لعبة مختبر سرعة التفاعلات – Reaction Rates Lab */}
+        {gameData.type === "reaction_rates_lab" && (
+          <ReactionRatesLab
+            gameData={gameData}
+            game={{
+              game_id: game.game_id,
+              title: game.title,
+              chapter: game.chapter,
+              objective: game.objective,
+              points: game.points,
+            }}
+            onComplete={async (result) => {
+              await saveGameAttempt({
+                answers: (result.answers ?? {}) as Record<string, unknown>,
+                score: Math.round((result.score / 100) * game.points),
+                totalScore: game.points,
+                percentage: result.score,
+                timeSpent: result.timeSpent,
+              })
+              setShowFeedback(true)
+              setFeedbackMessage(
+                result.score >= 90 ? "ممتاز! أتقنتِ مختبر سرعة التفاعلات" : result.score >= 70 ? "جيد جداً! راجعي العوامل وطاقة التنشيط والمحفزات" : "حاولي مرة أخرى"
+              )
+              setTimeout(() => {
+                setShowFeedback(false)
+                router.push(`/student/games/${gameId}/result?score=${result.score}`)
+              }, 2000)
+            }}
+          />
+        )}
+
+        {/* لعبة رحلة في الصفائح التكتونية */}
+        {gameData.type === "plate_tectonics_journey" && (
+          <PlateTectonicsJourney
+            gameData={gameData}
+            game={{
+              game_id: game.game_id,
+              title: game.title,
+              chapter: game.chapter,
+              objective: game.objective,
+              points: game.points,
+            }}
+            onComplete={async (result) => {
+              await saveGameAttempt({
+                answers: (result.answers ?? {}) as Record<string, unknown>,
+                score: Math.round((result.score / 100) * game.points),
+                totalScore: game.points,
+                percentage: result.score,
+                timeSpent: result.timeSpent,
+              })
+              setShowFeedback(true)
+              setFeedbackMessage(
+                result.score >= 90 ? "ممتاز! أتقنتِ رحلة الصفائح التكتونية" : result.score >= 70 ? "جيد جداً! راجعي الحدود والزلازل والبراكين" : "حاولي مرة أخرى"
+              )
+              setTimeout(() => {
+                setShowFeedback(false)
+                router.push(`/student/games/${gameId}/result?score=${result.score}`)
+              }, 2000)
+            }}
+          />
+        )}
+
         {/* Game Area - Ordering */}
         {gameData.type === "ordering" && (
           <div className="card">
@@ -1211,7 +1339,7 @@ export default function GamePlayPage() {
         )}
 
         {/* Action Buttons - لا تظهر لألعاب متعددة المراحل التي تنتهي تلقائياً */}
-        {gameData.type !== "volcano_types" && gameData.type !== "geological_faults" && gameData.type !== "chemical_bond_lab" && gameData.type !== "valence_electron_patterns" && gameData.type !== "atom_electron_map" && (
+        {gameData.type !== "volcano_types" && gameData.type !== "geological_faults" && gameData.type !== "chemical_bond_lab" && gameData.type !== "valence_electron_patterns" && gameData.type !== "atom_electron_map" && gameData.type !== "smart_formula_lab" && gameData.type !== "chemical_reactions_energy_lab" && gameData.type !== "reaction_rates_lab" && gameData.type !== "plate_tectonics_journey" && (
         <div className="card">
           <div className="flex gap-3">
             <button

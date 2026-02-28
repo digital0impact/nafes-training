@@ -24,7 +24,11 @@ export type {
   FaultsGameData,
   ChemicalBondLabGameData,
   ValenceElectronPatternsGameData,
-  AtomElectronMapGameData
+  AtomElectronMapGameData,
+  SmartFormulaLabGameData,
+  ChemicalReactionsEnergyLabGameData,
+  ReactionRatesLabGameData,
+  PlateTectonicsJourneyGameData
 } from "@/types/games"
 
 import type { GameData } from "@/types/games"
@@ -95,6 +99,26 @@ const baseGamesData: Record<string, GameData> = {
   // game_electron_map_001: خريطة إلكترونات الذرة – التوزيع الإلكتروني والتمثيل النقطي (5 مراحل)
   game_electron_map_001: {
     type: "atom_electron_map",
+  } as GameData,
+
+  // game_smart_formula_lab: مختبر الصيغ الذكية – أيونات، جزيئات، مركبات (4 مستويات)
+  game_smart_formula_lab: {
+    type: "smart_formula_lab",
+  } as GameData,
+
+  // game_chemical_reactions_lab: مختبر التفاعلات والطاقة – 5 مستويات (حدوث التفاعل، أدلة، موازنة، الطاقة، تمثيل الطاقة)
+  game_chemical_reactions_lab: {
+    type: "chemical_reactions_energy_lab",
+  } as GameData,
+
+  // game_reaction_rates_lab: مختبر سرعة التفاعلات – سرعة التفاعل، طاقة التنشيط، المحفزات، العوامل المؤثرة
+  game_reaction_rates_lab: {
+    type: "reaction_rates_lab",
+  } as GameData,
+
+  // game_plate_tectonics_journey: رحلة في الصفائح التكتونية – نظرية الصفائح، الحدود، الزلازل والبراكين، الوديان المتصدعة
+  game_plate_tectonics_journey: {
+    type: "plate_tectonics_journey",
   } as GameData,
 
   // game_005: ربط حدود الصفائح بنتائجها (matching)
