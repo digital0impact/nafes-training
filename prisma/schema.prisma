@@ -33,7 +33,8 @@ model User {
   visitorComments  VisitorComment[]
   auditLogs        AuditLog[]
   teacherVisitors  VisitorProfile[]   @relation("VisitorProfileAsTeacher")
-  
+  visitorInvites   VisitorInvite[]
+
   @@map("users")
 }
 
@@ -41,7 +42,7 @@ model User {
 model VisitorProfile {
   id          String   @id @default(cuid())
   teacherId   String   // المعلم الذي منح الصلاحية
-  visitorId   String   // المستخدم بدور visitor_reviewer
+  visitorId   String   // المستخدم بدور visitor_reviewer أو من دعوة
   scope       String   // JSON: ["nafes_plan","activities","results","learning_indicators"]
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
@@ -54,6 +55,22 @@ model VisitorProfile {
   @@index([visitorId])
   @@index([teacherId])
   @@map("visitor_profiles")
+}
+
+// رابط دعوة زائر - المعلم ينشئه ويمنحه للزائر ليدخل ببريده الخاص
+model VisitorInvite {
+  id        String   @id @default(cuid())
+  teacherId String
+  token     String   @unique // رمز فريد في الرابط
+  scope     String   // JSON: نفس نطاق VisitorProfile
+  createdAt DateTime @default(now())
+  expiresAt DateTime? // انتهاء صلاحية الدعوة (اختياري)
+
+  teacher   User     @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@index([teacherId])
+  @@index([token])
+  @@map("visitor_invites")
 }
 
 // تعليق الزائر على عنصر (نشاط، اختبار، مؤشر نافس) - لا يمكن تعديله أو حذفه

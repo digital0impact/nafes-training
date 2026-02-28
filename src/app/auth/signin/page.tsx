@@ -132,7 +132,12 @@ export default function SignInPage() {
         return
       }
 
-      // تحديد الوجهة حسب دور المستخدم
+      // تحديد الوجهة: رابط next إن وُجد، وإلا حسب دور المستخدم
+      const nextUrl = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("next") : null
+      if (nextUrl && nextUrl.startsWith("/")) {
+        window.location.href = nextUrl
+        return
+      }
       const userRes = await fetch("/api/auth/user")
       const userData = await userRes.json().catch(() => ({}))
       if (!userRes.ok || !userData?.user) {

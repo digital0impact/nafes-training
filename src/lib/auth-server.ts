@@ -49,6 +49,7 @@ export async function getCurrentUser(): Promise<User | null> {
         name: true,
         role: true,
         subscriptionPlan: true,
+        isDisabled: true,
       },
     })
 
@@ -62,7 +63,7 @@ export async function getCurrentUser(): Promise<User | null> {
       name: dbUser.name,
       role: dbUser.role,
       subscriptionPlan: dbUser.subscriptionPlan,
-      isDisabled: false,
+      isDisabled: dbUser.isDisabled ?? false,
     }
   } catch (error) {
     console.error('Error getting current user:', error)
@@ -97,17 +98,18 @@ export async function requireTeacher(): Promise<User> {
 }
 
 /**
- * التحقق من أن المستخدم زائر (visitor_reviewer) ونشط
+ * التحقق من أن المستخدم لديه صلاحية زائر نشطة (إما دور visitor_reviewer أو مرتبط بدعوة)
  */
 export async function requireVisitor(): Promise<User> {
   const user = await requireAuth()
   
-  if (user.role !== 'visitor_reviewer') {
-    throw new Error('Forbidden: Visitor access required')
-  }
-  
   if (user.isDisabled) {
     throw new Error('Forbidden: Account disabled')
+  }
+
+  const profile = await getVisitorProfile(user.id)
+  if (!profile || !profile.isActive) {
+    throw new Error('Forbidden: Visitor access required')
   }
   
   return user

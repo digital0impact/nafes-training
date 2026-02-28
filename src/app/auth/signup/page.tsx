@@ -57,17 +57,18 @@ export default function SignUpPage() {
           message: errorMessage,
         })
       } else {
+        const nextParam = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("next") : null
+        const nextQ = nextParam ? `&next=${encodeURIComponent(nextParam)}` : ""
         // إذا كان يحتاج تأكيد البريد
         if (result.needsEmailConfirmation) {
           setFormError("root", {
             message: "تم إنشاء الحساب بنجاح. يرجى التحقق من بريدك الإلكتروني وتأكيد الحساب قبل تسجيل الدخول.",
           })
-          // الانتظار قليلاً ثم التوجيه
           setTimeout(() => {
-            router.push("/auth/signin?registered=true&needsConfirmation=true")
+            router.push(`/auth/signin?registered=true&needsConfirmation=true${nextQ}`)
           }, 3000)
         } else {
-          router.push("/auth/signin?registered=true")
+          router.push(`/auth/signin?registered=true${nextQ}`)
         }
       }
     } catch (err: any) {

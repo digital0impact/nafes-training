@@ -32,6 +32,38 @@ export default function TeacherVisitorsPage() {
   const [addSubmitting, setAddSubmitting] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [inviteUrl, setInviteUrl] = useState<string | null>(null)
+  const [creatingInvite, setCreatingInvite] = useState(false)
+  const [inviteError, setInviteError] = useState<string | null>(null)
+  const [linkCopied, setLinkCopied] = useState(false)
+
+  const createInviteLink = () => {
+    setCreatingInvite(true)
+    setInviteUrl(null)
+    setInviteError(null)
+    setSuccessMessage(null)
+    fetch("/api/teacher/visitors/invites", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ scope: ["nafes_plan", "activities", "results", "learning_indicators"] }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.error) throw new Error(data.error)
+        setInviteUrl(data.inviteUrl ?? null)
+        setSuccessMessage("تم إنشاء الرابط. شاركيه مع من تريدين؛ سيدخلن ببريدهن الإلكتروني الخاص.")
+      })
+      .catch((err) => setInviteError(err.message || "حدث خطأ"))
+      .finally(() => setCreatingInvite(false))
+  }
+
+  const copyInviteLink = () => {
+    if (!inviteUrl) return
+    navigator.clipboard.writeText(inviteUrl).then(() => {
+      setLinkCopied(true)
+      setTimeout(() => setLinkCopied(false), 2000)
+    })
+  }
 
   const fetchVisitors = () => {
     setLoading(true)
@@ -141,6 +173,43 @@ export default function TeacherVisitorsPage() {
           {successMessage}
         </div>
       )}
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <h2 className="mb-2 text-lg font-bold text-slate-900">رابط دعوة للزوار</h2>
+        <p className="mb-4 text-sm text-slate-600">
+          أنشئي رابطاً خاصاً وشاركيه مع من تريدين. من يفتح الرابط يمكنها الدخول والمعاينة والتعليق <strong>ببريدها الإلكتروني الخاص</strong> (تسجيل دخول أو إنشاء حساب).
+        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={createInviteLink}
+            disabled={creatingInvite}
+            className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50"
+          >
+            {creatingInvite ? "جاري الإنشاء..." : "إنشاء رابط دعوة"}
+          </button>
+        </div>
+        {inviteError && (
+          <p className="mt-3 text-sm text-red-600">{inviteError}</p>
+        )}
+        {inviteUrl && (
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <input
+              type="text"
+              readOnly
+              value={inviteUrl}
+              className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700"
+            />
+            <button
+              type="button"
+              onClick={copyInviteLink}
+              className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+            >
+              {linkCopied ? "تم النسخ ✓" : "نسخ الرابط"}
+            </button>
+          </div>
+        )}
+      </section>
 
       {showAdd && (
         <section className="rounded-2xl border border-slate-200 bg-white p-6">
