@@ -57,6 +57,11 @@ export async function middleware(req: NextRequest) {
 
   // حماية صفحات الزائر (Visitor/Reviewer) - يتطلب تسجيل دخول
   if (pathname.startsWith("/visitor")) {
+    // السماح بفتح صفحة تفعيل الدعوة بدون جلسة،
+    // لأن هذه الصفحة هي التي تحمل `token` وتُعيد توجيه المستخدم بعد تسجيل الدخول.
+    if (pathname.startsWith("/visitor/join")) {
+      return NextResponse.next();
+    }
     try {
       const response = NextResponse.next()
       const supabase = createServerClient(

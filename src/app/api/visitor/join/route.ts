@@ -41,6 +41,21 @@ export async function POST(request: Request) {
       },
     })
     if (existing) {
+      // تأكد أن صلاحية الزيارة مفعلة، وحدّث دور المستخدم ليتمكن من الدخول لواجهة الزائر
+      await prisma.visitorProfile.update({
+        where: {
+          teacherId_visitorId: { teacherId: invite.teacherId, visitorId: user.id },
+        },
+        data: { isActive: true },
+      })
+
+      if (user.role !== 'visitor_reviewer') {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { role: 'visitor_reviewer' },
+        })
+      }
+
       return NextResponse.json({
         message: 'أنتِ مرتبطة مسبقاً بصلاحية الزيارة لهذا المعلم',
         redirect: '/visitor',
@@ -55,6 +70,14 @@ export async function POST(request: Request) {
         isActive: true,
       },
     })
+
+    // تحديث دور المستخدم بعد تفعيل صلاحية الدعوة
+    if (user.role !== 'visitor_reviewer') {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { role: 'visitor_reviewer' },
+      })
+    }
 
     return NextResponse.json({
       message: 'تم تفعيل صلاحية الزيارة. يمكنكِ الآن المعاينة والتعليق.',
