@@ -1,25 +1,16 @@
 import { LearningOutcome } from "@/lib/data";
-
-// مسارات انفوجرافيك ناتج «الخلايا ووحدة بناء المخلوقات الحية» (مجلد الناتج الأول)
-const INFOGRAPHIC_CELL_THEORY = "/images/activities/الناتج الأول/نظرية الخلية.png";
-const INFOGRAPHIC_CELL_TYPES = "/images/activities/الناتج الأول/انواع الخلايا.png";
-const INFOGRAPHIC_CELL_ACTIVITIES = "/images/activities/الناتج الأول/انشطة الخلايا.png";
-// انفوجرافيك ناتج «تكامل أجهزة جسم الإنسان» (مجلد الناتج الثاني)
-const INFOGRAPHIC_BODY_1_2 = "/images/activities/الناتج الثاني/1-2.png";
-const INFOGRAPHIC_BODY_2_2 = "/images/activities/الناتج الثاني/2-2.png";
-const INFOGRAPHIC_BODY_2_3 = "/images/activities/الناتج الثاني/2-3.png";
-// انفوجرافيك ناتج «تصنيف المخلوقات الحية بنظام لينيوس» (مجلد الناتج الثالث)
-const INFOGRAPHIC_LINNAEUS_3_1 = "/images/activities/الناتج الثالث/3-1.png";
-const INFOGRAPHIC_LINNAEUS_3_2 = "/images/activities/الناتج الثالث/3-2.png";
-const INFOGRAPHIC_LINNAEUS_3_3 = "/images/activities/الناتج الثالث/3-3.png";
-// انفوجرافيك ناتج «انقسام الخلية وتكاثرها» (مجلد الناتج الرابع)
-const INFOGRAPHIC_CELL_DIVISION_4_1 = "/images/activities/الناتج الرابع/4-1.png";
+import {
+  getInfographicForLessonIndicator,
+  getInfographicsForLesson,
+} from "@/lib/learning-outcome-infographics";
 
 type Props = {
   item: LearningOutcome;
 };
 
 export function LearningOutcomeCard({ item }: Props) {
+  const infographics = getInfographicsForLesson(item.lesson);
+
   const getDomainColor = (domain: string) => {
     if (domain.includes("علوم الحياة")) return "bg-emerald-100 text-emerald-700";
     if (domain.includes("العلوم الفيزيائية")) return "bg-blue-100 text-blue-700";
@@ -27,29 +18,6 @@ export function LearningOutcomeCard({ item }: Props) {
     return "bg-slate-100 text-slate-700";
   };
 
-  const isCellTheoryOutcome = item.lesson === "الخلايا ووحدة بناء المخلوقات الحية";
-  const isBodyIntegrationOutcome = item.lesson === "تكامل أجهزة جسم الإنسان";
-  const isLinnaeusOutcome = item.lesson === "تصنيف المخلوقات الحية بنظام لينيوس";
-  const isCellDivisionOutcome = item.lesson === "انقسام الخلية وتكاثرها";
-  const getInfographicForIndicator = (index: number): { url: string; title: string } | null => {
-    if (isCellTheoryOutcome) {
-      if (index === 0 || index === 1) return { url: INFOGRAPHIC_CELL_THEORY, title: "انفوجرافيك نظرية الخلية" };
-      if (index === 2) return { url: INFOGRAPHIC_CELL_TYPES, title: "انفوجرافيك انواع الخلايا" };
-      if (index === 3) return { url: INFOGRAPHIC_CELL_ACTIVITIES, title: "انفوجرافيك انشطة الخلايا" };
-    }
-    if (isBodyIntegrationOutcome) {
-      if (index === 0) return { url: INFOGRAPHIC_BODY_1_2, title: "انفوجرافيك 1-2" };
-      if (index === 1) return { url: INFOGRAPHIC_BODY_2_2, title: "انفوجرافيك 2-2" };
-      if (index === 2) return { url: INFOGRAPHIC_BODY_2_3, title: "انفوجرافيك 2-3" };
-    }
-    if (isLinnaeusOutcome) {
-      if (index === 0) return { url: INFOGRAPHIC_LINNAEUS_3_1, title: "انفوجرافيك 3-1" };
-      if (index === 1) return { url: INFOGRAPHIC_LINNAEUS_3_2, title: "انفوجرافيك 3-2" };
-      if (index === 2) return { url: INFOGRAPHIC_LINNAEUS_3_3, title: "انفوجرافيك 3-3" };
-    }
-    if (isCellDivisionOutcome && index === 0) return { url: INFOGRAPHIC_CELL_DIVISION_4_1, title: "انفوجرافيك 4-1" };
-    return null;
-  };
 
   return (
     <div className="card space-y-4 border border-slate-50 hover:border-primary-200 transition">
@@ -72,7 +40,7 @@ export function LearningOutcomeCard({ item }: Props) {
         </div>
         <ul className="space-y-2 pr-5 text-sm leading-6 text-slate-700">
           {item.indicators.map((indicator, index) => {
-            const infographic = getInfographicForIndicator(index);
+            const infographic = getInfographicForLessonIndicator(item.lesson, index);
             return (
               <li key={index} className="flex gap-2 items-start">
                 <span className="flex items-center gap-1.5 mt-1.5 flex-shrink-0">
@@ -99,6 +67,38 @@ export function LearningOutcomeCard({ item }: Props) {
             );
           })}
         </ul>
+
+        {infographics.length > 0 && (
+          <div className="mt-4 border-t border-slate-200 pt-3">
+            <p className="mb-2 text-xs font-semibold text-slate-500">الإنفوجرافيك (مصغرات)</p>
+            <div className="grid grid-cols-2 gap-2">
+              {infographics.map((infographic, index) => (
+                <a
+                  key={`${item.lesson}-${infographic.url}-${index}`}
+                  href={infographic.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group overflow-hidden rounded-lg border border-slate-200 bg-white"
+                  title={infographic.title}
+                  aria-label={`عرض ${infographic.title}`}
+                >
+                  <img
+                    src={infographic.url}
+                    alt={infographic.title}
+                    className="h-20 w-full object-cover transition group-hover:scale-[1.02]"
+                    loading="lazy"
+                    onError={(event) => {
+                      event.currentTarget.style.display = "none";
+                    }}
+                  />
+                  <div className="border-t border-slate-200 px-2 py-1 text-center text-[11px] text-slate-600">
+                    {infographic.title}
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

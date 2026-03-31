@@ -15,6 +15,7 @@ import {
   type TestModel,
 } from "@/lib/test-models";
 import { type SimulationQuestion } from "@/lib/simulation-questions";
+import { getInfographicsForLesson } from "@/lib/learning-outcome-infographics";
 import { useStudentStore } from "@/store/student-store";
 
 export default function SimulationPage() {
@@ -241,6 +242,15 @@ export default function SimulationPage() {
     const score = calculateScore();
     const relatedOutcomes = getRelatedOutcomes(currentModel.id);
     const timeSpent = initialTime - timeRemaining;
+    const missingOutcomeSet = new Set(
+      questions
+        .filter((q) => answers[q.id] !== q.correctAnswer)
+        .map((q) => q.relatedOutcome)
+        .filter((outcome): outcome is string => Boolean(outcome))
+    );
+    const missingOutcomes = relatedOutcomes.filter((outcome) =>
+      missingOutcomeSet.has(outcome.lesson)
+    );
     
     return (
       <main className="space-y-6">
@@ -282,6 +292,8 @@ export default function SimulationPage() {
             {questions.map((q, index) => {
               const userAnswer = answers[q.id];
               const isCorrect = userAnswer === q.correctAnswer;
+              const linkedOutcome = q.relatedOutcome;
+              const infographics = getInfographicsForLesson(linkedOutcome);
               return (
                 <div
                   key={q.id}
@@ -305,10 +317,56 @@ export default function SimulationPage() {
                       </span>
                     </p>
                     {!isCorrect && (
-                      <p>
-                        <span className="font-semibold">الإجابة الصحيحة:</span>{" "}
-                        <span className="text-emerald-700">{q.correctAnswer}</span>
-                      </p>
+                      <>
+                        <p>
+                          <span className="font-semibold">الإجابة الصحيحة:</span>{" "}
+                          <span className="text-emerald-700">{q.correctAnswer}</span>
+                        </p>
+                        <p>
+                          <span className="font-semibold">المهارة المرتبطة:</span>{" "}
+                          <span className="rounded-md bg-primary-100 px-2 py-0.5 text-primary-700">
+                            {q.skill}
+                          </span>
+                        </p>
+                        {linkedOutcome && (
+                          <p>
+                            <span className="font-semibold">ناتج التعلم:</span>{" "}
+                            <span className="text-slate-700">{linkedOutcome}</span>
+                          </p>
+                        )}
+                        {infographics.length > 0 && (
+                          <div className="mt-3 rounded-xl border border-slate-200 bg-white p-3">
+                            <p className="mb-2 text-xs font-semibold text-slate-500">
+                              الإنفوجرافيك المرتبط بالمهارة
+                            </p>
+                            <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+                              {infographics.map((infographic, infographicIndex) => (
+                                <a
+                                  key={`${q.id}-${infographic.url}-${infographicIndex}`}
+                                  href={infographic.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="group block overflow-hidden rounded-lg border border-slate-200 bg-slate-50"
+                                  title={infographic.title}
+                                >
+                                  <img
+                                    src={infographic.url}
+                                    alt={infographic.title}
+                                    className="h-24 w-full object-cover transition group-hover:scale-[1.02]"
+                                    loading="lazy"
+                                    onError={(event) => {
+                                      event.currentTarget.style.display = "none";
+                                    }}
+                                  />
+                                  <div className="border-t border-slate-200 px-2 py-1 text-center text-[11px] text-slate-600">
+                                    {infographic.title}
+                                  </div>
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -317,12 +375,15 @@ export default function SimulationPage() {
           </div>
         </div>
 
-        {/* Related Learning Outcomes */}
-        {relatedOutcomes.length > 0 && (
+        {/* Missing Learning Outcomes Only */}
+        {missingOutcomes.length > 0 && (
           <div className="card">
-            <h3 className="mb-4 text-lg font-semibold text-slate-900">نواتج التعلم المرتبطة بهذا الاختبار</h3>
+            <h3 className="mb-4 text-lg font-semibold text-slate-900">نواتج التعلم التي تحتاج مراجعة</h3>
             <div className="grid gap-4 md:grid-cols-2">
-              {relatedOutcomes.map((outcome) => (
+              {missingOutcomes.map((outcome) => {
+                const outcomeInfographics = getInfographicsForLesson(outcome.lesson);
+                const firstInfographic = outcomeInfographics[0];
+                return (
                 <div key={outcome.lesson} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                   <div className="mb-2 flex items-center gap-2">
                     <span className="badge bg-primary-100 text-primary-700">{outcome.domain}</span>
@@ -330,8 +391,24 @@ export default function SimulationPage() {
                   </div>
                   <h4 className="font-semibold text-slate-900">{outcome.lesson}</h4>
                   <p className="mt-1 text-sm text-slate-600">{outcome.outcome}</p>
+                  {firstInfographic && (
+                    <a
+                      href={firstInfographic.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 block overflow-hidden rounded-lg border border-slate-200 bg-white"
+                      title={firstInfographic.title}
+                    >
+                      <img
+                        src={firstInfographic.url}
+                        alt={firstInfographic.title}
+                        className="h-24 w-full object-cover"
+                        loading="lazy"
+                      />
+                    </a>
+                  )}
                 </div>
-              ))}
+              )})}
             </div>
           </div>
         )}
