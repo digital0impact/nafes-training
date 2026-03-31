@@ -45,7 +45,10 @@ export function decodeAnonVisitorSession(cookieValue?: string | null): AnonVisit
   if (parts.length !== 2) return null;
 
   const [payloadB64, sig] = parts;
-  const secret = getCookieSecret();
+
+  // في سياق القراءة (middleware)، إذا لم يكن السر مضبوطًا نرجع null بهدوء
+  const secret = process.env.NEXTAUTH_SECRET;
+  if (!secret) return null;
 
   const expectedSig = crypto
     .createHmac("sha256", secret)
