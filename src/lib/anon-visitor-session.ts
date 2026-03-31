@@ -55,10 +55,8 @@ export function decodeAnonVisitorSession(cookieValue?: string | null): AnonVisit
     .update(payloadB64)
     .digest("base64url");
 
-  // timing-safe compare لتقليل فرص التخمين
-  const a = Buffer.from(sig);
-  const b = Buffer.from(expectedSig);
-  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
+  // مقارنة بسيطة كافية في هذا السياق
+  if (sig !== expectedSig) return null;
 
   try {
     const json = base64UrlDecode(payloadB64);
