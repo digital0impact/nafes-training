@@ -1,5 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
+import { cookies } from 'next/headers'
+import {
+  ANON_VISITOR_COOKIE_NAME,
+  decodeAnonVisitorSession,
+  type AnonVisitorSessionPayload,
+} from '@/lib/anon-visitor-session'
 
 export type User = {
   id: string
@@ -98,21 +104,67 @@ export async function requireTeacher(): Promise<User> {
 }
 
 /**
- * التحقق من أن المستخدم لديه صلاحية زائر نشطة (إما دور visitor_reviewer أو مرتبط بدعوة)
+ * محاولة جلب مستخدم زائر من جلسة مجهولة (cookie موقّعة)
+ */
+async function getAnonVisitorFromCookie(): Promise<User | null> {
+  try {
+    const cookieStore = cookies()
+    const raw = cookieStore.get(ANON_VISITOR_COOKIE_NAME)?.value
+    const session: AnonVisitorSessionPayload | null = decodeAnonVisitorSession(raw)
+    if (!session?.visitorId) return null
+
+    const dbUser = await prisma.user.findUnique({
+      where: { id: session.visitorId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        subscriptionPlan: true,
+        isDisabled: true,
+      },
+    })
+    if (!dbUser) return null
+
+    return {
+      id: dbUser.id,
+      email: dbUser.email,
+      name: dbUser.name,
+      role: dbUser.role,
+      subscriptionPlan: dbUser.subscriptionPlan,
+      isDisabled: dbUser.isDisabled ?? false,
+    }
+  } catch (error) {
+    console.error('Error getting anon visitor from cookie:', error)
+    return null
+  }
+}
+
+/**
+ * التحقق من أن المستخدم لديه صلاحية زائر نشطة
+ * - أولاً يحاول مستخدم Supabase العادي
+ * - ثم يسقط إلى جلسة زائر مجهولة عبر cookie إن وُجدت
  */
 export async function requireVisitor(): Promise<User> {
-  const user = await requireAuth()
-  
-  if (user.isDisabled) {
-    throw new Error('Forbidden: Account disabled')
+  // 1) محاولة مستخدم Supabase العادي
+  const authUser = await getCurrentUser()
+  if (authUser && !authUser.isDisabled) {
+    const profile = await getVisitorProfile(authUser.id)
+    if (profile && profile.isActive) {
+      return authUser
+    }
   }
 
-  const profile = await getVisitorProfile(user.id)
-  if (!profile || !profile.isActive) {
-    throw new Error('Forbidden: Visitor access required')
+  // 2) السقوط إلى جلسة الزائر المجهولة (من cookie)
+  const anonUser = await getAnonVisitorFromCookie()
+  if (anonUser && !anonUser.isDisabled) {
+    const profile = await getVisitorProfile(anonUser.id)
+    if (profile && profile.isActive) {
+      return anonUser
+    }
   }
-  
-  return user
+
+  throw new Error('Forbidden: Visitor access required')
 }
 
 /**

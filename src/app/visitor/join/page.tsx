@@ -14,10 +14,11 @@ export default function VisitorJoinPage() {
   const [done, setDone] = useState(false)
 
   useEffect(() => {
-    if (!token || !user || joining || done) return
+    if (!token || joining || done) return
     setError(null)
     setJoining(true)
-    fetch("/api/visitor/join", {
+    const endpoint = user ? "/api/visitor/join" : "/api/visitor/anon-join"
+    fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token }),
@@ -56,36 +57,6 @@ export default function VisitorJoinPage() {
       <main className="flex min-h-screen items-center justify-center p-4 bg-slate-50">
         <div className="card max-w-md w-full p-8 text-center text-slate-600">
           جاري التحميل...
-        </div>
-      </main>
-    )
-  }
-
-  if (!user) {
-    const joinUrl = `/visitor/join?token=${encodeURIComponent(token)}`
-    const signinNext = `/auth/signin?next=${encodeURIComponent(joinUrl)}`
-    const signupNext = `/auth/signup?next=${encodeURIComponent(joinUrl)}`
-    return (
-      <main className="flex min-h-screen items-center justify-center p-4 bg-slate-50">
-        <div className="card max-w-md w-full p-6">
-          <h1 className="text-xl font-bold text-slate-900 text-center">دعوة للزيارة والمعاينة</h1>
-          <p className="mt-3 text-slate-600 text-center text-sm">
-            للدخول والمعاينة والتعليق، سجّلي الدخول أو أنشئي حساباً <strong>ببريدك الإلكتروني الخاص</strong>.
-          </p>
-          <div className="mt-6 flex flex-col gap-3">
-            <Link
-              href={signinNext}
-              className="rounded-lg bg-primary-600 px-4 py-3 text-center font-semibold text-white hover:bg-primary-700"
-            >
-              تسجيل الدخول
-            </Link>
-            <Link
-              href={signupNext}
-              className="rounded-lg border-2 border-primary-600 px-4 py-3 text-center font-semibold text-primary-600 hover:bg-primary-50"
-            >
-              إنشاء حساب جديد
-            </Link>
-          </div>
         </div>
       </main>
     )

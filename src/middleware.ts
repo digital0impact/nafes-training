@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { ANON_VISITOR_COOKIE_NAME, decodeAnonVisitorSession } from '@/lib/anon-visitor-session'
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
@@ -62,6 +63,14 @@ export async function middleware(req: NextRequest) {
     if (pathname.startsWith("/visitor/join")) {
       return NextResponse.next();
     }
+
+    // السماح بدخول مجهول إذا كان لدينا cookie موقّعة (من رابط الدعوة)
+    const anonCookie = req.cookies.get(ANON_VISITOR_COOKIE_NAME)?.value
+    const anonSession = decodeAnonVisitorSession(anonCookie)
+    if (anonSession?.visitorId) {
+      return NextResponse.next()
+    }
+
     try {
       const response = NextResponse.next()
       const supabase = createServerClient(
