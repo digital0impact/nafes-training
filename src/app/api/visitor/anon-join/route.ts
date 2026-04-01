@@ -59,7 +59,7 @@ export async function POST(request: Request) {
       },
     })
 
-    const sessionValue = encodeAnonVisitorSession({
+    const sessionValue = await encodeAnonVisitorSession({
       visitorId: anonUser.id,
       iat: Math.floor(Date.now() / 1000),
     })

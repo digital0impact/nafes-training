@@ -108,9 +108,9 @@ export async function requireTeacher(): Promise<User> {
  */
 async function getAnonVisitorFromCookie(): Promise<User | null> {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const raw = cookieStore.get(ANON_VISITOR_COOKIE_NAME)?.value
-    const session: AnonVisitorSessionPayload | null = decodeAnonVisitorSession(raw)
+    const session: AnonVisitorSessionPayload | null = await decodeAnonVisitorSession(raw)
     if (!session?.visitorId) return null
 
     const dbUser = await prisma.user.findUnique({

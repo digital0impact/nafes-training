@@ -66,7 +66,7 @@ export async function middleware(req: NextRequest) {
 
     // السماح بدخول مجهول إذا كان لدينا cookie موقّعة (من رابط الدعوة)
     const anonCookie = req.cookies.get(ANON_VISITOR_COOKIE_NAME)?.value
-    const anonSession = decodeAnonVisitorSession(anonCookie)
+    const anonSession = await decodeAnonVisitorSession(anonCookie)
     if (anonSession?.visitorId) {
       return NextResponse.next()
     }
