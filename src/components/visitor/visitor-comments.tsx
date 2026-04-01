@@ -24,7 +24,9 @@ export function VisitorComments({ targetType, targetId, targetLabel }: VisitorCo
 
   const loadComments = () => {
     setLoading(true)
-    fetch(`/api/visitor/comments?targetType=${encodeURIComponent(targetType)}&targetId=${encodeURIComponent(targetId)}`)
+    fetch(`/api/visitor/comments?targetType=${encodeURIComponent(targetType)}&targetId=${encodeURIComponent(targetId)}`, {
+      credentials: "include",
+    })
       .then((r) => r.json())
       .then((data) => {
         setComments(data.comments ?? [])
@@ -45,6 +47,7 @@ export function VisitorComments({ targetType, targetId, targetLabel }: VisitorCo
     fetch("/api/visitor/comments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({
         targetType,
         targetId,

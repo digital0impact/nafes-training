@@ -37,6 +37,12 @@ export async function GET() {
             percentage: true,
             completedAt: true,
             nickname: true,
+            studentDbId: true,
+            student: {
+              select: {
+                name: true,
+              },
+            },
           },
         })
 
@@ -49,25 +55,34 @@ export async function GET() {
         // إحصائيات حسب الطالب (الاسم المستعار)
         const studentStats = attempts.reduce(
           (acc, attempt) => {
-            if (!acc[attempt.nickname]) {
-              acc[attempt.nickname] = {
+            // Use stable student ID when available to avoid merging/splitting
+            // attempts by nickname changes or duplicate nicknames.
+            const studentKey =
+              attempt.studentDbId && attempt.studentDbId.trim().length > 0
+                ? `student:${attempt.studentDbId}`
+                : `nickname:${attempt.nickname}`
+            const displayName = attempt.student?.name || attempt.nickname
+
+            if (!acc[studentKey]) {
+              acc[studentKey] = {
                 nickname: attempt.nickname,
+                displayName,
                 attempts: 0,
                 totalScore: 0,
                 bestScore: 0,
                 lastAttempt: null as Date | null,
               }
             }
-            acc[attempt.nickname].attempts++
-            acc[attempt.nickname].totalScore += attempt.percentage
-            if (attempt.percentage > acc[attempt.nickname].bestScore) {
-              acc[attempt.nickname].bestScore = attempt.percentage
+            acc[studentKey].attempts++
+            acc[studentKey].totalScore += attempt.percentage
+            if (attempt.percentage > acc[studentKey].bestScore) {
+              acc[studentKey].bestScore = attempt.percentage
             }
             if (
-              !acc[attempt.nickname].lastAttempt ||
-              attempt.completedAt > acc[attempt.nickname].lastAttempt!
+              !acc[studentKey].lastAttempt ||
+              attempt.completedAt > acc[studentKey].lastAttempt!
             ) {
-              acc[attempt.nickname].lastAttempt = attempt.completedAt
+              acc[studentKey].lastAttempt = attempt.completedAt
             }
             return acc
           },
@@ -75,6 +90,7 @@ export async function GET() {
             string,
             {
               nickname: string
+              displayName: string
               attempts: number
               totalScore: number
               bestScore: number
@@ -84,7 +100,7 @@ export async function GET() {
         )
 
         const studentReports = Object.values(studentStats).map((stat) => ({
-          nickname: stat.nickname,
+          nickname: stat.displayName || stat.nickname,
           attempts: stat.attempts,
           averageScore: Math.round((stat.totalScore / stat.attempts) * 100) / 100,
           bestScore: stat.bestScore,

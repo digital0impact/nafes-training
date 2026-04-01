@@ -14,6 +14,7 @@ type VisitorProfile = {
   teacherName: string
   scope: string[]
   isActive: boolean
+  visitorName?: string
 }
 type OutcomesData = { outcomes: Array<{ week: string; period?: string; lesson: string; domain: string; outcome: string; indicators: string[] }> }
 type ActivitiesData = { activities: Array<{ id: string; title: string; description: string; duration: string; skill: string; targetLevel: string | null; type: string | null; createdAt: string }> }
@@ -48,23 +49,29 @@ export default function VisitorDashboard() {
   const [loadingTab, setLoadingTab] = useState(false)
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await fetch("/api/visitor/profile")
+    if (authLoading) return
+    let cancelled = false
+    setLoadingProfile(true)
+    fetch("/api/visitor/profile", { credentials: "include" })
+      .then(async (res) => {
+        if (cancelled) return
         if (res.ok) {
-          const data = await res.json()
+          const data = (await res.json()) as VisitorProfile
           setProfile(data)
         } else {
           setProfile(null)
         }
-      } catch {
-        setProfile(null)
-      } finally {
-        setLoadingProfile(false)
-      }
+      })
+      .catch(() => {
+        if (!cancelled) setProfile(null)
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingProfile(false)
+      })
+    return () => {
+      cancelled = true
     }
-    if (user?.role === "visitor_reviewer") fetchProfile()
-  }, [user?.role])
+  }, [authLoading])
 
   useEffect(() => {
     if (!profile || activeTab === "overview") return
@@ -81,7 +88,7 @@ export default function VisitorDashboard() {
       setLoadingTab(false)
       return
     }
-    fetch(url)
+    fetch(url, { credentials: "include" })
       .then((r) => r.json())
       .then((data) => {
         if (activeTab === "nafes_plan") setOutcomes(data)
@@ -99,7 +106,7 @@ export default function VisitorDashboard() {
     router.refresh()
   }
 
-  if (authLoading || (user && user.role === "visitor_reviewer" && loadingProfile)) {
+  if (authLoading || loadingProfile) {
     return (
       <main className="space-y-6 p-6">
         <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-600">
@@ -109,9 +116,23 @@ export default function VisitorDashboard() {
     )
   }
 
-  if (!user || user.role !== "visitor_reviewer") {
-    return null
+  if (!profile) {
+    return (
+      <main className="flex min-h-screen items-center justify-center p-6">
+        <div className="card max-w-md w-full p-6 text-center space-y-3">
+          <h1 className="text-lg font-bold text-slate-900">لا يمكن عرض لوحة الزائر</h1>
+          <p className="text-sm text-slate-600">
+            إما أن الجلسة انتهت أو أنك لم تفتحي رابط الدعوة بعد. افتحي الرابط الذي أرسله المعلم، أو سجّلي الدخول بحساب مرتبط بدعوة زائر.
+          </p>
+          <Link href="/auth/signin" className="inline-block text-primary-600 hover:underline text-sm font-semibold">
+            تسجيل الدخول
+          </Link>
+        </div>
+      </main>
+    )
   }
+
+  const displayName = profile.visitorName ?? (user?.role === "visitor_reviewer" ? user.name : null) ?? "زائر"
 
   return (
     <main className="min-h-screen space-y-4 p-3 sm:space-y-6 sm:p-6">
@@ -120,16 +141,22 @@ export default function VisitorDashboard() {
           <div className="min-w-0">
             <p className="text-sm text-slate-500">واجهة الزائر – مشاهدة وتعليق فقط</p>
             <h1 className="mt-1 text-xl font-bold text-slate-900 sm:text-2xl truncate">
-              مرحباً، {user.name}
+              مرحباً، {displayName}
             </h1>
           </div>
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="min-h-[44px] self-start rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-100 touch-manipulation"
-          >
-            تسجيل الخروج
-          </button>
+          {user ? (
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="min-h-[44px] self-start rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-100 touch-manipulation"
+            >
+              تسجيل الخروج
+            </button>
+          ) : (
+            <p className="text-xs text-slate-500 self-start max-w-[200px]">
+              زيارة بدون تسجيل دخول (جلسة من رابط الدعوة)
+            </p>
+          )}
         </div>
         <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2.5 text-sm text-amber-800 sm:px-4 sm:py-3">
           <strong>صلاحية مشاهدة وتعليق فقط.</strong> لا يمكنك تعديل أو حذف أو إضافة محتوى، أو رفع ملفات، أو الوصول إلى إعدادات الحساب أو إدارة الصفوف والطلاب.
