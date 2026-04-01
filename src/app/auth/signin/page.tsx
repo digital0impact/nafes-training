@@ -156,7 +156,14 @@ export default function SignInPage() {
       console.error("Sign in error:", err)
       let errorMessage = "حدث خطأ أثناء تسجيل الدخول"
       
-      if (err.message) {
+      if (
+        err instanceof TypeError &&
+        typeof err.message === "string" &&
+        err.message.includes("Failed to fetch")
+      ) {
+        errorMessage =
+          "تعذر الاتصال بخدمة تسجيل الدخول. تحققي من إعدادات Supabase في Vercel (NEXT_PUBLIC_SUPABASE_URL وNEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY أو NEXT_PUBLIC_SUPABASE_ANON_KEY)."
+      } else if (err.message) {
         errorMessage = err.message
       } else if (err instanceof Error) {
         errorMessage = err.message

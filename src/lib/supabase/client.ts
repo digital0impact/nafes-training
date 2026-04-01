@@ -22,33 +22,46 @@ export function createClient() {
   if (typeof window === 'undefined') {
     // إرجاع client وهمي أثناء SSR/Build
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || 'placeholder-key'
+    const supabaseAnonKey =
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+      'placeholder-key'
     return createBrowserClient(supabaseUrl, supabaseAnonKey)
   }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+  const supabaseAnonKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseAnonKey) {
     const missing = []
     if (!supabaseUrl) missing.push('NEXT_PUBLIC_SUPABASE_URL')
-    if (!supabaseAnonKey) missing.push('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY')
+    if (!supabaseAnonKey) {
+      missing.push(
+        'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY (or NEXT_PUBLIC_SUPABASE_ANON_KEY)'
+      )
+    }
     
     console.error(`Missing Supabase environment variables: ${missing.join(', ')}`)
-    // إرجاع client وهمي بدلاً من رمي خطأ
-    return createBrowserClient('https://placeholder.supabase.co', 'placeholder-key')
+    throw new Error(`إعدادات Supabase ناقصة: ${missing.join(', ')}`)
   }
 
-  // التحقق من صحة المفتاح (تحذير فقط، لا نرمي خطأ)
-  if (supabaseAnonKey === 'your-publishable-key-here' || 
-      supabaseAnonKey === 'your-key-here' ||
-      supabaseAnonKey.length < 40) {
-    console.warn('⚠️ مفتاح Supabase قد يكون غير صحيح. تحققي من ملف .env')
+  const keyLooksInvalid =
+    supabaseAnonKey === 'your-publishable-key-here' ||
+    supabaseAnonKey === 'your-key-here' ||
+    supabaseAnonKey === 'placeholder-key' ||
+    supabaseAnonKey.length < 40
+  if (keyLooksInvalid) {
+    throw new Error('مفتاح Supabase غير صحيح. تحققي من متغيرات البيئة في Vercel')
   }
 
-  // التحقق من صحة URL (تحذير فقط)
-  if (!supabaseUrl.startsWith('https://') || !supabaseUrl.includes('.supabase.co')) {
-    console.warn('⚠️ رابط Supabase قد يكون غير صحيح. تحققي من ملف .env')
+  const urlLooksInvalid =
+    !supabaseUrl.startsWith('https://') ||
+    !supabaseUrl.includes('.supabase.co') ||
+    supabaseUrl.includes('placeholder')
+  if (urlLooksInvalid) {
+    throw new Error('رابط Supabase غير صحيح. تحققي من NEXT_PUBLIC_SUPABASE_URL')
   }
 
   return createBrowserClient(supabaseUrl, supabaseAnonKey)
