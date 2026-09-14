@@ -104,7 +104,7 @@ npm run check-env
 npm run check-db
 
 # التحقق من DATABASE_URL
-npm run check-url
+npm run check-env
 ```
 
 ### 5️⃣ إعداد قاعدة البيانات
@@ -187,7 +187,7 @@ npm start
 **الحل:**
 ```bash
 # تحقق من DATABASE_URL
-npm run check-url
+npm run check-env
 
 # تحقق من الاتصال
 npm run check-db

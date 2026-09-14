@@ -14,6 +14,8 @@ export type User = {
   role: string
   subscriptionPlan?: string
   isDisabled?: boolean
+  schoolId?: string | null
+  schoolName?: string | null
 }
 
 /** نطاقات عرض الزائر التي يحددها المعلم */
@@ -56,6 +58,8 @@ export async function getCurrentUser(): Promise<User | null> {
         role: true,
         subscriptionPlan: true,
         isDisabled: true,
+        schoolId: true,
+        school: { select: { name: true } },
       },
     })
 
@@ -70,6 +74,8 @@ export async function getCurrentUser(): Promise<User | null> {
       role: dbUser.role,
       subscriptionPlan: dbUser.subscriptionPlan,
       isDisabled: dbUser.isDisabled ?? false,
+      schoolId: dbUser.schoolId,
+      schoolName: dbUser.school?.name ?? null,
     }
   } catch (error) {
     console.error('Error getting current user:', error)

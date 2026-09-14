@@ -5,7 +5,7 @@
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force
 
 # الانتقال إلى مجلد المشروع
-Set-Location $PSScriptRoot
+Set-Location (Join-Path $PSScriptRoot "..\..")
 
 # تشغيل التطبيق
 npm start

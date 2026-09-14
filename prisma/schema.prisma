@@ -20,10 +20,12 @@ model User {
   role            String    @default("teacher") // teacher, admin, visitor_reviewer
   subscriptionPlan String   @default("free") // free, premium
   isDisabled      Boolean   @default(false) // تعطيل حساب الزائر فوراً
+  schoolId        String?   // المدرسة التابعة لها المعلمة (اختياري: يدعم الاستخدام الشخصي والمؤسسي معاً)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  
+
   // العلاقات
+  school           School?  @relation(fields: [schoolId], references: [id], onDelete: SetNull)
   testModels       TestModel[]
   activities       Activity[]
   classes          Class[]
@@ -35,7 +37,24 @@ model User {
   teacherVisitors  VisitorProfile[]   @relation("VisitorProfileAsTeacher")
   visitorInvites   VisitorInvite[]
 
+  @@index([schoolId])
   @@map("users")
+}
+
+// نموذج المدرسة - يجمّع/يصنّف المعلمات التابعات لنفس المدرسة
+// (تجميع فقط حالياً، بدون دور "مشرفة مدرسة" أو صلاحيات خاصة بعد)
+model School {
+  id        String   @id @default(cuid())
+  name      String
+  city      String?
+  isActive  Boolean  @default(true) // لتعطيل مدرسة كاملة عند انتهاء التعاقد مثلاً
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // العلاقات
+  teachers  User[]
+
+  @@map("schools")
 }
 
 // صلاحية الزائر (ما يمكنه مشاهدته) - يحددها المعلم

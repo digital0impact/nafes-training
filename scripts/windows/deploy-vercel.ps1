@@ -1,7 +1,7 @@
 # نشر التغييرات على Vercel عبر الدفع إلى GitHub
 # شغّل من مجلد المشروع: .\deploy-vercel.ps1
 
-Set-Location $PSScriptRoot
+Set-Location (Join-Path $PSScriptRoot "..\..")
 
 Write-Host "=== حالة Git ===" -ForegroundColor Cyan
 git status --short

@@ -95,7 +95,7 @@ DATABASE_URL="postgresql://postgres.YOUR_PROJECT_REF:YOUR_PASSWORD@aws-0-us-east
 
 ### الطريقة 1: استخدام سكريبت التحقق
 ```powershell
-npm run check-url
+npm run check-env
 ```
 
 ### الطريقة 2: التحقق اليدوي

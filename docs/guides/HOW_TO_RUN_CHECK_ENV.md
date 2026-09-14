@@ -1,68 +1,44 @@
 # 🚀 كيفية تشغيل سكريبت التحقق من متغيرات البيئة
 
-## الطريقة 1: استخدام ملف Batch (الأسهل)
+## الطريقة 1: مباشرة من npm (الأسهل والموصى بها)
 
-### في CMD:
-```cmd
-check-env.bat
+```powershell
+npm run check-env
 ```
 
-### في PowerShell:
-```powershell
-.\check-env.bat
-```
+لإصلاح/إنشاء ملف `.env` تلقائياً قبل الفحص:
 
-أو:
 ```powershell
-cmd /c check-env.bat
+npm run fix-env
 ```
 
 ---
 
-## الطريقة 2: استخدام ملف PowerShell
+## الطريقة 2: استخدام ملف PowerShell المساعد
 
 ```powershell
-.\check-env.ps1
+.\scripts\windows\check-env.ps1
 ```
 
-إذا ظهرت رسالة Execution Policy:
+هذا الملف يضبط Execution Policy للجلسة الحالية تلقائياً، فلا داعي لتشغيل أي أمر إضافي.
+
+---
+
+## الطريقة 3: مباشرة باستخدام npx
+
 ```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force
-.\check-env.ps1
+npx tsx scripts/env/check-env.ts
 ```
 
 ---
 
-## الطريقة 3: مباشرة من npm
+## الطريقة 4: من CMD مباشرة
 
-```powershell
-npm run check-all-env
-```
-
----
-
-## الطريقة 4: مباشرة باستخدام npx
-
-```powershell
-npx tsx scripts/check-all-env.ts
-```
-
----
-
-## الطريقة 5: من CMD مباشرة
-
-افتحي **Command Prompt** (CMD) وليس PowerShell:
+افتحي **Command Prompt** (CMD) وليس PowerShell، وانتقلي إلى مجلد المشروع:
 
 ```cmd
 cd "C:\Users\hope-\Desktop\نافس\التطبيق\nafes-training"
-check-env.bat
-```
-
-أو:
-
-```cmd
-cd "C:\Users\hope-\Desktop\نافس\التطبيق\nafes-training"
-npx tsx scripts/check-all-env.ts
+npm run check-env
 ```
 
 ---
@@ -98,4 +74,4 @@ npx tsx scripts/check-all-env.ts
 
 ## المساعدة
 
-إذا استمرت المشاكل، راجعي ملف `ENV_VARIABLES_CHECK.md` للتحقق اليدوي من المتغيرات.
+إذا استمرت المشاكل، راجعي ملف [`ENV_VARIABLES_CHECK.md`](./ENV_VARIABLES_CHECK.md) للتحقق اليدوي من المتغيرات.
