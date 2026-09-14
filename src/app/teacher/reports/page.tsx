@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from "react"
 import { PageBackground } from "@/components/layout/page-background"
+import { AcademicYearBar } from "@/components/teacher/academic-year-bar"
 
 type StudentReport = {
   nickname: string
@@ -27,14 +28,17 @@ export default function ReportsPage() {
   const [reports, setReports] = useState<ClassReport[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedClass, setSelectedClass] = useState<string | null>(null)
+  const [viewYearId, setViewYearId] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchReports()
-  }, [])
+    fetchReports(viewYearId)
+  }, [viewYearId])
 
-  const fetchReports = async () => {
+  const fetchReports = async (yearId: string | null) => {
     try {
-      const response = await fetch("/api/reports")
+      setLoading(true)
+      const url = yearId ? `/api/reports?academicYearId=${yearId}` : "/api/reports"
+      const response = await fetch(url)
       if (response.ok) {
         const data = await response.json()
         setReports(data.reports || [])
@@ -79,6 +83,7 @@ export default function ReportsPage() {
     <main className="relative min-h-screen overflow-hidden bg-[#faf9f7]">
       <PageBackground />
       <div className="relative z-10 space-y-6 p-4 py-8">
+        <AcademicYearBar onYearChange={setViewYearId} />
         <header className="card bg-gradient-to-br from-white to-primary-50">
           <div className="mb-4">
             <p className="text-sm text-slate-500">تقارير مفصلة</p>

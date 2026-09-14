@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, type ChangeEvent } from "react"
 import Link from "next/link"
 import { SectionHeader } from "@/components/ui/section-header"
 import { PageBackground } from "@/components/layout/page-background"
+import { AcademicYearBar } from "@/components/teacher/academic-year-bar"
 
 type Student = {
   id: string
@@ -28,6 +29,7 @@ export default function StudentsPage() {
   const [activeTab, setActiveTab] = useState<TabType>("all")
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isImporting, setIsImporting] = useState(false)
+  const [viewYearId, setViewYearId] = useState<string | null>(null)
   const [formData, setFormData] = useState<Student & { password?: string; classId?: string }>({
     id: "",
     name: "",
@@ -36,15 +38,21 @@ export default function StudentsPage() {
     classId: ""
   })
 
-  // جلب الفصول والطالبات
+  // جلب الفصول والطالبات - يُعاد الجلب عند تغيير السنة الدراسية المعروضة
   useEffect(() => {
-    fetchClasses()
-    fetchStudents()
-  }, [])
+    fetchClasses(viewYearId)
+    fetchStudents(viewYearId)
+    // عند عرض أرشيف، لا معنى لتبويبي الإضافة/الاستيراد (للقراءة فقط)
+    if (viewYearId && (activeTab === "add" || activeTab === "import")) {
+      setActiveTab("all")
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewYearId])
 
-  const fetchClasses = async () => {
+  const fetchClasses = async (yearId: string | null) => {
     try {
-      const response = await fetch("/api/classes")
+      const url = yearId ? `/api/classes?academicYearId=${yearId}` : "/api/classes"
+      const response = await fetch(url)
       if (response.ok) {
         const data = await response.json()
         setClasses(data.classes || [])
@@ -54,9 +62,10 @@ export default function StudentsPage() {
     }
   }
 
-  const fetchStudents = async () => {
+  const fetchStudents = async (yearId: string | null) => {
     try {
-      const response = await fetch("/api/students")
+      const url = yearId ? `/api/students?academicYearId=${yearId}` : "/api/students"
+      const response = await fetch(url)
       if (response.ok) {
         const data = await response.json()
         setStudents(data.students || [])
@@ -130,7 +139,7 @@ export default function StudentsPage() {
           return
         }
 
-        await fetchStudents()
+        await fetchStudents(viewYearId)
         alert(
           `تم إنشاء حساب الطالبة بنجاح!\nرقم الطالبة: ${data.student?.studentId}\nكلمة المرور: ${data.password || "1234"}`
         )
@@ -162,7 +171,7 @@ export default function StudentsPage() {
           return
         }
 
-        await fetchStudents()
+        await fetchStudents(viewYearId)
         alert("تم تحديث بيانات الطالبة بنجاح")
         handleCancel()
         setActiveTab("all")
@@ -181,7 +190,7 @@ export default function StudentsPage() {
         })
         
         if (response.ok) {
-          await fetchStudents()
+          await fetchStudents(viewYearId)
         } else {
           alert("حدث خطأ أثناء حذف الطالبة")
         }
@@ -252,7 +261,7 @@ export default function StudentsPage() {
         }
 
         if (importedStudents.length > 0) {
-          await fetchStudents()
+          await fetchStudents(viewYearId)
           alert(
             `تم استيراد ${importedStudents.length} طالبة بنجاح!\nكلمة المرور الافتراضية للجميع: ${defaultPassword}`
           )
@@ -305,6 +314,12 @@ export default function StudentsPage() {
     <main className="relative min-h-screen overflow-x-hidden bg-[#faf9f7]">
       <PageBackground />
       <div className="relative z-10 space-y-4 p-3 py-6 sm:space-y-6 sm:p-4 sm:py-8">
+        <AcademicYearBar onYearChange={setViewYearId} />
+        {viewYearId && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            📁 تعرضين أرشيف سنة دراسية سابقة (للقراءة فقط). للإضافة، ارجعي لـ "السنة الحالية".
+          </div>
+        )}
         <div className="card bg-gradient-to-br from-white to-primary-50 p-4 sm:p-6">
           {/* Tabs - scroll on mobile */}
           <div className="flex gap-1 border-b border-primary-200 overflow-x-auto pb-px -mx-1 px-1">
@@ -321,29 +336,33 @@ export default function StudentsPage() {
             >
               جميع الطالبات ({students.length})
             </button>
-            <button
-              onClick={() => {
-                setActiveTab("add")
-                handleCancel()
-              }}
-              className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
-                activeTab === "add"
-                  ? "text-emerald-700 border-emerald-600"
-                  : "text-slate-500 border-transparent hover:text-emerald-600"
-              }`}
-            >
-              {editingId ? "تعديل طالبة" : "إضافة طالبة"}
-            </button>
-            <button
-              onClick={() => setActiveTab("import")}
-              className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
-                activeTab === "import"
-                  ? "text-blue-700 border-blue-600"
-                  : "text-slate-500 border-transparent hover:text-blue-600"
-              }`}
-            >
-              استيراد طالبات
-            </button>
+            {!viewYearId && (
+              <button
+                onClick={() => {
+                  setActiveTab("add")
+                  handleCancel()
+                }}
+                className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
+                  activeTab === "add"
+                    ? "text-emerald-700 border-emerald-600"
+                    : "text-slate-500 border-transparent hover:text-emerald-600"
+                }`}
+              >
+                {editingId ? "تعديل طالبة" : "إضافة طالبة"}
+              </button>
+            )}
+            {!viewYearId && (
+              <button
+                onClick={() => setActiveTab("import")}
+                className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${
+                  activeTab === "import"
+                    ? "text-blue-700 border-blue-600"
+                    : "text-slate-500 border-transparent hover:text-blue-600"
+                }`}
+              >
+                استيراد طالبات
+              </button>
+            )}
             <button
               onClick={() => setActiveTab("reports")}
               className={`min-h-[48px] flex-shrink-0 px-4 py-3 font-semibold transition-colors border-b-2 whitespace-nowrap touch-manipulation sm:px-6 ${

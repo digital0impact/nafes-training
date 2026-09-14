@@ -29,6 +29,7 @@ model User {
   testModels       TestModel[]
   activities       Activity[]
   classes          Class[]
+  academicYears    AcademicYear[]
   gameShares       GameShare[]
   testShares       TestShare[]
   visitorProfiles  VisitorProfile[]  @relation("VisitorProfileAsVisitor")
@@ -55,6 +56,27 @@ model School {
   teachers  User[]
 
   @@map("schools")
+}
+
+// السنة الدراسية لكل معلمة - تسمح ببدء سنة جديدة دون حذف بيانات السنوات
+// السابقة: الفصول القديمة تبقى مرتبطة بسنتها، والفصول الجديدة تُنسب تلقائياً
+// للسنة النشطة. سنة واحدة فقط تكون نشطة لكل معلمة في أي وقت.
+model AcademicYear {
+  id        String   @id @default(cuid())
+  label     String   // مثال: "1447هـ" أو "2025-2026"
+  userId    String   // المعلمة صاحبة السنة الدراسية
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // العلاقات
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classes   Class[]
+
+  @@unique([userId, label])
+  @@index([userId])
+  @@index([userId, isActive])
+  @@map("academic_years")
 }
 
 // صلاحية الزائر (ما يمكنه مشاهدته) - يحددها المعلم
@@ -178,16 +200,19 @@ model Class {
   name          String    // اسم الفصل (مثل علوم ثالث متوسط أ)
   grade         String    // الصف (مثل 3/1)
   userId        String    // المعلم الذي أنشأ الفصل
+  academicYearId String?  // السنة الدراسية (فارغ = فصل قديم من قبل تفعيل هذه الميزة)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  
+
   // العلاقات
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  academicYear  AcademicYear? @relation(fields: [academicYearId], references: [id], onDelete: SetNull)
   students      Student[]
   trainingAttempts TrainingAttempt[]
   gameAttempts  GameAttempt[]
   gameShares    GameShare[]
-  
+
+  @@index([academicYearId])
   @@map("classes")
 }
 

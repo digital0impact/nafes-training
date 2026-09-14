@@ -10,6 +10,7 @@ import Link from "next/link"
 import { PageBackground } from "@/components/layout/page-background"
 import { createClassSchema, type CreateClassInput } from "@/lib/validations"
 import { generateClassCode } from "@/lib/utils/class-code-generator"
+import { AcademicYearBar } from "@/components/teacher/academic-year-bar"
 
 type Class = {
   id: string
@@ -35,6 +36,7 @@ export default function ClassesPage() {
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [viewYearId, setViewYearId] = useState<string | null>(null)
 
   const {
     register,
@@ -48,14 +50,16 @@ export default function ClassesPage() {
     resolver: zodResolver(createClassSchema),
   })
 
-  // جلب الفصول
+  // جلب الفصول - يُعاد الجلب عند تغيير السنة الدراسية المعروضة
   useEffect(() => {
-    fetchClasses()
-  }, [])
+    fetchClasses(viewYearId)
+  }, [viewYearId])
 
-  const fetchClasses = async () => {
+  const fetchClasses = async (yearId: string | null) => {
     try {
-      const response = await fetch("/api/classes")
+      setLoading(true)
+      const url = yearId ? `/api/classes?academicYearId=${yearId}` : "/api/classes"
+      const response = await fetch(url)
       if (response.ok) {
         const data = await response.json()
         setClasses(data.classes || [])
@@ -87,7 +91,7 @@ export default function ClassesPage() {
           message: result.error || "حدث خطأ أثناء حفظ الفصل",
         })
       } else {
-        await fetchClasses()
+        await fetchClasses(viewYearId)
         reset()
         setShowForm(false)
         setEditingId(null)
@@ -118,7 +122,7 @@ export default function ClassesPage() {
       })
 
       if (response.ok) {
-        await fetchClasses()
+        await fetchClasses(viewYearId)
       } else {
         const result = await response.json()
         alert(result.error || "حدث خطأ أثناء حذف الفصل")
@@ -228,18 +232,26 @@ export default function ClassesPage() {
     <main className="relative min-h-screen overflow-hidden bg-[#faf9f7]">
       <PageBackground />
       <div className="relative z-10 space-y-6 p-4 py-8">
+        <AcademicYearBar onYearChange={setViewYearId} />
+        {viewYearId && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            📁 تعرضين أرشيف سنة دراسية سابقة (للقراءة فقط). للإضافة، ارجعي لـ "السنة الحالية".
+          </div>
+        )}
         <div className="card bg-white">
           <div className="mb-6 flex items-center justify-end">
-            <button
-              onClick={() => {
-                reset()
-                setEditingId(null)
-                setShowForm(true)
-              }}
-              className="rounded-2xl bg-emerald-500 px-6 py-3 font-semibold text-white hover:bg-emerald-600"
-            >
-              + إضافة فصل جديد
-            </button>
+            {!viewYearId && (
+              <button
+                onClick={() => {
+                  reset()
+                  setEditingId(null)
+                  setShowForm(true)
+                }}
+                className="rounded-2xl bg-emerald-500 px-6 py-3 font-semibold text-white hover:bg-emerald-600"
+              >
+                + إضافة فصل جديد
+              </button>
+            )}
           </div>
 
           {/* نموذج إضافة/تعديل فصل */}
@@ -383,20 +395,22 @@ export default function ClassesPage() {
                         الصف: {classData.grade}
                       </p>
                     </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEdit(classData)}
-                        className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                      >
-                        تعديل
-                      </button>
-                      <button
-                        onClick={() => handleDelete(classData.id)}
-                        className="rounded-lg border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
-                      >
-                        حذف
-                      </button>
-                    </div>
+                    {!viewYearId && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEdit(classData)}
+                          className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                        >
+                          تعديل
+                        </button>
+                        <button
+                          onClick={() => handleDelete(classData.id)}
+                          className="rounded-lg border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
+                        >
+                          حذف
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-3">
