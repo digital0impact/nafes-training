@@ -1,19 +1,29 @@
 import { NextResponse } from "next/server"
 import { requireTeacher } from "@/lib/auth-server"
 import { prisma } from "@/lib/prisma"
+import { currentYearClassFilter, getActiveAcademicYearId } from "@/lib/academic-year"
 
 /**
  * GET - جلب تقارير الفصول للمعلم
  * يعرض عدد المحاولات ومتوسط الدرجات لكل فصل
+ * Query: academicYearId (اختياري) لعرض تقارير سنة دراسية سابقة (أرشيف)
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const user = await requireTeacher()
 
-    // جلب جميع فصول المعلم
+    const { searchParams } = new URL(request.url)
+    const requestedYearId = searchParams.get("academicYearId")
+
+    const yearFilter = requestedYearId
+      ? { academicYearId: requestedYearId }
+      : currentYearClassFilter(await getActiveAcademicYearId(user.id))
+
+    // جلب فصول المعلم (السنة الحالية أو السنة المحددة)
     const classes = await prisma.class.findMany({
       where: {
         userId: user.id,
+        ...yearFilter,
       },
       include: {
         _count: {

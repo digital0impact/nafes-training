@@ -3,17 +3,27 @@ import { requireTeacher } from "@/lib/auth-server"
 import { prisma } from "@/lib/prisma"
 import { createClassSchema } from "@/lib/validations"
 import { generateUniqueClassCode } from "@/lib/utils/class-code-generator"
+import { currentYearClassFilter, getActiveAcademicYearId } from "@/lib/academic-year"
 
 /**
- * GET - جلب جميع فصول المعلم
+ * GET - جلب فصول المعلم
+ * Query: academicYearId (اختياري) لعرض سنة دراسية سابقة (أرشيف) بدلاً من السنة الحالية
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const user = await requireTeacher()
+
+    const { searchParams } = new URL(request.url)
+    const requestedYearId = searchParams.get("academicYearId")
+
+    const yearFilter = requestedYearId
+      ? { academicYearId: requestedYearId }
+      : currentYearClassFilter(await getActiveAcademicYearId(user.id))
 
     const classes = await prisma.class.findMany({
       where: {
         userId: user.id,
+        ...yearFilter,
       },
       include: {
         _count: {
@@ -89,13 +99,16 @@ export async function POST(request: Request) {
       }
     }
 
-    // إنشاء الفصل
+    // إنشاء الفصل - يُنسب تلقائياً للسنة الدراسية النشطة إن وُجدت
+    const activeYearId = await getActiveAcademicYearId(user.id)
+
     const newClass = await prisma.class.create({
       data: {
         name,
         grade,
         code: classCode,
         userId: user.id,
+        academicYearId: activeYearId,
       },
       include: {
         _count: {
