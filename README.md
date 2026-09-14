@@ -35,8 +35,8 @@ NEXTAUTH_URL=http://localhost:3000
 
 **للتحقق من الإعداد:**
 ```bash
-npm run check-url    # التحقق من DATABASE_URL
-npm run check-db     # اختبار الاتصال
+npm run check-env    # فحص شامل لملف .env (المتغيرات، DATABASE_URL، مفاتيح Supabase)
+npm run check-db     # اختبار الاتصال الفعلي بقاعدة البيانات
 ```
 
 ### 3. إعداد قاعدة البيانات
@@ -53,24 +53,16 @@ npm run check-db
 ### 5. تشغيل التطبيق
 
 #### في Windows PowerShell:
-إذا ظهرت رسالة خطأ عن Execution Policy، استخدمي أحد الحلول التالية:
+إذا ظهرت رسالة خطأ عن Execution Policy، استخدمي ملفات المساعدة في `scripts/windows/`:
 
-**الحل الأسهل:** استخدمي ملف `run-dev.bat` (انقرتي مرتين على الملف)
-
-**أو في PowerShell:**
 ```powershell
-.\run-dev.ps1
+.\scripts\windows\run-dev.ps1
 ```
 
-**أو في CMD:**
-```cmd
-run-dev.bat
-```
-
-**ملفات متاحة أخرى:**
-- `run-build.bat` / `run-build.ps1` - لبناء التطبيق
-- `run-start.bat` / `run-start.ps1` - لتشغيل التطبيق بعد البناء
-- `run-npm.ps1 <command>` - لتشغيل أي أمر npm
+**ملفات متاحة أخرى** (راجعي [`scripts/windows/README.md`](./scripts/windows/README.md) للتفاصيل):
+- `scripts\windows\run-build.ps1` - لبناء التطبيق
+- `scripts\windows\run-start.ps1` - لتشغيل التطبيق بعد البناء
+- `scripts\windows\run-npm.ps1 <command>` - لتشغيل أي أمر npm
 
 #### في Linux/Mac أو إذا لم تظهر مشكلة:
 ```bash
@@ -79,15 +71,17 @@ npm run dev
 
 ثم افتحي المتصفح على **http://localhost:3000**
 
-> 💡 **ملاحظة:** إذا واجهت مشكلة Execution Policy، راجعي ملف [FIX_EXECUTION_POLICY.md](./FIX_EXECUTION_POLICY.md) للحلول التفصيلية.
+> 💡 **ملاحظة:** إذا واجهت مشكلة Execution Policy، راجعي ملف [FIX_EXECUTION_POLICY.md](./docs/guides/FIX_EXECUTION_POLICY.md) للحلول التفصيلية.
 
 ## الأدلة المتاحة
 
-- 📖 **[دليل الإعداد الكامل](./SETUP_GUIDE.md)** - خطوات تفصيلية لإعداد التطبيق محلياً
-- 🚀 **[دليل النشر والمشاركة](./DEPLOYMENT_GUIDE.md)** - كيفية نشر التطبيق ومشاركته مع الآخرين
-- 🗄️ **[ربط Supabase](./SUPABASE_SETUP.md)** - خطوات تفصيلية لربط قاعدة بيانات Supabase
-- 🔧 **[حل مشكلة Execution Policy](./FIX_EXECUTION_POLICY.md)** - حل مشكلة PowerShell في Windows
-- 🐛 **[دليل حل المشاكل](./TROUBLESHOOTING.md)** - حلول للمشاكل الشائعة
+كل الأدلة التفصيلية موجودة في [`docs/guides/`](./docs/guides/)، أهمها:
+
+- 📖 **[دليل الإعداد الكامل](./docs/guides/SETUP_GUIDE.md)** - خطوات تفصيلية لإعداد التطبيق محلياً
+- 🚀 **[حالة النشر على Vercel](./docs/guides/VERCEL_DEPLOYMENT_STATUS.md)** - كيفية نشر التطبيق ومشاركته
+- 🗄️ **[ربط Supabase](./supabase/README.md)** - خطوات تفصيلية لربط قاعدة بيانات Supabase
+- 🔧 **[حل مشكلة Execution Policy](./docs/guides/FIX_EXECUTION_POLICY.md)** - حل مشكلة PowerShell في Windows
+- 🐛 **[دليل حل المشاكل](./docs/guides/TROUBLESHOOTING.md)** - حلول للمشاكل الشائعة
 
 ## البنية العامة
 
