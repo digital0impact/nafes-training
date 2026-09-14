@@ -9,6 +9,8 @@ export type User = {
   role: string
   subscriptionPlan?: string
   isDisabled?: boolean
+  schoolId?: string | null
+  schoolName?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
