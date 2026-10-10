@@ -47,6 +47,7 @@ export type GameType =
   | "plate_tectonics_journey"
   | "science_method_journey"
   | "science_skills_match"
+  | "classifier_game"
 
 // ============================================
 // واجهات لعبة الاختيار من متعدد (Multiple Choice)
@@ -455,6 +456,16 @@ export interface ScienceSkillsMatchGameData {
 }
 
 // ============================================
+// واجهة ألعاب التصنيف (لوحات متحركة + بطاقات على عدة جولات)
+// ============================================
+
+/** بيانات لعبة تصنيف – config هو مفتاح اللعبة في سجل components/games/classifier/configs */
+export interface ClassifierGameData {
+  type: "classifier_game"
+  config: string
+}
+
+// ============================================
 // واجهة موحدة لبيانات الألعاب
 // ============================================
 
@@ -482,6 +493,7 @@ export type GameData =
   | PlateTectonicsJourneyGameData
   | ScienceMethodJourneyGameData
   | ScienceSkillsMatchGameData
+  | ClassifierGameData
 
 // ============================================
 // واجهات إضافية للبيانات المعقدة
@@ -697,6 +709,10 @@ export function isScienceSkillsMatchGame(data: GameData): data is ScienceSkillsM
   return data.type === "science_skills_match"
 }
 
+export function isClassifierGame(data: GameData): data is ClassifierGameData {
+  return data.type === "classifier_game"
+}
+
 // ============================================
 // Helper Types
 // ============================================
@@ -725,6 +741,7 @@ export type GameDataByType<T extends GameType> =
   T extends "plate_tectonics_journey" ? PlateTectonicsJourneyGameData :
   T extends "science_method_journey" ? ScienceMethodJourneyGameData :
   T extends "science_skills_match" ? ScienceSkillsMatchGameData :
+  T extends "classifier_game" ? ClassifierGameData :
   never
 
 /**
