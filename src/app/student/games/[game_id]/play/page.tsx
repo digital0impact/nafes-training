@@ -18,6 +18,8 @@ import SmartFormulaLab from "@/components/games/SmartFormulaLab"
 import ChemicalReactionsEnergyLab from "@/components/games/ChemicalReactionsEnergyLab"
 import ReactionRatesLab from "@/components/games/ReactionRatesLab"
 import PlateTectonicsJourney from "@/components/games/PlateTectonicsJourney"
+import ScienceMethodJourney from "@/components/games/ScienceMethodJourney"
+import ScienceSkillsMatch from "@/components/games/ScienceSkillsMatch"
 
 type EducationalGame = {
   game_id: string
@@ -221,7 +223,9 @@ export default function GamePlayPage() {
             setPeriodicFamilyDistributions({})
             setPeriodicFamilyAnswers({})
           }
-          // volcano_types, geological_faults: لا حاجة لتهيئة إضافية، المكون يدير حالته
+          // volcano_types, geological_faults, chemical_bond_lab وغيرها من الألعاب المخصصة
+          // (بما فيها science_method_journey وscience_skills_match): لا حاجة لتهيئة
+          // إضافية، المكون يدير حالته
           
           // بدء حساب الوقت
           setStartTime(Date.now())
@@ -868,6 +872,68 @@ export default function GamePlayPage() {
           />
         )}
 
+        {/* لعبة رحلة المحقق العلمي - ترتيب خطوات المنهج العلمي */}
+        {gameData.type === "science_method_journey" && (
+          <ScienceMethodJourney
+            gameData={gameData}
+            game={{
+              game_id: game.game_id,
+              title: game.title,
+              chapter: game.chapter,
+              objective: game.objective,
+              points: game.points,
+            }}
+            onComplete={async (result) => {
+              await saveGameAttempt({
+                answers: (result.answers ?? {}) as Record<string, unknown>,
+                score: Math.round((result.score / 100) * game.points),
+                totalScore: game.points,
+                percentage: result.score,
+                timeSpent: result.timeSpent,
+              })
+              setShowFeedback(true)
+              setFeedbackMessage(
+                result.score === 100 ? "ممتاز! رتّبتِ خطوات المنهج العلمي بشكل صحيح تماماً" : result.score >= 70 ? "جيد جداً! راجعي الخطوات وحاولي تحسين النتيجة" : "حاولي مرة أخرى"
+              )
+              setTimeout(() => {
+                setShowFeedback(false)
+                router.push(`/student/games/${gameId}/result?score=${result.score}`)
+              }, 2000)
+            }}
+          />
+        )}
+
+        {/* لعبة بطاقات مهارات العالمة الصغيرة - تمييز مهارات العلم */}
+        {gameData.type === "science_skills_match" && (
+          <ScienceSkillsMatch
+            gameData={gameData}
+            game={{
+              game_id: game.game_id,
+              title: game.title,
+              chapter: game.chapter,
+              objective: game.objective,
+              points: game.points,
+            }}
+            onComplete={async (result) => {
+              await saveGameAttempt({
+                answers: (result.answers ?? {}) as Record<string, unknown>,
+                score: Math.round((result.score / 100) * game.points),
+                totalScore: game.points,
+                percentage: result.score,
+                timeSpent: result.timeSpent,
+              })
+              setShowFeedback(true)
+              setFeedbackMessage(
+                result.score === 100 ? "ممتاز! ربطتِ كل مهارة بوصفها الصحيح تماماً" : result.score >= 70 ? "جيد جداً! راجعي الأزواج وحاولي تحسين النتيجة" : "حاولي مرة أخرى"
+              )
+              setTimeout(() => {
+                setShowFeedback(false)
+                router.push(`/student/games/${gameId}/result?score=${result.score}`)
+              }, 2000)
+            }}
+          />
+        )}
+
         {/* Game Area - Ordering */}
         {gameData.type === "ordering" && (
           <div className="card">
@@ -1339,7 +1405,7 @@ export default function GamePlayPage() {
         )}
 
         {/* Action Buttons - لا تظهر لألعاب متعددة المراحل التي تنتهي تلقائياً */}
-        {gameData.type !== "volcano_types" && gameData.type !== "geological_faults" && gameData.type !== "chemical_bond_lab" && gameData.type !== "valence_electron_patterns" && gameData.type !== "atom_electron_map" && gameData.type !== "smart_formula_lab" && gameData.type !== "chemical_reactions_energy_lab" && gameData.type !== "reaction_rates_lab" && gameData.type !== "plate_tectonics_journey" && (
+        {gameData.type !== "volcano_types" && gameData.type !== "geological_faults" && gameData.type !== "chemical_bond_lab" && gameData.type !== "valence_electron_patterns" && gameData.type !== "atom_electron_map" && gameData.type !== "smart_formula_lab" && gameData.type !== "chemical_reactions_energy_lab" && gameData.type !== "reaction_rates_lab" && gameData.type !== "plate_tectonics_journey" && gameData.type !== "science_method_journey" && gameData.type !== "science_skills_match" && (
         <div className="card">
           <div className="flex gap-3">
             <button

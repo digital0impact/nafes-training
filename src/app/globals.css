@@ -49,3 +49,27 @@ body {
   }
 }
 
+/* حركات بسيطة تُستخدم في بعض الألعاب التفاعلية (مثل رحلة المحقق العلمي) */
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+
+@keyframes pop-in {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(160px) rotate(360deg); opacity: 0; }
+}
+
+@layer utilities {
+  .animate-shake { animation: shake 0.4s ease-in-out; }
+  .animate-pop-in { animation: pop-in 0.25s ease-out; }
+  .animate-confetti-fall { animation: confetti-fall 1.4s ease-in forwards; }
+}
+

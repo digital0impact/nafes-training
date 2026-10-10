@@ -45,6 +45,8 @@ export type GameType =
   | "chemical_reactions_energy_lab"
   | "reaction_rates_lab"
   | "plate_tectonics_journey"
+  | "science_method_journey"
+  | "science_skills_match"
 
 // ============================================
 // واجهات لعبة الاختيار من متعدد (Multiple Choice)
@@ -434,6 +436,25 @@ export interface PlateTectonicsJourneyGameData {
 }
 
 // ============================================
+// واجهة لعبة رحلة المحقق العلمي (ترتيب خطوات المنهج العلمي)
+// ============================================
+
+/** بيانات لعبة رحلة المحقق العلمي – ترتيب خطوات المنهج العلمي بأسلوب قصصي تفاعلي */
+export interface ScienceMethodJourneyGameData {
+  type: "science_method_journey"
+}
+
+// ============================================
+// واجهة لعبة بطاقات مهارات العالمة الصغيرة (تمييز مهارات العلم)
+// ============================================
+
+/** بيانات لعبة بطاقات مهارات العالمة الصغيرة – مطابقة مهارات العلم بأوصافها بأسلوب تفاعلي */
+export interface ScienceSkillsMatchGameData {
+  type: "science_skills_match"
+  pairs: MatchingPair[]
+}
+
+// ============================================
 // واجهة موحدة لبيانات الألعاب
 // ============================================
 
@@ -459,6 +480,8 @@ export type GameData =
   | ChemicalReactionsEnergyLabGameData
   | ReactionRatesLabGameData
   | PlateTectonicsJourneyGameData
+  | ScienceMethodJourneyGameData
+  | ScienceSkillsMatchGameData
 
 // ============================================
 // واجهات إضافية للبيانات المعقدة
@@ -666,6 +689,14 @@ export function isPlateTectonicsJourneyGame(data: GameData): data is PlateTecton
   return data.type === "plate_tectonics_journey"
 }
 
+export function isScienceMethodJourneyGame(data: GameData): data is ScienceMethodJourneyGameData {
+  return data.type === "science_method_journey"
+}
+
+export function isScienceSkillsMatchGame(data: GameData): data is ScienceSkillsMatchGameData {
+  return data.type === "science_skills_match"
+}
+
 // ============================================
 // Helper Types
 // ============================================
@@ -692,6 +723,8 @@ export type GameDataByType<T extends GameType> =
   T extends "chemical_reactions_energy_lab" ? ChemicalReactionsEnergyLabGameData :
   T extends "reaction_rates_lab" ? ReactionRatesLabGameData :
   T extends "plate_tectonics_journey" ? PlateTectonicsJourneyGameData :
+  T extends "science_method_journey" ? ScienceMethodJourneyGameData :
+  T extends "science_skills_match" ? ScienceSkillsMatchGameData :
   never
 
 /**

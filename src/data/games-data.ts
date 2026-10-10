@@ -28,7 +28,9 @@ export type {
   SmartFormulaLabGameData,
   ChemicalReactionsEnergyLabGameData,
   ReactionRatesLabGameData,
-  PlateTectonicsJourneyGameData
+  PlateTectonicsJourneyGameData,
+  ScienceMethodJourneyGameData,
+  ScienceSkillsMatchGameData
 } from "@/types/games"
 
 import type { GameData } from "@/types/games"
@@ -36,22 +38,14 @@ import { chemicalPhysicsGamesData } from "./chemical-physics-games-data"
 import { VOLCANO_TYPES } from "./volcano-types-data"
 
 const baseGamesData: Record<string, GameData> = {
-  // game_001: ترتيب خطوات المنهج العلمي (ordering)
+  // game_001: رحلة المحقق العلمي - ترتيب خطوات المنهج العلمي بأسلوب قصصي تفاعلي
   game_001: {
-    type: "ordering",
-    items: [
-      { id: "1", text: "الملاحظة", correctOrder: 1 },
-      { id: "2", text: "طرح السؤال", correctOrder: 2 },
-      { id: "3", text: "صياغة الفرضية", correctOrder: 3 },
-      { id: "4", text: "التجربة", correctOrder: 4 },
-      { id: "5", text: "تحليل النتائج", correctOrder: 5 },
-      { id: "6", text: "الاستنتاج", correctOrder: 6 }
-    ]
-  },
+    type: "science_method_journey",
+  } as GameData,
 
-  // game_002: تمييز مهارات العلم (matching)
+  // game_002: بطاقات مهارات العالمة الصغيرة - تمييز مهارات العلم بأسلوب تفاعلي
   game_002: {
-    type: "matching",
+    type: "science_skills_match",
     pairs: [
       { id: "1", label: "الملاحظة", target: "استخدام الحواس لجمع المعلومات" },
       { id: "2", label: "القياس", target: "استخدام أدوات لقياس الكميات" },
@@ -59,7 +53,7 @@ const baseGamesData: Record<string, GameData> = {
       { id: "4", label: "الاستدلال", target: "استنتاج معلومات من الملاحظات" },
       { id: "5", label: "التنبؤ", target: "توقع ما سيحدث في المستقبل" }
     ]
-  },
+  } as GameData,
 
   // game_003: أسباب حدوث الزلازل (multiple_choice)
   game_003: {
