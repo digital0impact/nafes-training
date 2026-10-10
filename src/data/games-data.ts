@@ -115,6 +115,11 @@ const baseGamesData: Record<string, GameData> = {
     type: "plate_tectonics_journey",
   } as GameData,
 
+  // game_plate_boundaries_explorer: مستكشفة حدود الصفائح – ربط أنواع الحدود بالظواهر والأماكن (3 جولات)
+  game_plate_boundaries_explorer: {
+    type: "plate_boundaries_explorer",
+  } as GameData,
+
   // game_005: ربط حدود الصفائح بنتائجها (matching)
   game_005: {
     type: "matching",

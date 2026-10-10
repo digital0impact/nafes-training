@@ -20,6 +20,7 @@ import ReactionRatesLab from "@/components/games/ReactionRatesLab"
 import PlateTectonicsJourney from "@/components/games/PlateTectonicsJourney"
 import ScienceMethodJourney from "@/components/games/ScienceMethodJourney"
 import ScienceSkillsMatch from "@/components/games/ScienceSkillsMatch"
+import PlateBoundariesExplorer from "@/components/games/PlateBoundariesExplorer"
 
 type EducationalGame = {
   game_id: string
@@ -784,6 +785,34 @@ export default function TeacherGamesPage() {
                         </div>
                       ) : (
                         <PlateTectonicsJourney
+                          gameData={previewData}
+                          game={{
+                            game_id: selectedGame.game_id,
+                            title: selectedGame.title,
+                            chapter: selectedGame.chapter,
+                            objective: selectedGame.objective,
+                            points: selectedGame.points,
+                          }}
+                          onComplete={(result) => {
+                            setScore(result.score)
+                            setSubmitted(true)
+                          }}
+                        />
+                      )
+                    ) : previewData.type === "plate_boundaries_explorer" ? (
+                      submitted ? (
+                        <div className="rounded-xl border-2 border-emerald-200 p-6 text-center bg-emerald-50">
+                          <p className="font-semibold text-emerald-900">انتهيت من المعاينة</p>
+                          <p className="text-lg font-bold text-emerald-800 mt-2">النتيجة: {score}%</p>
+                          <button
+                            onClick={closePreview}
+                            className="mt-4 px-6 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700"
+                          >
+                            إغلاق
+                          </button>
+                        </div>
+                      ) : (
+                        <PlateBoundariesExplorer
                           gameData={previewData}
                           game={{
                             game_id: selectedGame.game_id,

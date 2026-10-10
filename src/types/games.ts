@@ -47,6 +47,7 @@ export type GameType =
   | "plate_tectonics_journey"
   | "science_method_journey"
   | "science_skills_match"
+  | "plate_boundaries_explorer"
 
 // ============================================
 // واجهات لعبة الاختيار من متعدد (Multiple Choice)
@@ -455,6 +456,15 @@ export interface ScienceSkillsMatchGameData {
 }
 
 // ============================================
+// واجهة لعبة مستكشفة حدود الصفائح (ربط الحدود بالظواهر الناتجة عنها)
+// ============================================
+
+/** بيانات لعبة مستكشفة حدود الصفائح – الأسئلة مضمّنة في المكوّن */
+export interface PlateBoundariesExplorerGameData {
+  type: "plate_boundaries_explorer"
+}
+
+// ============================================
 // واجهة موحدة لبيانات الألعاب
 // ============================================
 
@@ -482,6 +492,7 @@ export type GameData =
   | PlateTectonicsJourneyGameData
   | ScienceMethodJourneyGameData
   | ScienceSkillsMatchGameData
+  | PlateBoundariesExplorerGameData
 
 // ============================================
 // واجهات إضافية للبيانات المعقدة
@@ -697,6 +708,10 @@ export function isScienceSkillsMatchGame(data: GameData): data is ScienceSkillsM
   return data.type === "science_skills_match"
 }
 
+export function isPlateBoundariesExplorerGame(data: GameData): data is PlateBoundariesExplorerGameData {
+  return data.type === "plate_boundaries_explorer"
+}
+
 // ============================================
 // Helper Types
 // ============================================
@@ -725,6 +740,7 @@ export type GameDataByType<T extends GameType> =
   T extends "plate_tectonics_journey" ? PlateTectonicsJourneyGameData :
   T extends "science_method_journey" ? ScienceMethodJourneyGameData :
   T extends "science_skills_match" ? ScienceSkillsMatchGameData :
+  T extends "plate_boundaries_explorer" ? PlateBoundariesExplorerGameData :
   never
 
 /**
