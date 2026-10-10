@@ -45,6 +45,7 @@ export type GameType =
   | "chemical_reactions_energy_lab"
   | "reaction_rates_lab"
   | "plate_tectonics_journey"
+  | "science_method_journey"
 
 // ============================================
 // واجهات لعبة الاختيار من متعدد (Multiple Choice)
@@ -434,6 +435,15 @@ export interface PlateTectonicsJourneyGameData {
 }
 
 // ============================================
+// واجهة لعبة رحلة المحقق العلمي (ترتيب خطوات المنهج العلمي)
+// ============================================
+
+/** بيانات لعبة رحلة المحقق العلمي – ترتيب خطوات المنهج العلمي بأسلوب قصصي تفاعلي */
+export interface ScienceMethodJourneyGameData {
+  type: "science_method_journey"
+}
+
+// ============================================
 // واجهة موحدة لبيانات الألعاب
 // ============================================
 
@@ -459,6 +469,7 @@ export type GameData =
   | ChemicalReactionsEnergyLabGameData
   | ReactionRatesLabGameData
   | PlateTectonicsJourneyGameData
+  | ScienceMethodJourneyGameData
 
 // ============================================
 // واجهات إضافية للبيانات المعقدة
@@ -666,6 +677,10 @@ export function isPlateTectonicsJourneyGame(data: GameData): data is PlateTecton
   return data.type === "plate_tectonics_journey"
 }
 
+export function isScienceMethodJourneyGame(data: GameData): data is ScienceMethodJourneyGameData {
+  return data.type === "science_method_journey"
+}
+
 // ============================================
 // Helper Types
 // ============================================
@@ -692,6 +707,7 @@ export type GameDataByType<T extends GameType> =
   T extends "chemical_reactions_energy_lab" ? ChemicalReactionsEnergyLabGameData :
   T extends "reaction_rates_lab" ? ReactionRatesLabGameData :
   T extends "plate_tectonics_journey" ? PlateTectonicsJourneyGameData :
+  T extends "science_method_journey" ? ScienceMethodJourneyGameData :
   never
 
 /**
