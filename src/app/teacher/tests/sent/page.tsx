@@ -246,7 +246,7 @@ export default function TeacherTestsSentPage() {
 
         {/* modal تقرير النتائج */}
         {reportFor && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={closeReport}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90" onClick={closeReport}>
             <div
               className="card max-h-[85vh] w-full max-w-2xl overflow-hidden flex flex-col bg-white shadow-xl"
               onClick={(e) => e.stopPropagation()}

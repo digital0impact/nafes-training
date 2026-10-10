@@ -557,7 +557,7 @@ export default function DiagnosticModelsPage() {
 
       {/* Preview Modal */}
       {showPreviewModal && selectedModel && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
           <div className="w-full max-w-4xl rounded-3xl bg-white shadow-2xl max-h-[90vh] overflow-hidden flex flex-col">
             {/* Modal Header */}
             <div className="border-b border-slate-200 p-6 bg-gradient-to-br from-white to-blue-50">
@@ -688,7 +688,7 @@ export default function DiagnosticModelsPage() {
 
       {/* Send Modal */}
       {showSendModal && selectedModel && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
           <div className="w-full max-w-2xl rounded-3xl bg-white shadow-2xl">
             {/* Modal Header */}
             <div className="border-b border-slate-200 p-6">

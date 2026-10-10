@@ -490,7 +490,7 @@ export default function TeacherGamesPage() {
         </div>
 
         {selectedGame && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
             <div className="w-full max-w-4xl rounded-3xl bg-white shadow-2xl max-h-[90vh] overflow-hidden flex flex-col">
               <div className="border-b border-slate-200 p-6 bg-gradient-to-br from-white to-purple-50">
                 <div className="flex items-start justify-between">
@@ -1168,7 +1168,7 @@ export default function TeacherGamesPage() {
 
         {/* Share Modal */}
         {showShareModal && selectedGame && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
             <div className="w-full max-w-2xl rounded-3xl bg-white shadow-2xl max-h-[90vh] overflow-hidden flex flex-col">
               <div className="border-b border-slate-200 p-6 bg-gradient-to-br from-white to-emerald-50">
                 <div className="flex items-center justify-between">
