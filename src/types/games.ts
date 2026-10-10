@@ -47,7 +47,7 @@ export type GameType =
   | "plate_tectonics_journey"
   | "science_method_journey"
   | "science_skills_match"
-  | "plate_boundaries_explorer"
+  | "classifier_game"
 
 // ============================================
 // واجهات لعبة الاختيار من متعدد (Multiple Choice)
@@ -456,12 +456,13 @@ export interface ScienceSkillsMatchGameData {
 }
 
 // ============================================
-// واجهة لعبة مستكشفة حدود الصفائح (ربط الحدود بالظواهر الناتجة عنها)
+// واجهة ألعاب التصنيف (لوحات متحركة + بطاقات على عدة جولات)
 // ============================================
 
-/** بيانات لعبة مستكشفة حدود الصفائح – الأسئلة مضمّنة في المكوّن */
-export interface PlateBoundariesExplorerGameData {
-  type: "plate_boundaries_explorer"
+/** بيانات لعبة تصنيف – config هو مفتاح اللعبة في سجل components/games/classifier/configs */
+export interface ClassifierGameData {
+  type: "classifier_game"
+  config: string
 }
 
 // ============================================
@@ -492,7 +493,7 @@ export type GameData =
   | PlateTectonicsJourneyGameData
   | ScienceMethodJourneyGameData
   | ScienceSkillsMatchGameData
-  | PlateBoundariesExplorerGameData
+  | ClassifierGameData
 
 // ============================================
 // واجهات إضافية للبيانات المعقدة
@@ -708,8 +709,8 @@ export function isScienceSkillsMatchGame(data: GameData): data is ScienceSkillsM
   return data.type === "science_skills_match"
 }
 
-export function isPlateBoundariesExplorerGame(data: GameData): data is PlateBoundariesExplorerGameData {
-  return data.type === "plate_boundaries_explorer"
+export function isClassifierGame(data: GameData): data is ClassifierGameData {
+  return data.type === "classifier_game"
 }
 
 // ============================================
@@ -740,7 +741,7 @@ export type GameDataByType<T extends GameType> =
   T extends "plate_tectonics_journey" ? PlateTectonicsJourneyGameData :
   T extends "science_method_journey" ? ScienceMethodJourneyGameData :
   T extends "science_skills_match" ? ScienceSkillsMatchGameData :
-  T extends "plate_boundaries_explorer" ? PlateBoundariesExplorerGameData :
+  T extends "classifier_game" ? ClassifierGameData :
   never
 
 /**

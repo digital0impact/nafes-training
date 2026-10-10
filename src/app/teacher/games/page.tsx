@@ -20,7 +20,7 @@ import ReactionRatesLab from "@/components/games/ReactionRatesLab"
 import PlateTectonicsJourney from "@/components/games/PlateTectonicsJourney"
 import ScienceMethodJourney from "@/components/games/ScienceMethodJourney"
 import ScienceSkillsMatch from "@/components/games/ScienceSkillsMatch"
-import PlateBoundariesExplorer from "@/components/games/PlateBoundariesExplorer"
+import ClassifierGame from "@/components/games/classifier/ClassifierGame"
 
 type EducationalGame = {
   game_id: string
@@ -799,7 +799,7 @@ export default function TeacherGamesPage() {
                           }}
                         />
                       )
-                    ) : previewData.type === "plate_boundaries_explorer" ? (
+                    ) : previewData.type === "classifier_game" ? (
                       submitted ? (
                         <div className="rounded-xl border-2 border-emerald-200 p-6 text-center bg-emerald-50">
                           <p className="font-semibold text-emerald-900">انتهيت من المعاينة</p>
@@ -812,7 +812,7 @@ export default function TeacherGamesPage() {
                           </button>
                         </div>
                       ) : (
-                        <PlateBoundariesExplorer
+                        <ClassifierGame
                           gameData={previewData}
                           game={{
                             game_id: selectedGame.game_id,

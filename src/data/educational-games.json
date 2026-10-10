@@ -78,7 +78,7 @@
       "game_id": "game_plate_boundaries_explorer",
       "chapter": "الفصل الثالث: الصفائح الأرضية",
       "title": "مستكشفة حدود الصفائح",
-      "game_type": "plate_boundaries_explorer",
+      "game_type": "classifier_game",
       "learning_indicator": "يربط بين أنواع حدود الصفائح (المتباعدة، المتقاربة، التحويلية) والظواهر الناتجة عنها",
       "objective": "ثلاث جولات: الظواهر والتضاريس، أماكن من العالم، ثم تحدٍّ سريع؛ اختاري الحدّ المسؤول عن كل ظاهرة",
       "level": "متوسط",

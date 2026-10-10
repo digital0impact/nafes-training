@@ -20,7 +20,7 @@ import ReactionRatesLab from "@/components/games/ReactionRatesLab"
 import PlateTectonicsJourney from "@/components/games/PlateTectonicsJourney"
 import ScienceMethodJourney from "@/components/games/ScienceMethodJourney"
 import ScienceSkillsMatch from "@/components/games/ScienceSkillsMatch"
-import PlateBoundariesExplorer from "@/components/games/PlateBoundariesExplorer"
+import ClassifierGame from "@/components/games/classifier/ClassifierGame"
 
 type EducationalGame = {
   game_id: string
@@ -873,9 +873,9 @@ export default function GamePlayPage() {
           />
         )}
 
-        {/* لعبة مستكشفة حدود الصفائح - ربط الحدود بالظواهر الناتجة عنها */}
-        {gameData.type === "plate_boundaries_explorer" && (
-          <PlateBoundariesExplorer
+        {/* ألعاب التصنيف (النمط الموحّد): لوحات متحركة وبطاقات على عدة جولات */}
+        {gameData.type === "classifier_game" && (
+          <ClassifierGame
             gameData={gameData}
             game={{
               game_id: game.game_id,
@@ -894,7 +894,7 @@ export default function GamePlayPage() {
               })
               setShowFeedback(true)
               setFeedbackMessage(
-                result.score >= 90 ? "ممتاز! أتقنتِ ربط حدود الصفائح بظواهرها" : result.score >= 70 ? "جيد جداً! راجعي الظواهر التي أخطأتِ فيها" : "حاولي مرة أخرى"
+                result.score >= 90 ? "ممتاز! أتقنتِ هذه اللعبة" : result.score >= 70 ? "جيد جداً! راجعي البطاقات التي أخطأتِ فيها" : "حاولي مرة أخرى"
               )
               setTimeout(() => {
                 setShowFeedback(false)
@@ -1437,7 +1437,7 @@ export default function GamePlayPage() {
         )}
 
         {/* Action Buttons - لا تظهر لألعاب متعددة المراحل التي تنتهي تلقائياً */}
-        {gameData.type !== "volcano_types" && gameData.type !== "geological_faults" && gameData.type !== "chemical_bond_lab" && gameData.type !== "valence_electron_patterns" && gameData.type !== "atom_electron_map" && gameData.type !== "smart_formula_lab" && gameData.type !== "chemical_reactions_energy_lab" && gameData.type !== "reaction_rates_lab" && gameData.type !== "plate_tectonics_journey" && gameData.type !== "science_method_journey" && gameData.type !== "science_skills_match" && gameData.type !== "plate_boundaries_explorer" && (
+        {gameData.type !== "volcano_types" && gameData.type !== "geological_faults" && gameData.type !== "chemical_bond_lab" && gameData.type !== "valence_electron_patterns" && gameData.type !== "atom_electron_map" && gameData.type !== "smart_formula_lab" && gameData.type !== "chemical_reactions_energy_lab" && gameData.type !== "reaction_rates_lab" && gameData.type !== "plate_tectonics_journey" && gameData.type !== "science_method_journey" && gameData.type !== "science_skills_match" && gameData.type !== "classifier_game" && (
         <div className="card">
           <div className="flex gap-3">
             <button
