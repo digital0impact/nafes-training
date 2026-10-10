@@ -46,6 +46,7 @@ export type GameType =
   | "reaction_rates_lab"
   | "plate_tectonics_journey"
   | "science_method_journey"
+  | "science_skills_match"
 
 // ============================================
 // واجهات لعبة الاختيار من متعدد (Multiple Choice)
@@ -444,6 +445,16 @@ export interface ScienceMethodJourneyGameData {
 }
 
 // ============================================
+// واجهة لعبة بطاقات مهارات العالمة الصغيرة (تمييز مهارات العلم)
+// ============================================
+
+/** بيانات لعبة بطاقات مهارات العالمة الصغيرة – مطابقة مهارات العلم بأوصافها بأسلوب تفاعلي */
+export interface ScienceSkillsMatchGameData {
+  type: "science_skills_match"
+  pairs: MatchingPair[]
+}
+
+// ============================================
 // واجهة موحدة لبيانات الألعاب
 // ============================================
 
@@ -470,6 +481,7 @@ export type GameData =
   | ReactionRatesLabGameData
   | PlateTectonicsJourneyGameData
   | ScienceMethodJourneyGameData
+  | ScienceSkillsMatchGameData
 
 // ============================================
 // واجهات إضافية للبيانات المعقدة
@@ -681,6 +693,10 @@ export function isScienceMethodJourneyGame(data: GameData): data is ScienceMetho
   return data.type === "science_method_journey"
 }
 
+export function isScienceSkillsMatchGame(data: GameData): data is ScienceSkillsMatchGameData {
+  return data.type === "science_skills_match"
+}
+
 // ============================================
 // Helper Types
 // ============================================
@@ -708,6 +724,7 @@ export type GameDataByType<T extends GameType> =
   T extends "reaction_rates_lab" ? ReactionRatesLabGameData :
   T extends "plate_tectonics_journey" ? PlateTectonicsJourneyGameData :
   T extends "science_method_journey" ? ScienceMethodJourneyGameData :
+  T extends "science_skills_match" ? ScienceSkillsMatchGameData :
   never
 
 /**

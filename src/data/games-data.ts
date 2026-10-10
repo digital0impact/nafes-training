@@ -29,7 +29,8 @@ export type {
   ChemicalReactionsEnergyLabGameData,
   ReactionRatesLabGameData,
   PlateTectonicsJourneyGameData,
-  ScienceMethodJourneyGameData
+  ScienceMethodJourneyGameData,
+  ScienceSkillsMatchGameData
 } from "@/types/games"
 
 import type { GameData } from "@/types/games"
@@ -42,9 +43,9 @@ const baseGamesData: Record<string, GameData> = {
     type: "science_method_journey",
   } as GameData,
 
-  // game_002: تمييز مهارات العلم (matching)
+  // game_002: بطاقات مهارات العالمة الصغيرة - تمييز مهارات العلم بأسلوب تفاعلي
   game_002: {
-    type: "matching",
+    type: "science_skills_match",
     pairs: [
       { id: "1", label: "الملاحظة", target: "استخدام الحواس لجمع المعلومات" },
       { id: "2", label: "القياس", target: "استخدام أدوات لقياس الكميات" },
@@ -52,7 +53,7 @@ const baseGamesData: Record<string, GameData> = {
       { id: "4", label: "الاستدلال", target: "استنتاج معلومات من الملاحظات" },
       { id: "5", label: "التنبؤ", target: "توقع ما سيحدث في المستقبل" }
     ]
-  },
+  } as GameData,
 
   // game_003: أسباب حدوث الزلازل (multiple_choice)
   game_003: {
