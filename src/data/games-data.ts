@@ -141,6 +141,16 @@ const baseGamesData: Record<string, GameData> = {
     config: "division",
   } as GameData,
 
+  game_dna_code: {
+    type: "classifier_game",
+    config: "dna",
+  } as GameData,
+
+  game_mendel_garden: {
+    type: "classifier_game",
+    config: "mendel",
+  } as GameData,
+
   game_plate_boundaries_explorer: {
     type: "classifier_game",
     config: "plates",
