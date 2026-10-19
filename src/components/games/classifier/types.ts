@@ -44,4 +44,6 @@ export type ClassifierConfig = {
   rounds: RoundDef[]
   /** ألقاب النهاية: ثلاث نجوم، نجمتان، نجمة */
   ranks: [string, string, string]
+  /** مصدر المحتوى، يظهر أسفل شاشة البداية والنهاية (مثل: الصف الأول المتوسط، الفصل الدراسي الثاني، ص ١٨–٢١) */
+  source?: string
 }

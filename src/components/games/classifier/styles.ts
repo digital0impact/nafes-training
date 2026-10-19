@@ -82,6 +82,7 @@ export const CLASSIFIER_STYLES = `
 @media (prefers-reduced-motion:reduce){.pbx *{animation:none!important;transition:none!important}}
 
 .pbx [hidden]{display:none!important}
+.pbx .src{margin:0;font-size:12px;color:var(--muted);opacity:.8}
 .pbx .title,.pbx .sub,.pbx .big,.pbx .say{margin:0}
 .pbx .sub{margin-top:6px}
 `
