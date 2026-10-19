@@ -1,4 +1,5 @@
 import type { ClassifierConfig } from "../types"
+import { body } from "./body"
 import { cells } from "./cells"
 import { plates } from "./plates"
 
@@ -6,4 +7,5 @@ import { plates } from "./plates"
 export const CLASSIFIER_CONFIGS: Record<string, ClassifierConfig> = {
   plates,
   cells,
+  body,
 }

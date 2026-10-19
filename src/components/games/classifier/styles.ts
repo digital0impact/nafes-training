@@ -51,7 +51,7 @@ export const CLASSIFIER_STYLES = `
   display:flex;flex-direction:column;gap:4px;align-items:center;text-align:center;min-width:0;
   transition:transform .12s,border-color .12s
 }
-.pbx .panel:hover:not(:disabled){transform:translateY(-4px);border-color:var(--crust)}
+.pbx .panel:hover:not(:disabled){border-color:var(--crust);box-shadow:0 0 0 3px rgba(230,189,99,.25)}
 .pbx .panel:disabled{cursor:default}
 .pbx .panel canvas{width:100%;aspect-ratio:3/2;border-radius:12px;display:block;background:var(--abyss)}
 .pbx .panel .name{font-weight:800;font-size:clamp(17px,3.6vw,26px);line-height:1.2;color:var(--crust)}
