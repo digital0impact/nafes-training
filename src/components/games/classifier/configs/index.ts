@@ -1,6 +1,7 @@
 import type { ClassifierConfig } from "../types"
 import { body } from "./body"
 import { cells } from "./cells"
+import { cycles } from "./cycles"
 import { linnaeus } from "./linnaeus"
 import { plates } from "./plates"
 
@@ -10,4 +11,5 @@ export const CLASSIFIER_CONFIGS: Record<string, ClassifierConfig> = {
   cells,
   body,
   linnaeus,
+  cycles,
 }

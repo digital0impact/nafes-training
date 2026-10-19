@@ -116,6 +116,11 @@ const baseGamesData: Record<string, GameData> = {
   } as GameData,
 
   // game_plate_boundaries_explorer: مستكشفة حدود الصفائح – ربط أنواع الحدود بالظواهر والأماكن (3 جولات)
+  game_nature_cycles: {
+    type: "classifier_game",
+    config: "cycles",
+  } as GameData,
+
   game_linnaeus_ladder: {
     type: "classifier_game",
     config: "linnaeus",
