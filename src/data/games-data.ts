@@ -136,6 +136,11 @@ const baseGamesData: Record<string, GameData> = {
     config: "cells",
   } as GameData,
 
+  game_cell_division: {
+    type: "classifier_game",
+    config: "division",
+  } as GameData,
+
   game_plate_boundaries_explorer: {
     type: "classifier_game",
     config: "plates",
