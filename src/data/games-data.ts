@@ -115,6 +115,57 @@ const baseGamesData: Record<string, GameData> = {
     type: "plate_tectonics_journey",
   } as GameData,
 
+  // game_plate_boundaries_explorer: مستكشفة حدود الصفائح – ربط أنواع الحدود بالظواهر والأماكن (3 جولات)
+  game_nature_cycles: {
+    type: "classifier_game",
+    config: "cycles",
+  } as GameData,
+
+  game_linnaeus_ladder: {
+    type: "classifier_game",
+    config: "linnaeus",
+  } as GameData,
+
+  game_body_control: {
+    type: "classifier_game",
+    config: "body",
+  } as GameData,
+
+  game_cells_explorer: {
+    type: "classifier_game",
+    config: "cells",
+  } as GameData,
+
+  game_cell_division: {
+    type: "classifier_game",
+    config: "division",
+  } as GameData,
+
+  game_dna_code: {
+    type: "classifier_game",
+    config: "dna",
+  } as GameData,
+
+  game_mendel_garden: {
+    type: "classifier_game",
+    config: "mendel",
+  } as GameData,
+
+  game_mixtures_lab: {
+    type: "classifier_game",
+    config: "mixtures",
+  } as GameData,
+
+  game_ph_lab: {
+    type: "classifier_game",
+    config: "acids",
+  } as GameData,
+
+  game_plate_boundaries_explorer: {
+    type: "classifier_game",
+    config: "plates",
+  } as GameData,
+
   // game_005: ربط حدود الصفائح بنتائجها (matching)
   game_005: {
     type: "matching",

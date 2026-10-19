@@ -20,6 +20,7 @@ import ReactionRatesLab from "@/components/games/ReactionRatesLab"
 import PlateTectonicsJourney from "@/components/games/PlateTectonicsJourney"
 import ScienceMethodJourney from "@/components/games/ScienceMethodJourney"
 import ScienceSkillsMatch from "@/components/games/ScienceSkillsMatch"
+import ClassifierGame from "@/components/games/classifier/ClassifierGame"
 
 type EducationalGame = {
   game_id: string
@@ -872,6 +873,37 @@ export default function GamePlayPage() {
           />
         )}
 
+        {/* ألعاب التصنيف (النمط الموحّد): لوحات متحركة وبطاقات على عدة جولات */}
+        {gameData.type === "classifier_game" && (
+          <ClassifierGame
+            gameData={gameData}
+            game={{
+              game_id: game.game_id,
+              title: game.title,
+              chapter: game.chapter,
+              objective: game.objective,
+              points: game.points,
+            }}
+            onComplete={async (result) => {
+              await saveGameAttempt({
+                answers: (result.answers ?? {}) as Record<string, unknown>,
+                score: Math.round((result.score / 100) * game.points),
+                totalScore: game.points,
+                percentage: result.score,
+                timeSpent: result.timeSpent,
+              })
+              setShowFeedback(true)
+              setFeedbackMessage(
+                result.score >= 90 ? "ممتاز! أتقنتِ هذه اللعبة" : result.score >= 70 ? "جيد جداً! راجعي البطاقات التي أخطأتِ فيها" : "حاولي مرة أخرى"
+              )
+              setTimeout(() => {
+                setShowFeedback(false)
+                router.push(`/student/games/${gameId}/result?score=${result.score}`)
+              }, 2000)
+            }}
+          />
+        )}
+
         {/* لعبة رحلة المحقق العلمي - ترتيب خطوات المنهج العلمي */}
         {gameData.type === "science_method_journey" && (
           <ScienceMethodJourney
@@ -1405,7 +1437,7 @@ export default function GamePlayPage() {
         )}
 
         {/* Action Buttons - لا تظهر لألعاب متعددة المراحل التي تنتهي تلقائياً */}
-        {gameData.type !== "volcano_types" && gameData.type !== "geological_faults" && gameData.type !== "chemical_bond_lab" && gameData.type !== "valence_electron_patterns" && gameData.type !== "atom_electron_map" && gameData.type !== "smart_formula_lab" && gameData.type !== "chemical_reactions_energy_lab" && gameData.type !== "reaction_rates_lab" && gameData.type !== "plate_tectonics_journey" && gameData.type !== "science_method_journey" && gameData.type !== "science_skills_match" && (
+        {gameData.type !== "volcano_types" && gameData.type !== "geological_faults" && gameData.type !== "chemical_bond_lab" && gameData.type !== "valence_electron_patterns" && gameData.type !== "atom_electron_map" && gameData.type !== "smart_formula_lab" && gameData.type !== "chemical_reactions_energy_lab" && gameData.type !== "reaction_rates_lab" && gameData.type !== "plate_tectonics_journey" && gameData.type !== "science_method_journey" && gameData.type !== "science_skills_match" && gameData.type !== "classifier_game" && (
         <div className="card">
           <div className="flex gap-3">
             <button
