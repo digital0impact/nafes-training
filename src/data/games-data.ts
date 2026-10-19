@@ -151,6 +151,16 @@ const baseGamesData: Record<string, GameData> = {
     config: "mendel",
   } as GameData,
 
+  game_mixtures_lab: {
+    type: "classifier_game",
+    config: "mixtures",
+  } as GameData,
+
+  game_ph_lab: {
+    type: "classifier_game",
+    config: "acids",
+  } as GameData,
+
   game_plate_boundaries_explorer: {
     type: "classifier_game",
     config: "plates",
