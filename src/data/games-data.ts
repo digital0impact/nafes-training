@@ -211,6 +211,16 @@ const baseGamesData: Record<string, GameData> = {
     config: "space",
   } as GameData,
 
+  game_planet_danger: {
+    type: "classifier_game",
+    config: "planet",
+  } as GameData,
+
+  game_earth_treasures: {
+    type: "classifier_game",
+    config: "resources",
+  } as GameData,
+
   game_plate_boundaries_explorer: {
     type: "classifier_game",
     config: "plates",
