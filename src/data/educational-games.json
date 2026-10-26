@@ -231,6 +231,30 @@
       "points": 30
     },
     {
+      "game_id": "game_sky_dance",
+      "chapter": "علوم الأرض والفضاء: حركة الأجرام السماوية",
+      "title": "الأرض والقمر والشمس",
+      "game_type": "classifier_game",
+      "learning_indicator": "يفسر الظواهر الناتجة عن حركة الأرض والقمر حول الشمس (الليل والنهار، الفصول، أطوار القمر، الكسوف والخسوف، المد والجزر)",
+      "objective": "ثلاث جولات: حركة الأرض والقمر، ظواهر من الفضاء، ثم تحدٍّ سريع",
+      "level": "متوسط",
+      "difficulty": 2,
+      "remedial": false,
+      "points": 30
+    },
+    {
+      "game_id": "game_space_observatory",
+      "chapter": "علوم الأرض والفضاء: استكشاف الفضاء",
+      "title": "مرصد الفضاء",
+      "game_type": "classifier_game",
+      "learning_indicator": "يتعرف مكونات النظام الشمسي والمجرات ووسائل رصد الكون",
+      "objective": "خمس جولات: الكواكب، وسائل الرصد، المجرات، أجرام أخرى، ثم تحدٍّ سريع",
+      "level": "متوسط",
+      "difficulty": 2,
+      "remedial": false,
+      "points": 30
+    },
+    {
       "game_id": "game_003",
       "chapter": "الفصل الثاني: الزلازل والبراكين",
       "title": "أسباب حدوث الزلازل",

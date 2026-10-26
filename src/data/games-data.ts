@@ -201,6 +201,16 @@ const baseGamesData: Record<string, GameData> = {
     config: "rocks",
   } as GameData,
 
+  game_sky_dance: {
+    type: "classifier_game",
+    config: "orbits",
+  } as GameData,
+
+  game_space_observatory: {
+    type: "classifier_game",
+    config: "space",
+  } as GameData,
+
   game_plate_boundaries_explorer: {
     type: "classifier_game",
     config: "plates",
