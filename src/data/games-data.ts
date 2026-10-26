@@ -191,6 +191,16 @@ const baseGamesData: Record<string, GameData> = {
     config: "newton",
   } as GameData,
 
+  game_quake_watch: {
+    type: "classifier_game",
+    config: "quakes",
+  } as GameData,
+
+  game_rock_museum: {
+    type: "classifier_game",
+    config: "rocks",
+  } as GameData,
+
   game_plate_boundaries_explorer: {
     type: "classifier_game",
     config: "plates",
