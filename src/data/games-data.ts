@@ -246,6 +246,16 @@ const baseGamesData: Record<string, GameData> = {
     config: "heat",
   } as GameData,
 
+  game_waves_sound: {
+    type: "classifier_game",
+    config: "sound",
+  } as GameData,
+
+  game_light_spectrum: {
+    type: "classifier_game",
+    config: "light",
+  } as GameData,
+
   game_plate_boundaries_explorer: {
     type: "classifier_game",
     config: "plates",

@@ -339,6 +339,30 @@
       "points": 30
     },
     {
+      "game_id": "game_waves_sound",
+      "chapter": "العلوم الفيزيائية: الموجات والصوت",
+      "title": "موجات وأصوات",
+      "game_type": "classifier_game",
+      "learning_indicator": "يميز بين أنواع الموجات وخصائصها، ويفسر الانعكاس والانكسار والحيود، ويوضح خصائص الصوت",
+      "objective": "خمس جولات: أنواع الموجات، خصائص الموجات، تغير اتجاه الأمواج، خصائص الصوت، ثم تحدٍّ سريع",
+      "level": "متوسط",
+      "difficulty": 2,
+      "remedial": false,
+      "points": 30
+    },
+    {
+      "game_id": "game_light_spectrum",
+      "chapter": "العلوم الفيزيائية: الضوء",
+      "title": "طيف الضوء",
+      "game_type": "classifier_game",
+      "learning_indicator": "يتعرف أنواع الموجات في الطيف الكهرومغناطيسي واستخداماتها، ويقارن بين عيوب الإبصار",
+      "objective": "ثلاث جولات: الطيف الكهرومغناطيسي، عيوب الإبصار، ثم تحدٍّ سريع",
+      "level": "متوسط",
+      "difficulty": 2,
+      "remedial": false,
+      "points": 30
+    },
+    {
       "game_id": "game_003",
       "chapter": "الفصل الثاني: الزلازل والبراكين",
       "title": "أسباب حدوث الزلازل",

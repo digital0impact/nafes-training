@@ -46,7 +46,8 @@ export const CLASSIFIER_STYLES = `
 .pbx .panels[data-n="4"]{grid-template-columns:repeat(4,minmax(0,1fr))}
 .pbx .panels[data-n="5"]{grid-template-columns:repeat(5,minmax(0,1fr))}
 .pbx .panels[data-n="6"]{grid-template-columns:repeat(6,minmax(0,1fr))}
-.pbx .panels[data-n="4"] .name,.pbx .panels[data-n="5"] .name,.pbx .panels[data-n="6"] .name{font-size:clamp(15px,2.4vw,21px)}
+.pbx .panels[data-n="7"]{grid-template-columns:repeat(7,minmax(0,1fr))}
+.pbx .panels[data-n="4"] .name,.pbx .panels[data-n="5"] .name,.pbx .panels[data-n="6"] .name,.pbx .panels[data-n="7"] .name{font-size:clamp(15px,2.4vw,21px)}
 .pbx .panel{
   background:var(--deep);border:2px solid var(--ridge);border-radius:18px;padding:8px 8px 12px;
   display:flex;flex-direction:column;gap:4px;align-items:center;text-align:center;min-width:0;
@@ -76,7 +77,7 @@ export const CLASSIFIER_STYLES = `
 .pbx .missed b{color:var(--foam)}
 .pbx .sub{font-weight:800;font-size:20px;margin:6px 0 0;color:var(--sea)}
 @media (max-width:620px){.pbx .panels[data-n="4"]{grid-template-columns:repeat(2,minmax(0,1fr))}
-.pbx .panels[data-n="5"],.pbx .panels[data-n="6"]{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.pbx .panels[data-n="5"],.pbx .panels[data-n="6"],.pbx .panels[data-n="7"]{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:480px){.pbx .panel .key{display:none}
 .pbx .pcard{min-height:190px}}
 
