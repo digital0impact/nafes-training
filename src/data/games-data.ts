@@ -256,6 +256,16 @@ const baseGamesData: Record<string, GameData> = {
     config: "light",
   } as GameData,
 
+  game_cell_gates: {
+    type: "classifier_game",
+    config: "membrane",
+  } as GameData,
+
+  game_life_journey: {
+    type: "classifier_game",
+    config: "lifecycle",
+  } as GameData,
+
   game_plate_boundaries_explorer: {
     type: "classifier_game",
     config: "plates",
@@ -283,43 +293,7 @@ const baseGamesData: Record<string, GameData> = {
     ]
   },
 
-  // game_007: اختيار نوع النقل عبر الغشاء (scenario_choice)
-  game_007: {
-    type: "scenario_choice",
-    scenarios: [
-      {
-        id: "1",
-        scenario: "انتقال الأكسجين من الدم إلى الخلايا",
-        choices: ["النقل النشط", "الانتشار البسيط", "الانتشار المسهل", "البلعمة"],
-        correctAnswer: "الانتشار البسيط"
-      },
-      {
-        id: "2",
-        scenario: "انتقال الجلوكوز ضد تدرج التركيز",
-        choices: ["النقل النشط", "الانتشار البسيط", "الانتشار المسهل", "البلعمة"],
-        correctAnswer: "النقل النشط"
-      },
-      {
-        id: "3",
-        scenario: "انتقال الأيونات عبر القنوات",
-        choices: ["النقل النشط", "الانتشار البسيط", "الانتشار المسهل", "البلعمة"],
-        correctAnswer: "الانتشار المسهل"
-      }
-    ]
-  },
 
-  // game_008: تصنيف النقل النشط والسلبي (drag_drop)
-  game_008: {
-    type: "drag_drop",
-    categories: ["نقل نشط", "نقل سلبي"],
-    items: [
-      { id: "1", text: "انتقال الصوديوم ضد التدرج", category: "نقل نشط" },
-      { id: "2", text: "انتشار الأكسجين", category: "نقل سلبي" },
-      { id: "3", text: "انتقال الجلوكوز مع التدرج", category: "نقل سلبي" },
-      { id: "4", text: "انتقال البوتاسيوم ضد التدرج", category: "نقل نشط" },
-      { id: "5", text: "انتشار ثاني أكسيد الكربون", category: "نقل سلبي" }
-    ]
-  },
 
   // game_009: تصنيف الصفات الوراثية والمكتسبة (matching)
   game_009: {
@@ -353,32 +327,7 @@ const baseGamesData: Record<string, GameData> = {
     ]
   },
 
-  // game_011: ترتيب مراحل دورة الحياة (ordering)
-  game_011: {
-    type: "ordering",
-    items: [
-      { id: "1", text: "البويضة المخصبة", correctOrder: 1 },
-      { id: "2", text: "الجنين", correctOrder: 2 },
-      { id: "3", text: "الطفولة", correctOrder: 3 },
-      { id: "4", text: "المراهقة", correctOrder: 4 },
-      { id: "5", text: "البلوغ", correctOrder: 5 },
-      { id: "6", text: "الشيخوخة", correctOrder: 6 }
-    ]
-  },
 
-  // game_012: تصنيف التكاثر الجنسي واللاجنسي (drag_drop)
-  game_012: {
-    type: "drag_drop",
-    categories: ["تكاثر جنسي", "تكاثر لاجنسي"],
-    items: [
-      { id: "1", text: "الإنسان", category: "تكاثر جنسي" },
-      { id: "2", text: "البكتيريا", category: "تكاثر لاجنسي" },
-      { id: "3", text: "الفراشة", category: "تكاثر جنسي" },
-      { id: "4", text: "الهيدرا", category: "تكاثر لاجنسي" },
-      { id: "5", text: "الأسماك", category: "تكاثر جنسي" },
-      { id: "6", text: "النجم البحر", category: "تكاثر لاجنسي" }
-    ]
-  },
 
   // game_atom_001: مهندس الذرّة (atom_builder)
   // اللعبة تغطي المؤشر التعليمي: "يصف كيفية ترتيب الإلكترونات داخل الذرة، وعلاقته بموقعها في الجدول الدوري، ويقارن بين أعداد الإلكترونات التي تستوعبها مستويات الطاقة، ويحدد المستويات الأقل والأعلى طاقة لعنصرٍ ما."

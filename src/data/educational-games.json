@@ -363,6 +363,30 @@
       "points": 30
     },
     {
+      "game_id": "game_cell_gates",
+      "chapter": "علوم الحياة: النقل عبر الغشاء البلازمي",
+      "title": "بوابات الخلية",
+      "game_type": "classifier_game",
+      "learning_indicator": "يميز بين النقل السلبي والنقل النشط، ويقارن بين الانتشار والخاصية الأسموزية والانتشار المدعوم، ويوضح البلعمة والإخراج الخلوي",
+      "objective": "أربع جولات: سلبي أم نشط، أنواع النقل السلبي، البلعمة والإخراج الخلوي، ثم تحدٍّ سريع",
+      "level": "متوسط",
+      "difficulty": 2,
+      "remedial": false,
+      "points": 30
+    },
+    {
+      "game_id": "game_life_journey",
+      "chapter": "علوم الحياة: دورات الحياة والتكاثر",
+      "title": "رحلة الحياة",
+      "game_type": "classifier_game",
+      "learning_indicator": "يقارن بين التحول الكامل والتحول الناقص والنمو التدريجي، ويميز بين الإخصاب الخارجي والداخلي، والتكاثر الجنسي واللاجنسي",
+      "objective": "أربع جولات: كيف تنمو الحيوانات، الإخصاب، جنسي أم لاجنسي، ثم تحدٍّ سريع",
+      "level": "متوسط",
+      "difficulty": 2,
+      "remedial": false,
+      "points": 30
+    },
+    {
       "game_id": "game_003",
       "chapter": "الفصل الثاني: الزلازل والبراكين",
       "title": "أسباب حدوث الزلازل",
@@ -447,30 +471,6 @@
       "points": 15
     },
     {
-      "game_id": "game_007",
-      "chapter": "الفصل الرابع: النقل عبر الغشاء البلازمي",
-      "title": "اختيار نوع النقل عبر الغشاء",
-      "game_type": "scenario_choice",
-      "learning_indicator": "يختار نوع النقل المناسب حسب المادة والظروف",
-      "objective": "اختيار نوع النقل الصحيح لكل سيناريو معطى",
-      "level": "سهل",
-      "difficulty": 1,
-      "remedial": true,
-      "points": 10
-    },
-    {
-      "game_id": "game_008",
-      "chapter": "الفصل الرابع: النقل عبر الغشاء البلازمي",
-      "title": "تصنيف النقل النشط والسلبي",
-      "game_type": "drag_drop",
-      "learning_indicator": "يميز بين أنواع النقل النشط والسلبي",
-      "objective": "سحب كل عملية نقل إلى التصنيف الصحيح",
-      "level": "متوسط",
-      "difficulty": 2,
-      "remedial": false,
-      "points": 15
-    },
-    {
       "game_id": "game_009",
       "chapter": "الفصل الخامس: الوراثة",
       "title": "تصنيف الصفات الوراثية والمكتسبة",
@@ -493,30 +493,6 @@
       "difficulty": 3,
       "remedial": false,
       "points": 20
-    },
-    {
-      "game_id": "game_011",
-      "chapter": "الفصل السادس: التكاثر والنمو",
-      "title": "ترتيب مراحل دورة الحياة",
-      "game_type": "ordering",
-      "learning_indicator": "يرتب مراحل دورة الحياة بالترتيب الصحيح",
-      "objective": "ترتيب مراحل دورة الحياة من البداية للنهاية",
-      "level": "سهل",
-      "difficulty": 1,
-      "remedial": true,
-      "points": 10
-    },
-    {
-      "game_id": "game_012",
-      "chapter": "الفصل السادس: التكاثر والنمو",
-      "title": "تصنيف التكاثر الجنسي واللاجنسي",
-      "game_type": "drag_drop",
-      "learning_indicator": "يميز بين أنواع التكاثر الجنسي واللاجنسي",
-      "objective": "سحب كل كائن حي إلى نوع التكاثر المناسب",
-      "level": "متوسط",
-      "difficulty": 2,
-      "remedial": false,
-      "points": 15
     },
     {
       "game_id": "game_chem_001",

@@ -23,7 +23,7 @@
     {
       "chapter": "الفصل الرابع: النقل عبر الغشاء البلازمي",
       "student_status": "بحاجة إلى معالجة عاجلة",
-      "assigned_games": ["game_007"],
+      "assigned_games": ["game_cell_gates"],
       "recommendation": "يحتاج الطالب إلى مراجعة أساسية شاملة لهذا الفصل من خلال الألعاب العلاجية البسيطة"
     },
     {
@@ -35,7 +35,7 @@
     {
       "chapter": "الفصل السادس: التكاثر والنمو",
       "student_status": "بحاجة إلى معالجة عاجلة",
-      "assigned_games": ["game_011"],
+      "assigned_games": ["game_life_journey"],
       "recommendation": "يحتاج الطالب إلى مراجعة أساسية شاملة لهذا الفصل من خلال الألعاب العلاجية البسيطة"
     }
   ]
