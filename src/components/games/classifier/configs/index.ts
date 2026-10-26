@@ -1,4 +1,5 @@
 import type { ClassifierConfig } from "../types"
+import { periodic } from "./periodic"
 import { states } from "./states"
 import { acids } from "./acids"
 import { mixtures } from "./mixtures"
@@ -14,6 +15,7 @@ import { plates } from "./plates"
 /** سجل ألعاب التصنيف: المفتاح هو قيمة config في بيانات اللعبة (games-data.ts) */
 export const CLASSIFIER_CONFIGS: Record<string, ClassifierConfig> = {
   plates,
+  periodic,
   states,
   acids,
   mixtures,

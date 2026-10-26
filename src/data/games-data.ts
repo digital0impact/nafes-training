@@ -166,6 +166,11 @@ const baseGamesData: Record<string, GameData> = {
     config: "states",
   } as GameData,
 
+  game_periodic_map: {
+    type: "classifier_game",
+    config: "periodic",
+  } as GameData,
+
   game_plate_boundaries_explorer: {
     type: "classifier_game",
     config: "plates",
