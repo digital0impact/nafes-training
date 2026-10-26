@@ -171,6 +171,11 @@ const baseGamesData: Record<string, GameData> = {
     config: "periodic",
   } as GameData,
 
+  game_bond_factory: {
+    type: "classifier_game",
+    config: "bonds",
+  } as GameData,
+
   game_plate_boundaries_explorer: {
     type: "classifier_game",
     config: "plates",
