@@ -236,6 +236,16 @@ const baseGamesData: Record<string, GameData> = {
     config: "magnets",
   } as GameData,
 
+  game_energy_station: {
+    type: "classifier_game",
+    config: "energy",
+  } as GameData,
+
+  game_heat_lab: {
+    type: "classifier_game",
+    config: "heat",
+  } as GameData,
+
   game_plate_boundaries_explorer: {
     type: "classifier_game",
     config: "plates",
