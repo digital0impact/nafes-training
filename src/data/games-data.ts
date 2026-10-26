@@ -181,6 +181,16 @@ const baseGamesData: Record<string, GameData> = {
     config: "reactions",
   } as GameData,
 
+  game_motion_race: {
+    type: "classifier_game",
+    config: "motion",
+  } as GameData,
+
+  game_newton_laws: {
+    type: "classifier_game",
+    config: "newton",
+  } as GameData,
+
   game_plate_boundaries_explorer: {
     type: "classifier_game",
     config: "plates",
