@@ -221,6 +221,21 @@ const baseGamesData: Record<string, GameData> = {
     config: "resources",
   } as GameData,
 
+  game_atom_models: {
+    type: "classifier_game",
+    config: "atoms",
+  } as GameData,
+
+  game_circuit_workshop: {
+    type: "classifier_game",
+    config: "circuits",
+  } as GameData,
+
+  game_magnet_world: {
+    type: "classifier_game",
+    config: "magnets",
+  } as GameData,
+
   game_plate_boundaries_explorer: {
     type: "classifier_game",
     config: "plates",

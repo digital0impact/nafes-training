@@ -1,4 +1,7 @@
 import type { ClassifierConfig } from "../types"
+import { magnets } from "./magnets"
+import { circuits } from "./circuits"
+import { atoms } from "./atoms"
 import { resources } from "./resources"
 import { planet } from "./planet"
 import { space } from "./space"
@@ -25,6 +28,9 @@ import { plates } from "./plates"
 /** سجل ألعاب التصنيف: المفتاح هو قيمة config في بيانات اللعبة (games-data.ts) */
 export const CLASSIFIER_CONFIGS: Record<string, ClassifierConfig> = {
   plates,
+  magnets,
+  circuits,
+  atoms,
   resources,
   planet,
   space,
