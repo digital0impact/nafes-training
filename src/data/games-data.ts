@@ -176,6 +176,11 @@ const baseGamesData: Record<string, GameData> = {
     config: "bonds",
   } as GameData,
 
+  game_reactions_lab: {
+    type: "classifier_game",
+    config: "reactions",
+  } as GameData,
+
   game_plate_boundaries_explorer: {
     type: "classifier_game",
     config: "plates",
