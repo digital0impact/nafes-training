@@ -33,6 +33,8 @@ export function AcademicYearBar({
   const [label, setLabel] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState("")
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState("")
 
   const fetchYears = async () => {
     try {
@@ -66,6 +68,7 @@ export function AcademicYearBar({
     const yearId = value === "current" ? null : value
     setSelected(yearId)
     onYearChange(yearId)
+    setDeleteError("")
     try {
       if (yearId) localStorage.setItem(STORAGE_KEY, yearId)
       else localStorage.removeItem(STORAGE_KEY)
@@ -106,6 +109,43 @@ export function AcademicYearBar({
     }
   }
 
+  const selectedYear = selected ? years.find((year) => year.id === selected) : undefined
+  const canDeleteSelected = Boolean(selectedYear && !selectedYear.isActive)
+
+  const handleDeleteYear = async () => {
+    if (!selectedYear) return
+
+    const confirmed = confirm(
+      selectedYear._count.classes > 0
+        ? `هل أنت متأكدة من حذف السنة الدراسية "${selectedYear.label}"؟ سيتم فك ربط ${selectedYear._count.classes} فصل منها (تبقى الفصول والطالبات محفوظة ضمن السنة الحالية)، ولا يمكن التراجع عن هذا الإجراء.`
+        : `هل أنت متأكدة من حذف السنة الدراسية "${selectedYear.label}"؟ لا يمكن التراجع عن هذا الإجراء.`
+    )
+    if (!confirmed) return
+
+    setDeleting(true)
+    setDeleteError("")
+
+    try {
+      const res = await fetch(`/api/academic-years/${selectedYear.id}`, {
+        method: "DELETE",
+      })
+      const data = await res.json().catch(() => ({}))
+
+      if (!res.ok) {
+        setDeleteError(data.error || "حدث خطأ أثناء حذف السنة الدراسية")
+        return
+      }
+
+      await fetchYears()
+      handleSelect("current")
+    } catch (err) {
+      console.error("Error deleting academic year:", err)
+      setDeleteError("حدث خطأ أثناء الاتصال بالخادم")
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   if (loading) return null
 
   return (
@@ -126,6 +166,18 @@ export function AcademicYearBar({
               </option>
             ))}
           </select>
+        )}
+
+        {canDeleteSelected && !showForm && (
+          <Button
+            type="button"
+            variant="danger"
+            size="sm"
+            isLoading={deleting}
+            onClick={handleDeleteYear}
+          >
+            🗑️ حذف هذه السنة
+          </Button>
         )}
 
         {!showForm && (
@@ -168,6 +220,8 @@ export function AcademicYearBar({
           {error && <p className="w-full text-sm text-red-600">{error}</p>}
         </form>
       )}
+
+      {deleteError && <p className="mt-2 text-sm text-red-600">{deleteError}</p>}
 
       {years.length > 0 && !showForm && (
         <p className="mt-2 text-xs text-slate-500">

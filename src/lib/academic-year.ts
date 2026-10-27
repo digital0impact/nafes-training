@@ -16,11 +16,14 @@ export async function getActiveAcademicYearId(userId: string): Promise<string | 
 /**
  * فلتر Prisma لعرض فصول "السنة الحالية" فقط:
  * - إذا لم تُفعّل المعلمة الميزة بعد (activeYearId = null): لا فلترة، تظهر كل الفصول كما كان سابقاً.
- * - إذا فعّلتها: تظهر فقط فصول السنة النشطة (فصول السنوات السابقة تُنسب دائماً لسنتها عند
- *   إنشاء أول سنة، فلا تبقى فصول "بلا سنة" بعد أول استخدام للميزة).
+ * - إذا فعّلتها: تظهر فصول السنة النشطة، بالإضافة لأي فصول "بلا سنة" (academicYearId = null) -
+ *   وهذا يشمل فصولاً قديمة قبل تفعيل الميزة، أو فصولاً تحررت بعد حذف سنتها الدراسية (الحذف لا
+ *   يمسح الفصول، فقط يفك ارتباطها بالسنة المحذوفة؛ عرضها ضمن "الحالية" أبسط وأوضح من إخفائها).
  */
 export function currentYearClassFilter(
   activeYearId: string | null
 ): Prisma.ClassWhereInput {
-  return activeYearId ? { academicYearId: activeYearId } : {}
+  return activeYearId
+    ? { OR: [{ academicYearId: activeYearId }, { academicYearId: null }] }
+    : {}
 }
