@@ -430,7 +430,6 @@ export default function ClassifierGame({ gameData, onComplete }: ClassifierGameP
           <p className="big" data-el="big">{cfg.intro.big}</p>
           <p className="say" data-el="say">{cfg.intro.say}</p>
           <button className="go" data-el="go" type="button">ابدئي اللعب</button>
-          {cfg.source && <p className="src">المصدر: {cfg.source}</p>}
         </section>
 
         <div className="track" data-el="timer" hidden aria-hidden="true"><i /></div>
@@ -446,7 +445,6 @@ export default function ClassifierGame({ gameData, onComplete }: ClassifierGameP
           <p className="sub" data-el="missedH">راجعي هذه البطاقات</p>
           <ul className="missed" data-el="missed" />
           <button className="go" data-el="again" type="button">احفظي النتيجة</button>
-          {cfg.source && <p className="src">المصدر: {cfg.source}</p>}
         </section>
       </div>
     </div>
