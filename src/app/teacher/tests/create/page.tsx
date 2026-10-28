@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { learningOutcomes } from "@/lib/data";
-import { simulationQuestions } from "@/lib/simulation-questions";
+import { findQuestionById } from "@/lib/simulation-questions";
 import { QuestionSelector } from "@/components/tests/question-selector";
 import { SectionHeader } from "@/components/ui/section-header";
 import type { SimulationQuestion } from "@/lib/simulation-questions";
@@ -45,7 +45,7 @@ export default function CreateTestPage() {
   function addQuestionsFromBank(questionIds: Set<string>) {
     const newQuestions: Question[] = Array.from(questionIds)
       .flatMap((qId) => {
-        const bankQuestion = simulationQuestions.find((q) => q.id === qId);
+        const bankQuestion = findQuestionById(qId);
         if (!bankQuestion) return [];
 
         return [{
@@ -142,7 +142,7 @@ export default function CreateTestPage() {
       // جمع نواتج التعلم من الأسئلة المختارة
       const outcomesFromQuestions = new Set<string>();
       bankQuestionIds.forEach((qId) => {
-        const q = simulationQuestions.find((sq) => sq.id === qId);
+        const q = findQuestionById(qId);
         if (q?.relatedOutcome) {
           outcomesFromQuestions.add(q.relatedOutcome);
         }
@@ -186,7 +186,7 @@ export default function CreateTestPage() {
   // الحصول على معلومات السؤال من بنك الأسئلة
   function getBankQuestionInfo(question: Question): SimulationQuestion | null {
     if (question.type === "bank" && question.bankQuestionId) {
-      return simulationQuestions.find((q) => q.id === question.bankQuestionId) || null;
+      return findQuestionById(question.bankQuestionId) || null;
     }
     return null;
   }
