@@ -319,9 +319,9 @@ export default function StudentsPage() {
     document.body.removeChild(link)
   }
 
-  // تجميع الطالبات حسب الصف
+  // تجميع الطالبات حسب الصف، مع ترتيب كل مجموعة هجائياً بالاسم
   const studentsByGrade = useMemo(() => {
-    return students.reduce((acc, student) => {
+    const grouped = students.reduce((acc, student) => {
       const grade = student.grade || "غير محدد"
       if (!acc[grade]) {
         acc[grade] = []
@@ -329,6 +329,12 @@ export default function StudentsPage() {
       acc[grade].push(student)
       return acc
     }, {} as Record<string, Student[]>)
+
+    for (const grade of Object.keys(grouped)) {
+      grouped[grade].sort((a, b) => a.name.localeCompare(b.name, "ar"))
+    }
+
+    return grouped
   }, [students])
 
   const sortedGrades = useMemo(() => {
