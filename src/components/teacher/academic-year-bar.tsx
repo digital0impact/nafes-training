@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils/cn"
 
 type AcademicYear = {
   id: string
@@ -33,8 +34,8 @@ export function AcademicYearBar({
   const [label, setLabel] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState("")
-  const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState("")
+  const [deletingYearId, setDeletingYearId] = useState<string | null>(null)
 
   const fetchYears = async () => {
     try {
@@ -109,24 +110,19 @@ export function AcademicYearBar({
     }
   }
 
-  const selectedYear = selected ? years.find((year) => year.id === selected) : undefined
-  const canDeleteSelected = Boolean(selectedYear && !selectedYear.isActive)
-
-  const handleDeleteYear = async () => {
-    if (!selectedYear) return
-
+  const handleDeleteYear = async (year: AcademicYear) => {
     const confirmed = confirm(
-      selectedYear._count.classes > 0
-        ? `هل أنت متأكدة من حذف السنة الدراسية "${selectedYear.label}"؟ سيتم فك ربط ${selectedYear._count.classes} فصل منها (تبقى الفصول والطالبات محفوظة ضمن السنة الحالية)، ولا يمكن التراجع عن هذا الإجراء.`
-        : `هل أنت متأكدة من حذف السنة الدراسية "${selectedYear.label}"؟ لا يمكن التراجع عن هذا الإجراء.`
+      year._count.classes > 0
+        ? `هل أنت متأكدة من حذف السنة الدراسية "${year.label}"؟ سيتم فك ربط ${year._count.classes} فصل منها (تبقى الفصول والطالبات محفوظة ضمن السنة الحالية)، ولا يمكن التراجع عن هذا الإجراء.`
+        : `هل أنت متأكدة من حذف السنة الدراسية "${year.label}"؟ لا يمكن التراجع عن هذا الإجراء.`
     )
     if (!confirmed) return
 
-    setDeleting(true)
+    setDeletingYearId(year.id)
     setDeleteError("")
 
     try {
-      const res = await fetch(`/api/academic-years/${selectedYear.id}`, {
+      const res = await fetch(`/api/academic-years/${year.id}`, {
         method: "DELETE",
       })
       const data = await res.json().catch(() => ({}))
@@ -137,12 +133,12 @@ export function AcademicYearBar({
       }
 
       await fetchYears()
-      handleSelect("current")
+      if (selected === year.id) handleSelect("current")
     } catch (err) {
       console.error("Error deleting academic year:", err)
       setDeleteError("حدث خطأ أثناء الاتصال بالخادم")
     } finally {
-      setDeleting(false)
+      setDeletingYearId(null)
     }
   }
 
@@ -154,30 +150,56 @@ export function AcademicYearBar({
         <span className="text-sm font-semibold text-slate-700">📅 السنة الدراسية:</span>
 
         {years.length > 0 && (
-          <select
-            value={selected ?? "current"}
-            onChange={(e) => handleSelect(e.target.value)}
-            className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-          >
-            <option value="current">السنة الحالية</option>
-            {years.map((year) => (
-              <option key={year.id} value={year.id}>
-                {year.label} {year.isActive ? "(نشطة)" : `- أرشيف (${year._count.classes} فصل)`}
-              </option>
-            ))}
-          </select>
-        )}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleSelect("current")}
+              className={cn(
+                "rounded-lg border px-3 py-1.5 text-sm transition-colors",
+                selected === null
+                  ? "border-teal-500 bg-teal-50 font-semibold text-teal-700"
+                  : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+              )}
+            >
+              السنة الحالية
+            </button>
 
-        {canDeleteSelected && !showForm && (
-          <Button
-            type="button"
-            variant="danger"
-            size="sm"
-            isLoading={deleting}
-            onClick={handleDeleteYear}
-          >
-            🗑️ حذف هذه السنة
-          </Button>
+            {years.map((year) => (
+              <div
+                key={year.id}
+                className={cn(
+                  "flex items-center overflow-hidden rounded-lg border",
+                  selected === year.id
+                    ? "border-teal-500 bg-teal-50"
+                    : "border-slate-300 bg-white"
+                )}
+              >
+                <button
+                  type="button"
+                  onClick={() => handleSelect(year.id)}
+                  className={cn(
+                    "px-3 py-1.5 text-sm transition-colors",
+                    selected === year.id
+                      ? "font-semibold text-teal-700"
+                      : "text-slate-700 hover:bg-slate-50"
+                  )}
+                >
+                  {year.label} {year.isActive ? "(نشطة)" : `- أرشيف (${year._count.classes} فصل)`}
+                </button>
+                {!year.isActive && (
+                  <button
+                    type="button"
+                    title="حذف هذه السنة"
+                    disabled={deletingYearId === year.id}
+                    onClick={() => handleDeleteYear(year)}
+                    className="border-r border-slate-200 px-2 py-1.5 text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
+                  >
+                    {deletingYearId === year.id ? "..." : "🗑️"}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
         )}
 
         {!showForm && (
