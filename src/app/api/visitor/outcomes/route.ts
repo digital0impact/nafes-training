@@ -1,6 +1,36 @@
 import { NextResponse } from 'next/server'
 import { requireVisitor, getVisitorProfile, canVisitorSee, type VisitorScopeKey } from '@/lib/auth-server'
 import { learningOutcomes } from '@/lib/data'
+import { prisma } from '@/lib/prisma'
+
+const weekNumber = (week: string) => parseInt(week.replace(/\D/g, '')) || 0
+const periodRank = (period?: string) => (period === 'الفترة الثانية' ? 2 : period === 'الفترة الأولى' ? 1 : 3)
+
+type SavedPlan = { periodChanges?: Record<string, string>; weekAssignments?: Record<string, string> }
+
+async function readPlan(teacherId: string): Promise<SavedPlan | null> {
+  try {
+    const rows = await prisma.$queryRaw<{ data: SavedPlan | null }[]>`
+      SELECT "data" FROM "teacher_plans" WHERE "userId" = ${teacherId}`
+    return rows[0]?.data ?? null
+  } catch {
+    return null // الجدول لم يُنشأ بعد: لا توجد خطط محفوظة
+  }
+}
+
+/** خطة نافس كما رتبتها المعلمة؛ إن لم تحفظ خطة تظهر الخطة الافتراضية */
+async function getTeacherOutcomes(teacherId: string) {
+  const plan = await readPlan(teacherId)
+  const outcomes = learningOutcomes.map((item) => {
+    const key = `${item.domain}-${item.lesson}`
+    return {
+      ...item,
+      period: plan?.periodChanges?.[key] || item.period,
+      week: plan?.weekAssignments?.[key] || item.week,
+    }
+  })
+  return outcomes.sort((a, b) => periodRank(a.period) - periodRank(b.period) || weekNumber(a.week) - weekNumber(b.week))
+}
 
 /**
  * GET - خطة نافس (قراءة فقط) للزائر - بدون بيانات شخصية
@@ -15,7 +45,7 @@ export async function GET() {
     if (!canVisitorSee(profile.scope, 'nafes_plan' as VisitorScopeKey)) {
       return NextResponse.json({ error: 'غير مصرح بعرض خطة نافس.' }, { status: 403 })
     }
-    return NextResponse.json({ outcomes: learningOutcomes })
+    return NextResponse.json({ outcomes: await getTeacherOutcomes(profile.teacherId) })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'حدث خطأ'
     if (message === 'Unauthorized') return NextResponse.json({ error: 'يجب تسجيل الدخول' }, { status: 401 })

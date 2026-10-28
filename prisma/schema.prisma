@@ -37,6 +37,7 @@ model User {
   auditLogs        AuditLog[]
   teacherVisitors  VisitorProfile[]   @relation("VisitorProfileAsTeacher")
   visitorInvites   VisitorInvite[]
+  teacherPlan      TeacherPlan?
 
   @@index([schoolId])
   @@map("users")
@@ -354,4 +355,15 @@ model TestShare {
   @@map("test_shares")
   @@index([userId])
   @@index([modelId])
+}
+
+// خطة نافس المخصصة لكل معلمة (توزيع النواتج على الأسابيع). عدم وجود سجل = الخطة الافتراضية
+model TeacherPlan {
+  userId    String   @id
+  data      Json
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("teacher_plans")
 }
