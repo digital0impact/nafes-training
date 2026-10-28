@@ -5,7 +5,6 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
-import { TeacherHeader } from "@/features/classes/components/teacher-header"
 import { PageBackground } from "@/components/layout/page-background"
 
 type Class = {
@@ -82,8 +81,6 @@ export default function ClassDetailPage() {
     <main className="relative min-h-screen overflow-hidden bg-[#faf9f7]">
       <PageBackground />
       <div className="relative z-10 space-y-6 p-4 py-8">
-        <TeacherHeader />
-
         <div className="card bg-white">
           <div className="mb-6 flex items-center justify-between">
             <div>
