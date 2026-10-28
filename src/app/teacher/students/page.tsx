@@ -201,84 +201,88 @@ export default function StudentsPage() {
     }
   }
 
-  function handleFileImport(event: ChangeEvent<HTMLInputElement>) {
+  async function handleFileImport(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
     if (!file) return
 
     setIsImporting(true)
 
-    const reader = new FileReader()
-    reader.onload = async (e) => {
-      try {
-        const text = e.target?.result as string
-        const lines = text.split("\n").filter(line => line.trim())
-        
-        const dataLines = lines[0]?.includes("اسم") || lines[0]?.includes("الصف") 
-          ? lines.slice(1) 
-          : lines
+    try {
+      // نقرأ الملف كبيانات ثنائية ونستخدم مكتبة SheetJS لتحليله، بدلاً من قراءته
+      // كنص عادي - صيغة xlsx/xls ملفات ثنائية (ZIP/OLE) ولا يمكن تحليلها بتقسيم
+      // النص على الفواصل، وهذا كان سبب فشل الاستيراد من إكسل تحديداً.
+      const XLSX = await import("xlsx")
+      const buffer = await file.arrayBuffer()
+      const workbook = XLSX.read(buffer, { type: "array" })
+      const sheet = workbook.Sheets[workbook.SheetNames[0]]
+      const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, blankrows: false })
 
-        const importedStudents: Student[] = []
-        const defaultPassword = "1234"
+      const firstCell = rows[0]?.[0]
+      const dataRows =
+        typeof firstCell === "string" && (firstCell.includes("اسم") || firstCell.includes("الصف"))
+          ? rows.slice(1)
+          : rows
 
-        for (const line of dataLines) {
-          const parts = line.split(",").map(p => p.trim())
-          
-          if (parts.length >= 2) {
-            const name = parts[0]
-            const grade = parts[1] || ""
-            const classCode = parts[2] || `SCI${grade.replace("/", "")}`
-            
-            if (name) {
-              try {
-                const response = await fetch("/api/students/create", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    name,
-                    grade,
-                    classCode,
-                    // لا نرسل password - سيتم إنشاء كلمة مرور افتراضية تلقائياً
-                    classId: undefined, // سيتم البحث عن الفصل باستخدام classCode
-                  }),
-                })
+      const defaultPassword = "1234"
+      let importedCount = 0
+      const failedRows: string[] = []
 
-                if (response.ok) {
-                  const created = await response.json()
-                  importedStudents.push({
-                    id: created.student?.studentId,
-                    name,
-                    grade,
-                    classCode
-                  })
-                }
-              } catch (error) {
-                console.error(`Error creating student ${name}:`, error)
-              }
-            }
+      for (const row of dataRows) {
+        const name = String(row[0] ?? "").trim()
+        if (!name) continue
+
+        const grade = String(row[1] ?? "").trim()
+        const classCode = String(row[2] ?? "").trim() || `SCI${grade.replace("/", "")}`
+
+        try {
+          const response = await fetch("/api/students/create", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name,
+              grade,
+              classCode,
+              // لا نرسل password - سيتم إنشاء كلمة مرور افتراضية تلقائياً
+            }),
+          })
+
+          if (response.ok) {
+            importedCount++
+          } else {
+            const data = await response.json().catch(() => ({}))
+            failedRows.push(`${name}: ${data.error || "فشل إنشاء الحساب"}`)
           }
+        } catch (error) {
+          console.error(`Error creating student ${name}:`, error)
+          failedRows.push(`${name}: تعذر الاتصال بالخادم`)
         }
-
-        if (importedStudents.length > 0) {
-          await fetchStudents(viewYearId)
-          alert(
-            `تم استيراد ${importedStudents.length} طالبة بنجاح!\nكلمة المرور الافتراضية للجميع: ${defaultPassword}`
-          )
-          setActiveTab("all")
-        } else {
-          alert("لم يتم العثور على بيانات صحيحة في الملف أو حدث خطأ في إنشاء الحسابات")
-        }
-      } catch (error) {
-        console.error("خطأ في استيراد الملف:", error)
-        alert("حدث خطأ أثناء استيراد الملف. تأكدي من تنسيق الملف")
-      } finally {
-        setIsImporting(false)
-        event.target.value = ""
       }
-    }
 
-    reader.readAsText(file, 'UTF-8')
+      if (importedCount > 0) {
+        await fetchStudents(viewYearId)
+        setActiveTab("all")
+      }
+
+      if (importedCount > 0 && failedRows.length === 0) {
+        alert(`تم استيراد ${importedCount} طالبة بنجاح!\nكلمة المرور الافتراضية للجميع: ${defaultPassword}`)
+      } else if (importedCount > 0) {
+        alert(
+          `تم استيراد ${importedCount} طالبة بنجاح (كلمة المرور الافتراضية: ${defaultPassword}).\n\nلم يتم استيراد ${failedRows.length} طالبة:\n${failedRows.slice(0, 8).join("\n")}${failedRows.length > 8 ? "\n..." : ""}`
+        )
+      } else if (failedRows.length > 0) {
+        alert(`لم يتم استيراد أي طالبة:\n${failedRows.slice(0, 8).join("\n")}${failedRows.length > 8 ? "\n..." : ""}`)
+      } else {
+        alert("لم يتم العثور على بيانات صحيحة في الملف")
+      }
+    } catch (error) {
+      console.error("خطأ في استيراد الملف:", error)
+      alert("حدث خطأ أثناء استيراد الملف. تأكدي من تنسيق الملف (CSV أو Excel)")
+    } finally {
+      setIsImporting(false)
+      event.target.value = ""
+    }
   }
 
   function handleExportTemplate() {
@@ -629,6 +633,8 @@ export default function StudentsPage() {
                 <ul className="space-y-1 text-xs text-blue-800">
                   <li>• يجب أن يكون الملف بصيغة CSV أو Excel</li>
                   <li>• السطر الأول يمكن أن يحتوي على العناوين (سيتم تجاهله)</li>
+                  <li>• رمز الفصل يجب أن يطابق رمز فصل موجود مسبقاً في المنصة، وإلا ستفشل تلك الطالبة مع توضيح السبب</li>
+                  <li>• في إكسل، نسّقي خلية "الصف" كنص قبل الكتابة فيها (مثل 3/1) لتفادي تحويلها تلقائياً إلى تاريخ</li>
                   <li>• كلمة المرور الافتراضية للطالبات المستوردة: 1234</li>
                   <li>• سيتم إنشاء رقم طالبة تلقائياً لكل طالبة</li>
                 </ul>
