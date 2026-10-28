@@ -29,6 +29,7 @@ export default function StudentsPage() {
   const [activeTab, setActiveTab] = useState<TabType>("all")
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isImporting, setIsImporting] = useState(false)
+  const [importClassId, setImportClassId] = useState("")
   const [viewYearId, setViewYearId] = useState<string | null>(null)
   const [formData, setFormData] = useState<Student & { password?: string; classId?: string }>({
     id: "",
@@ -46,6 +47,7 @@ export default function StudentsPage() {
     if (viewYearId && (activeTab === "add" || activeTab === "import")) {
       setActiveTab("all")
     }
+    setImportClassId("") // قائمة الفصول تتغير مع السنة، فنُلغي اختياراً قد لا يعود صالحاً
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewYearId])
 
@@ -205,6 +207,13 @@ export default function StudentsPage() {
     const file = event.target.files?.[0]
     if (!file) return
 
+    const selectedClass = classes.find((c) => c.id === importClassId)
+    if (!selectedClass) {
+      alert("اختاري الفصل الذي ستنتمي له الطالبات المستوردات أولاً")
+      event.target.value = ""
+      return
+    }
+
     setIsImporting(true)
 
     try {
@@ -227,12 +236,14 @@ export default function StudentsPage() {
       let importedCount = 0
       const failedRows: string[] = []
 
+      // كل الطالبات المستوردات يُنسبن للفصل المحدد أعلاه - الملف يحتاج عمود
+      // الاسم فقط (أي أعمدة أخرى كصف أو رمز فصل، إن وُجدت، تُتجاهل).
       for (const row of dataRows) {
         const name = String(row[0] ?? "").trim()
         if (!name) continue
 
-        const grade = String(row[1] ?? "").trim()
-        const classCode = String(row[2] ?? "").trim() || `SCI${grade.replace("/", "")}`
+        const grade = selectedClass.grade
+        const classCode = selectedClass.code
 
         try {
           const response = await fetch("/api/students/create", {
@@ -286,7 +297,7 @@ export default function StudentsPage() {
   }
 
   function handleExportTemplate() {
-    const template = "اسم الطالبة,الصف,رمز الفصل\nسارة محمد,3/1,SCI3A\nنورة عبدالله,3/2,SCI3B"
+    const template = "اسم الطالبة\nسارة محمد\nنورة عبدالله"
     const blob = new Blob(["\ufeff" + template], { type: "text/csv;charset=utf-8;" })
     const link = document.createElement("a")
     const url = URL.createObjectURL(blob)
@@ -585,28 +596,64 @@ export default function StudentsPage() {
           <div className="space-y-6">
             <SectionHeader
               title="استيراد طالبات من ملف"
-              subtitle="استوردي قائمة الطالبات من ملف CSV أو Excel"
+              subtitle="استوردي قائمة أسماء الطالبات من ملف CSV أو Excel، وأضيفيها دفعة واحدة لفصل محدد"
             />
 
             <div className="card space-y-6">
-              <div className="rounded-2xl border-2 border-dashed border-primary-300 bg-primary-50 p-8 text-center">
+              {classes.length === 0 ? (
+                <div className="rounded-2xl bg-amber-50 border border-amber-200 p-4 text-sm text-amber-800">
+                  لا توجد فصول بعد. أنشئي فصلاً أولاً من صفحة "الفصول" قبل استيراد الطالبات.
+                </div>
+              ) : (
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-900">
+                    اختاري الفصل الذي ستنتمي له الطالبات المستوردات
+                  </label>
+                  <select
+                    value={importClassId}
+                    onChange={(e) => setImportClassId(e.target.value)}
+                    className="w-full max-w-sm rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="">— اختاري الفصل —</option>
+                    {classes.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} ({c.grade}) - {c.code}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div
+                className={`rounded-2xl border-2 border-dashed p-8 text-center ${
+                  importClassId ? "border-primary-300 bg-primary-50" : "border-slate-200 bg-slate-50"
+                }`}
+              >
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-100">
                   <svg className="h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
                 </div>
-                <h3 className="mb-2 text-lg font-semibold text-slate-900">رفع ملف الطالبات</h3>
+                <h3 className="mb-2 text-lg font-semibold text-slate-900">رفع ملف أسماء الطالبات</h3>
                 <p className="mb-4 text-slate-600">
-                  قومي برفع ملف CSV أو Excel يحتوي على بيانات الطالبات
+                  {importClassId
+                    ? "قومي برفع ملف CSV أو Excel يحتوي على عمود واحد بأسماء الطالبات"
+                    : "اختاري الفصل أعلاه أولاً لتفعيل الرفع"}
                 </p>
-                <label className="inline-block rounded-2xl bg-primary-600 px-6 py-3 font-semibold text-white transition hover:bg-primary-700 cursor-pointer">
-                  {isImporting ? 'جاري الاستيراد...' : '📥 اختيار ملف'}
+                <label
+                  className={`inline-block rounded-2xl px-6 py-3 font-semibold text-white transition ${
+                    importClassId && !isImporting
+                      ? "bg-primary-600 hover:bg-primary-700 cursor-pointer"
+                      : "bg-slate-300 cursor-not-allowed"
+                  }`}
+                >
+                  {isImporting ? "جاري الاستيراد..." : "📥 اختيار ملف"}
                   <input
                     type="file"
                     accept=".csv,.xlsx,.xls"
                     onChange={handleFileImport}
                     className="hidden"
-                    disabled={isImporting}
+                    disabled={isImporting || !importClassId}
                   />
                 </label>
               </div>
@@ -615,9 +662,9 @@ export default function StudentsPage() {
                 <h4 className="mb-3 text-sm font-semibold text-slate-900">تنسيق الملف المطلوب:</h4>
                 <div className="rounded-2xl bg-slate-50 p-4">
                   <code className="text-xs text-slate-700">
-                    اسم الطالبة,الصف,رمز الفصل<br />
-                    سارة محمد,3/1,SCI3A<br />
-                    نورة عبدالله,3/2,SCI3B
+                    اسم الطالبة<br />
+                    سارة محمد<br />
+                    نورة عبدالله
                   </code>
                 </div>
                 <button
@@ -632,9 +679,9 @@ export default function StudentsPage() {
                 <h4 className="mb-2 text-sm font-semibold text-blue-900">ملاحظات مهمة:</h4>
                 <ul className="space-y-1 text-xs text-blue-800">
                   <li>• يجب أن يكون الملف بصيغة CSV أو Excel</li>
+                  <li>• عمود واحد فقط يكفي: اسم الطالبة - أي أعمدة أخرى يتم تجاهلها</li>
                   <li>• السطر الأول يمكن أن يحتوي على العناوين (سيتم تجاهله)</li>
-                  <li>• رمز الفصل يجب أن يطابق رمز فصل موجود مسبقاً في المنصة، وإلا ستفشل تلك الطالبة مع توضيح السبب</li>
-                  <li>• في إكسل، نسّقي خلية "الصف" كنص قبل الكتابة فيها (مثل 3/1) لتفادي تحويلها تلقائياً إلى تاريخ</li>
+                  <li>• كل الطالبات المستوردات في هذه العملية يُضَفن لنفس الفصل المختار أعلاه</li>
                   <li>• كلمة المرور الافتراضية للطالبات المستوردة: 1234</li>
                   <li>• سيتم إنشاء رقم طالبة تلقائياً لكل طالبة</li>
                 </ul>
