@@ -13,6 +13,7 @@ import {
 } from "@/lib/test-models";
 import { useStudentStore } from "@/store/student-store";
 import { StudentAuthGuard } from "@/components/student";
+import { resolveLessonName } from "@/lib/data";
 
 type TestTab = "new" | "completed";
 
@@ -314,7 +315,7 @@ function SelectTestModelContent() {
                   <div className="space-y-2 border-t border-slate-100 pt-3">
                     <p className="text-xs font-semibold text-slate-600">نواتج التعلم المرتبطة:</p>
                     <div className="flex flex-wrap gap-1">
-                      {(relatedOutcomes.length ? relatedOutcomes : model.relatedOutcomes!.map((lesson: string) => ({ lesson }))).slice(0, 3).map((outcome: { lesson: string }) => (
+                      {(relatedOutcomes.length ? relatedOutcomes : model.relatedOutcomes!.map((lesson: string) => ({ lesson: resolveLessonName(lesson) }))).slice(0, 3).map((outcome: { lesson: string }) => (
                         <span
                           key={outcome.lesson}
                           className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-600"

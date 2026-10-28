@@ -353,7 +353,7 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "نظام السلم التصنيفي المتدرج",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تصنيف المخلوقات الحية بنظام لينيوس"
+    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث"
   },
   {
     id: "q24",
@@ -368,7 +368,7 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "البدائيات والطلائعيات والفطريات والنباتات والحيوانات",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تصنيف المخلوقات الحية بنظام لينيوس"
+    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث"
   },
   {
     id: "q25",
@@ -954,7 +954,7 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الشعبة",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تصنيف المخلوقات الحية بنظام لينيوس"
+    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث"
   },
   {
     id: "q64",
@@ -1317,7 +1317,7 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "النوع",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تصنيف المخلوقات الحية بنظام لينيوس"
+    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث"
   },
   {
     id: "q88",
@@ -1619,7 +1619,7 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المملكة",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تصنيف المخلوقات الحية بنظام لينيوس"
+    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث"
   },
   {
     id: "q110",

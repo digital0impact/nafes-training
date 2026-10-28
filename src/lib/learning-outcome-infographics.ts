@@ -14,7 +14,7 @@ const INFOGRAPHICS_BY_LESSON: Record<string, OutcomeInfographic[]> = {
     { url: "/images/activities/تكامل أجهزة جسم الإنسان2/2-2.png", title: "انفوجرافيك 2-2" },
     { url: "/images/activities/تكامل أجهزة جسم الإنسان2/2-3.png", title: "انفوجرافيك 2-3" },
   ],
-  "تصنيف المخلوقات الحية بنظام لينيوس": [
+  "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث": [
     { url: "/images/activities/تصنيف المخلوقات الحية بنظام3 لينيوس/3-1.png", title: "انفوجرافيك 3-1" },
     { url: "/images/activities/تصنيف المخلوقات الحية بنظام3 لينيوس/3-2.png", title: "انفوجرافيك 3-2" },
     { url: "/images/activities/تصنيف المخلوقات الحية بنظام3 لينيوس/3-3.png", title: "انفوجرافيك 3-3" },
