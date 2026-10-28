@@ -6,6 +6,7 @@ import Link from "next/link"
 import { StudentAuthGuard, useStudentAuth } from "@/components/student"
 import { gamesData } from "@/data/games-data"
 import InteractiveCircuit from "@/components/games/InteractiveCircuit"
+import LabTheme from "@/components/games/LabTheme"
 import AtomBuilder from "@/components/games/AtomBuilder"
 import AtomBuilderEnhanced from "@/components/games/AtomBuilderEnhanced"
 import PeriodicFamilyComparison from "@/components/games/PeriodicFamilyComparison"
@@ -20,6 +21,7 @@ import ReactionRatesLab from "@/components/games/ReactionRatesLab"
 import PlateTectonicsJourney from "@/components/games/PlateTectonicsJourney"
 import ScienceMethodJourney from "@/components/games/ScienceMethodJourney"
 import ScienceSkillsMatch from "@/components/games/ScienceSkillsMatch"
+import ClassifierGame from "@/components/games/classifier/ClassifierGame"
 
 type EducationalGame = {
   game_id: string
@@ -595,255 +597,304 @@ export default function GamePlayPage() {
 
         {/* لعبة بركانك الصحيح - 3 مستويات */}
         {gameData.type === "volcano_types" && (
-          <VolcanoTypesGame
-            gameData={gameData}
-            game={{
-              game_id: game.game_id,
-              title: game.title,
-              chapter: game.chapter,
-              objective: game.objective,
-              points: game.points,
-            }}
-            onComplete={async (result) => {
-              await saveGameAttempt({
-                answers: (result.answers ?? {}) as Record<string, unknown>,
-                score: Math.round((result.score / 100) * game.points),
-                totalScore: game.points,
-                percentage: result.score,
-                timeSpent: result.timeSpent,
-              })
-              setShowFeedback(true)
-              setFeedbackMessage(
-                result.score === 100 ? "ممتاز! لقد أتقنت الإجابة" : result.score >= 70 ? "جيد جداً! حاولي مرة أخرى لتحسين النتيجة" : "حاولي مرة أخرى"
-              )
-              setTimeout(() => {
-                setShowFeedback(false)
-                router.push(`/student/games/${gameId}/result?score=${result.score}`)
-              }, 2000)
-            }}
-          />
+          <LabTheme>
+            <VolcanoTypesGame
+              gameData={gameData}
+              game={{
+                game_id: game.game_id,
+                title: game.title,
+                chapter: game.chapter,
+                objective: game.objective,
+                points: game.points,
+              }}
+              onComplete={async (result) => {
+                await saveGameAttempt({
+                  answers: (result.answers ?? {}) as Record<string, unknown>,
+                  score: Math.round((result.score / 100) * game.points),
+                  totalScore: game.points,
+                  percentage: result.score,
+                  timeSpent: result.timeSpent,
+                })
+                setShowFeedback(true)
+                setFeedbackMessage(
+                  result.score === 100 ? "ممتاز! لقد أتقنت الإجابة" : result.score >= 70 ? "جيد جداً! حاولي مرة أخرى لتحسين النتيجة" : "حاولي مرة أخرى"
+                )
+                setTimeout(() => {
+                  setShowFeedback(false)
+                  router.push(`/student/games/${gameId}/result?score=${result.score}`)
+                }, 2000)
+              }}
+            />
+          </LabTheme>
         )}
 
         {/* لعبة الصدوع الجيولوجية - 3 مراحل */}
         {gameData.type === "geological_faults" && (
-          <GeologicalFaultsGame
-            gameData={gameData}
-            game={{
-              game_id: game.game_id,
-              title: game.title,
-              chapter: game.chapter,
-              objective: game.objective,
-              points: game.points,
-            }}
-            onComplete={async (result) => {
-              await saveGameAttempt({
-                answers: (result.answers ?? {}) as Record<string, unknown>,
-                score: Math.round((result.score / 100) * game.points),
-                totalScore: game.points,
-                percentage: result.score,
-                timeSpent: result.timeSpent,
-              })
-              setShowFeedback(true)
-              setFeedbackMessage(
-                result.score === 100 ? "ممتاز! أتقنتِ الصدوع الجيولوجية" : result.score >= 70 ? "جيد جداً! حاولي مرة أخرى لتحسين النتيجة" : "حاولي مرة أخرى"
-              )
-              setTimeout(() => {
-                setShowFeedback(false)
-                router.push(`/student/games/${gameId}/result?score=${result.score}`)
-              }, 2000)
-            }}
-          />
+          <LabTheme>
+            <GeologicalFaultsGame
+              gameData={gameData}
+              game={{
+                game_id: game.game_id,
+                title: game.title,
+                chapter: game.chapter,
+                objective: game.objective,
+                points: game.points,
+              }}
+              onComplete={async (result) => {
+                await saveGameAttempt({
+                  answers: (result.answers ?? {}) as Record<string, unknown>,
+                  score: Math.round((result.score / 100) * game.points),
+                  totalScore: game.points,
+                  percentage: result.score,
+                  timeSpent: result.timeSpent,
+                })
+                setShowFeedback(true)
+                setFeedbackMessage(
+                  result.score === 100 ? "ممتاز! أتقنتِ الصدوع الجيولوجية" : result.score >= 70 ? "جيد جداً! حاولي مرة أخرى لتحسين النتيجة" : "حاولي مرة أخرى"
+                )
+                setTimeout(() => {
+                  setShowFeedback(false)
+                  router.push(`/student/games/${gameId}/result?score=${result.score}`)
+                }, 2000)
+              }}
+            />
+          </LabTheme>
         )}
 
         {/* لعبة مختبر الروابط الكيميائية – Chemical Bond Lab */}
         {gameData.type === "chemical_bond_lab" && (
-          <ChemicalBondLab
-            gameData={gameData}
-            game={{
-              game_id: game.game_id,
-              title: game.title,
-              chapter: game.chapter,
-              objective: game.objective,
-              points: game.points,
-            }}
-            onComplete={async (result) => {
-              await saveGameAttempt({
-                answers: (result.answers ?? {}) as Record<string, unknown>,
-                score: Math.round((result.score / 100) * game.points),
-                totalScore: game.points,
-                percentage: result.score,
-                timeSpent: result.timeSpent,
-              })
-              setShowFeedback(true)
-              setFeedbackMessage(
-                result.score === 100 ? "ممتاز! أتقنتِ مختبر الروابط الكيميائية" : result.score >= 70 ? "جيد جداً! حاولي مرة أخرى لتحسين النتيجة" : "حاولي مرة أخرى"
-              )
-              setTimeout(() => {
-                setShowFeedback(false)
-                router.push(`/student/games/${gameId}/result?score=${result.score}`)
-              }, 2000)
-            }}
-          />
+          <LabTheme>
+            <ChemicalBondLab
+              gameData={gameData}
+              game={{
+                game_id: game.game_id,
+                title: game.title,
+                chapter: game.chapter,
+                objective: game.objective,
+                points: game.points,
+              }}
+              onComplete={async (result) => {
+                await saveGameAttempt({
+                  answers: (result.answers ?? {}) as Record<string, unknown>,
+                  score: Math.round((result.score / 100) * game.points),
+                  totalScore: game.points,
+                  percentage: result.score,
+                  timeSpent: result.timeSpent,
+                })
+                setShowFeedback(true)
+                setFeedbackMessage(
+                  result.score === 100 ? "ممتاز! أتقنتِ مختبر الروابط الكيميائية" : result.score >= 70 ? "جيد جداً! حاولي مرة أخرى لتحسين النتيجة" : "حاولي مرة أخرى"
+                )
+                setTimeout(() => {
+                  setShowFeedback(false)
+                  router.push(`/student/games/${gameId}/result?score=${result.score}`)
+                }, 2000)
+              }}
+            />
+          </LabTheme>
         )}
 
         {/* لعبة سر العائلة الدورية – Valence Electron Patterns */}
         {gameData.type === "valence_electron_patterns" && (
-          <ValenceElectronPatterns
-            gameData={gameData}
-            game={{
-              game_id: game.game_id,
-              title: game.title,
-              chapter: game.chapter,
-              objective: game.objective,
-              points: game.points,
-            }}
-            onComplete={async (result) => {
-              await saveGameAttempt({
-                answers: (result.answers ?? {}) as Record<string, unknown>,
-                score: Math.round((result.score / 100) * game.points),
-                totalScore: game.points,
-                percentage: result.score,
-                timeSpent: result.timeSpent,
-              })
-              setShowFeedback(true)
-              setFeedbackMessage(
-                result.score === 100 ? "ممتاز! أتقنتِ سر العائلة الدورية" : result.score >= 70 ? "جيد جداً! حاولي مرة أخرى لتحسين النتيجة" : "حاولي مرة أخرى"
-              )
-              setTimeout(() => {
-                setShowFeedback(false)
-                router.push(`/student/games/${gameId}/result?score=${result.score}`)
-              }, 2000)
-            }}
-          />
+          <LabTheme>
+            <ValenceElectronPatterns
+              gameData={gameData}
+              game={{
+                game_id: game.game_id,
+                title: game.title,
+                chapter: game.chapter,
+                objective: game.objective,
+                points: game.points,
+              }}
+              onComplete={async (result) => {
+                await saveGameAttempt({
+                  answers: (result.answers ?? {}) as Record<string, unknown>,
+                  score: Math.round((result.score / 100) * game.points),
+                  totalScore: game.points,
+                  percentage: result.score,
+                  timeSpent: result.timeSpent,
+                })
+                setShowFeedback(true)
+                setFeedbackMessage(
+                  result.score === 100 ? "ممتاز! أتقنتِ سر العائلة الدورية" : result.score >= 70 ? "جيد جداً! حاولي مرة أخرى لتحسين النتيجة" : "حاولي مرة أخرى"
+                )
+                setTimeout(() => {
+                  setShowFeedback(false)
+                  router.push(`/student/games/${gameId}/result?score=${result.score}`)
+                }, 2000)
+              }}
+            />
+          </LabTheme>
         )}
 
         {/* لعبة خريطة إلكترونات الذرة – Atom Electron Map */}
         {gameData.type === "atom_electron_map" && (
-          <AtomElectronMap
-            gameData={gameData}
-            game={{
-              game_id: game.game_id,
-              title: game.title,
-              chapter: game.chapter,
-              objective: game.objective,
-              points: game.points,
-            }}
-            onComplete={async (result) => {
-              await saveGameAttempt({
-                answers: (result.answers ?? {}) as Record<string, unknown>,
-                score: Math.round((result.score / 100) * game.points),
-                totalScore: game.points,
-                percentage: result.score,
-                timeSpent: result.timeSpent,
-              })
-              setShowFeedback(true)
-              setFeedbackMessage(
-                result.score >= 90 ? "ممتاز! أتقنتِ خريطة إلكترونات الذرة" : result.score >= 70 ? "جيد جداً! راجعي التوزيع والتمثيل النقطي" : "حاولي مرة أخرى"
-              )
-              setTimeout(() => {
-                setShowFeedback(false)
-                router.push(`/student/games/${gameId}/result?score=${result.score}`)
-              }, 2000)
-            }}
-          />
+          <LabTheme>
+            <AtomElectronMap
+              gameData={gameData}
+              game={{
+                game_id: game.game_id,
+                title: game.title,
+                chapter: game.chapter,
+                objective: game.objective,
+                points: game.points,
+              }}
+              onComplete={async (result) => {
+                await saveGameAttempt({
+                  answers: (result.answers ?? {}) as Record<string, unknown>,
+                  score: Math.round((result.score / 100) * game.points),
+                  totalScore: game.points,
+                  percentage: result.score,
+                  timeSpent: result.timeSpent,
+                })
+                setShowFeedback(true)
+                setFeedbackMessage(
+                  result.score >= 90 ? "ممتاز! أتقنتِ خريطة إلكترونات الذرة" : result.score >= 70 ? "جيد جداً! راجعي التوزيع والتمثيل النقطي" : "حاولي مرة أخرى"
+                )
+                setTimeout(() => {
+                  setShowFeedback(false)
+                  router.push(`/student/games/${gameId}/result?score=${result.score}`)
+                }, 2000)
+              }}
+            />
+          </LabTheme>
         )}
 
         {/* لعبة مختبر الصيغ الذكية – Smart Formula Lab */}
         {gameData.type === "smart_formula_lab" && (
-          <SmartFormulaLab
-            gameData={gameData}
-            game={{
-              game_id: game.game_id,
-              title: game.title,
-              chapter: game.chapter,
-              objective: game.objective,
-              points: game.points,
-            }}
-            onComplete={async (result) => {
-              await saveGameAttempt({
-                answers: (result.answers ?? {}) as Record<string, unknown>,
-                score: Math.round((result.score / 100) * game.points),
-                totalScore: game.points,
-                percentage: result.score,
-                timeSpent: result.timeSpent,
-              })
-              setShowFeedback(true)
-              setFeedbackMessage(
-                result.score === 100 ? "ممتاز! أتقنتِ مختبر الصيغ الذكية" : result.score >= 70 ? "جيد جداً! راجعي الأيون والجزيء والمركب" : "حاولي مرة أخرى"
-              )
-              setTimeout(() => {
-                setShowFeedback(false)
-                router.push(`/student/games/${gameId}/result?score=${result.score}`)
-              }, 2000)
-            }}
-          />
+          <LabTheme>
+            <SmartFormulaLab
+              gameData={gameData}
+              game={{
+                game_id: game.game_id,
+                title: game.title,
+                chapter: game.chapter,
+                objective: game.objective,
+                points: game.points,
+              }}
+              onComplete={async (result) => {
+                await saveGameAttempt({
+                  answers: (result.answers ?? {}) as Record<string, unknown>,
+                  score: Math.round((result.score / 100) * game.points),
+                  totalScore: game.points,
+                  percentage: result.score,
+                  timeSpent: result.timeSpent,
+                })
+                setShowFeedback(true)
+                setFeedbackMessage(
+                  result.score === 100 ? "ممتاز! أتقنتِ مختبر الصيغ الذكية" : result.score >= 70 ? "جيد جداً! راجعي الأيون والجزيء والمركب" : "حاولي مرة أخرى"
+                )
+                setTimeout(() => {
+                  setShowFeedback(false)
+                  router.push(`/student/games/${gameId}/result?score=${result.score}`)
+                }, 2000)
+              }}
+            />
+          </LabTheme>
         )}
 
         {/* لعبة مختبر التفاعلات والطاقة – Chemical Reactions & Energy Lab */}
         {gameData.type === "chemical_reactions_energy_lab" && (
-          <ChemicalReactionsEnergyLab
-            gameData={gameData}
-            game={{
-              game_id: game.game_id,
-              title: game.title,
-              chapter: game.chapter,
-              objective: game.objective,
-              points: game.points,
-            }}
-            onComplete={async (result) => {
-              await saveGameAttempt({
-                answers: (result.answers ?? {}) as Record<string, unknown>,
-                score: Math.round((result.score / 100) * game.points),
-                totalScore: game.points,
-                percentage: result.score,
-                timeSpent: result.timeSpent,
-              })
-              setShowFeedback(true)
-              setFeedbackMessage(
-                result.score === 100 ? "ممتاز! أتقنتِ مختبر التفاعلات والطاقة" : result.score >= 70 ? "جيد جداً! راجعي التفاعلات والطاقة" : "حاولي مرة أخرى"
-              )
-              setTimeout(() => {
-                setShowFeedback(false)
-                router.push(`/student/games/${gameId}/result?score=${result.score}`)
-              }, 2000)
-            }}
-          />
+          <LabTheme>
+            <ChemicalReactionsEnergyLab
+              gameData={gameData}
+              game={{
+                game_id: game.game_id,
+                title: game.title,
+                chapter: game.chapter,
+                objective: game.objective,
+                points: game.points,
+              }}
+              onComplete={async (result) => {
+                await saveGameAttempt({
+                  answers: (result.answers ?? {}) as Record<string, unknown>,
+                  score: Math.round((result.score / 100) * game.points),
+                  totalScore: game.points,
+                  percentage: result.score,
+                  timeSpent: result.timeSpent,
+                })
+                setShowFeedback(true)
+                setFeedbackMessage(
+                  result.score === 100 ? "ممتاز! أتقنتِ مختبر التفاعلات والطاقة" : result.score >= 70 ? "جيد جداً! راجعي التفاعلات والطاقة" : "حاولي مرة أخرى"
+                )
+                setTimeout(() => {
+                  setShowFeedback(false)
+                  router.push(`/student/games/${gameId}/result?score=${result.score}`)
+                }, 2000)
+              }}
+            />
+          </LabTheme>
         )}
 
         {/* لعبة مختبر سرعة التفاعلات – Reaction Rates Lab */}
         {gameData.type === "reaction_rates_lab" && (
-          <ReactionRatesLab
-            gameData={gameData}
-            game={{
-              game_id: game.game_id,
-              title: game.title,
-              chapter: game.chapter,
-              objective: game.objective,
-              points: game.points,
-            }}
-            onComplete={async (result) => {
-              await saveGameAttempt({
-                answers: (result.answers ?? {}) as Record<string, unknown>,
-                score: Math.round((result.score / 100) * game.points),
-                totalScore: game.points,
-                percentage: result.score,
-                timeSpent: result.timeSpent,
-              })
-              setShowFeedback(true)
-              setFeedbackMessage(
-                result.score >= 90 ? "ممتاز! أتقنتِ مختبر سرعة التفاعلات" : result.score >= 70 ? "جيد جداً! راجعي العوامل وطاقة التنشيط والمحفزات" : "حاولي مرة أخرى"
-              )
-              setTimeout(() => {
-                setShowFeedback(false)
-                router.push(`/student/games/${gameId}/result?score=${result.score}`)
-              }, 2000)
-            }}
-          />
+          <LabTheme>
+            <ReactionRatesLab
+              gameData={gameData}
+              game={{
+                game_id: game.game_id,
+                title: game.title,
+                chapter: game.chapter,
+                objective: game.objective,
+                points: game.points,
+              }}
+              onComplete={async (result) => {
+                await saveGameAttempt({
+                  answers: (result.answers ?? {}) as Record<string, unknown>,
+                  score: Math.round((result.score / 100) * game.points),
+                  totalScore: game.points,
+                  percentage: result.score,
+                  timeSpent: result.timeSpent,
+                })
+                setShowFeedback(true)
+                setFeedbackMessage(
+                  result.score >= 90 ? "ممتاز! أتقنتِ مختبر سرعة التفاعلات" : result.score >= 70 ? "جيد جداً! راجعي العوامل وطاقة التنشيط والمحفزات" : "حاولي مرة أخرى"
+                )
+                setTimeout(() => {
+                  setShowFeedback(false)
+                  router.push(`/student/games/${gameId}/result?score=${result.score}`)
+                }, 2000)
+              }}
+            />
+          </LabTheme>
         )}
 
         {/* لعبة رحلة في الصفائح التكتونية */}
         {gameData.type === "plate_tectonics_journey" && (
-          <PlateTectonicsJourney
+          <LabTheme>
+            <PlateTectonicsJourney
+              gameData={gameData}
+              game={{
+                game_id: game.game_id,
+                title: game.title,
+                chapter: game.chapter,
+                objective: game.objective,
+                points: game.points,
+              }}
+              onComplete={async (result) => {
+                await saveGameAttempt({
+                  answers: (result.answers ?? {}) as Record<string, unknown>,
+                  score: Math.round((result.score / 100) * game.points),
+                  totalScore: game.points,
+                  percentage: result.score,
+                  timeSpent: result.timeSpent,
+                })
+                setShowFeedback(true)
+                setFeedbackMessage(
+                  result.score >= 90 ? "ممتاز! أتقنتِ رحلة الصفائح التكتونية" : result.score >= 70 ? "جيد جداً! راجعي الحدود والزلازل والبراكين" : "حاولي مرة أخرى"
+                )
+                setTimeout(() => {
+                  setShowFeedback(false)
+                  router.push(`/student/games/${gameId}/result?score=${result.score}`)
+                }, 2000)
+              }}
+            />
+          </LabTheme>
+        )}
+
+        {/* ألعاب التصنيف (النمط الموحّد): لوحات متحركة وبطاقات على عدة جولات */}
+        {gameData.type === "classifier_game" && (
+          <ClassifierGame
             gameData={gameData}
             game={{
               game_id: game.game_id,
@@ -862,7 +913,7 @@ export default function GamePlayPage() {
               })
               setShowFeedback(true)
               setFeedbackMessage(
-                result.score >= 90 ? "ممتاز! أتقنتِ رحلة الصفائح التكتونية" : result.score >= 70 ? "جيد جداً! راجعي الحدود والزلازل والبراكين" : "حاولي مرة أخرى"
+                result.score >= 90 ? "ممتاز! أتقنتِ هذه اللعبة" : result.score >= 70 ? "جيد جداً! راجعي البطاقات التي أخطأتِ فيها" : "حاولي مرة أخرى"
               )
               setTimeout(() => {
                 setShowFeedback(false)
@@ -874,64 +925,68 @@ export default function GamePlayPage() {
 
         {/* لعبة رحلة المحقق العلمي - ترتيب خطوات المنهج العلمي */}
         {gameData.type === "science_method_journey" && (
-          <ScienceMethodJourney
-            gameData={gameData}
-            game={{
-              game_id: game.game_id,
-              title: game.title,
-              chapter: game.chapter,
-              objective: game.objective,
-              points: game.points,
-            }}
-            onComplete={async (result) => {
-              await saveGameAttempt({
-                answers: (result.answers ?? {}) as Record<string, unknown>,
-                score: Math.round((result.score / 100) * game.points),
-                totalScore: game.points,
-                percentage: result.score,
-                timeSpent: result.timeSpent,
-              })
-              setShowFeedback(true)
-              setFeedbackMessage(
-                result.score === 100 ? "ممتاز! رتّبتِ خطوات المنهج العلمي بشكل صحيح تماماً" : result.score >= 70 ? "جيد جداً! راجعي الخطوات وحاولي تحسين النتيجة" : "حاولي مرة أخرى"
-              )
-              setTimeout(() => {
-                setShowFeedback(false)
-                router.push(`/student/games/${gameId}/result?score=${result.score}`)
-              }, 2000)
-            }}
-          />
+          <LabTheme>
+            <ScienceMethodJourney
+              gameData={gameData}
+              game={{
+                game_id: game.game_id,
+                title: game.title,
+                chapter: game.chapter,
+                objective: game.objective,
+                points: game.points,
+              }}
+              onComplete={async (result) => {
+                await saveGameAttempt({
+                  answers: (result.answers ?? {}) as Record<string, unknown>,
+                  score: Math.round((result.score / 100) * game.points),
+                  totalScore: game.points,
+                  percentage: result.score,
+                  timeSpent: result.timeSpent,
+                })
+                setShowFeedback(true)
+                setFeedbackMessage(
+                  result.score === 100 ? "ممتاز! رتّبتِ خطوات المنهج العلمي بشكل صحيح تماماً" : result.score >= 70 ? "جيد جداً! راجعي الخطوات وحاولي تحسين النتيجة" : "حاولي مرة أخرى"
+                )
+                setTimeout(() => {
+                  setShowFeedback(false)
+                  router.push(`/student/games/${gameId}/result?score=${result.score}`)
+                }, 2000)
+              }}
+            />
+          </LabTheme>
         )}
 
         {/* لعبة بطاقات مهارات العالمة الصغيرة - تمييز مهارات العلم */}
         {gameData.type === "science_skills_match" && (
-          <ScienceSkillsMatch
-            gameData={gameData}
-            game={{
-              game_id: game.game_id,
-              title: game.title,
-              chapter: game.chapter,
-              objective: game.objective,
-              points: game.points,
-            }}
-            onComplete={async (result) => {
-              await saveGameAttempt({
-                answers: (result.answers ?? {}) as Record<string, unknown>,
-                score: Math.round((result.score / 100) * game.points),
-                totalScore: game.points,
-                percentage: result.score,
-                timeSpent: result.timeSpent,
-              })
-              setShowFeedback(true)
-              setFeedbackMessage(
-                result.score === 100 ? "ممتاز! ربطتِ كل مهارة بوصفها الصحيح تماماً" : result.score >= 70 ? "جيد جداً! راجعي الأزواج وحاولي تحسين النتيجة" : "حاولي مرة أخرى"
-              )
-              setTimeout(() => {
-                setShowFeedback(false)
-                router.push(`/student/games/${gameId}/result?score=${result.score}`)
-              }, 2000)
-            }}
-          />
+          <LabTheme>
+            <ScienceSkillsMatch
+              gameData={gameData}
+              game={{
+                game_id: game.game_id,
+                title: game.title,
+                chapter: game.chapter,
+                objective: game.objective,
+                points: game.points,
+              }}
+              onComplete={async (result) => {
+                await saveGameAttempt({
+                  answers: (result.answers ?? {}) as Record<string, unknown>,
+                  score: Math.round((result.score / 100) * game.points),
+                  totalScore: game.points,
+                  percentage: result.score,
+                  timeSpent: result.timeSpent,
+                })
+                setShowFeedback(true)
+                setFeedbackMessage(
+                  result.score === 100 ? "ممتاز! ربطتِ كل مهارة بوصفها الصحيح تماماً" : result.score >= 70 ? "جيد جداً! راجعي الأزواج وحاولي تحسين النتيجة" : "حاولي مرة أخرى"
+                )
+                setTimeout(() => {
+                  setShowFeedback(false)
+                  router.push(`/student/games/${gameId}/result?score=${result.score}`)
+                }, 2000)
+              }}
+            />
+          </LabTheme>
         )}
 
         {/* Game Area - Ordering */}
@@ -1284,115 +1339,121 @@ export default function GamePlayPage() {
 
         {/* Game Area - Interactive Circuit */}
         {gameData.type === "interactive_circuit" && (
-          <div className="card">
-            <InteractiveCircuit
-              gameData={gameData}
-              currentScenarioIndex={circuitScenarioIndex}
-              circuitStates={circuitStates}
-              onStateChange={handleCircuitStateChange}
-              isSubmitted={isSubmitted}
-              showFeedback={isSubmitted}
-            />
-            
-            {/* Navigation for multiple scenarios */}
-            {gameData.scenarios.length > 1 && (
-              <div className="mt-6 flex items-center justify-between">
-                <button
-                  onClick={() => setCircuitScenarioIndex(Math.max(0, circuitScenarioIndex - 1))}
-                  disabled={circuitScenarioIndex === 0 || isSubmitted}
-                  className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  السابق
-                </button>
-                <span className="text-sm text-slate-600">
-                  السيناريو {circuitScenarioIndex + 1} من {gameData.scenarios.length}
-                </span>
-                <button
-                  onClick={() => setCircuitScenarioIndex(Math.min(gameData.scenarios.length - 1, circuitScenarioIndex + 1))}
-                  disabled={circuitScenarioIndex === gameData.scenarios.length - 1 || isSubmitted}
-                  className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  التالي
-                </button>
-              </div>
-            )}
-          </div>
+          <LabTheme>
+            <div className="card">
+              <InteractiveCircuit
+                gameData={gameData}
+                currentScenarioIndex={circuitScenarioIndex}
+                circuitStates={circuitStates}
+                onStateChange={handleCircuitStateChange}
+                isSubmitted={isSubmitted}
+                showFeedback={isSubmitted}
+              />
+              
+              {/* Navigation for multiple scenarios */}
+              {gameData.scenarios.length > 1 && (
+                <div className="mt-6 flex items-center justify-between">
+                  <button
+                    onClick={() => setCircuitScenarioIndex(Math.max(0, circuitScenarioIndex - 1))}
+                    disabled={circuitScenarioIndex === 0 || isSubmitted}
+                    className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    السابق
+                  </button>
+                  <span className="text-sm text-slate-600">
+                    السيناريو {circuitScenarioIndex + 1} من {gameData.scenarios.length}
+                  </span>
+                  <button
+                    onClick={() => setCircuitScenarioIndex(Math.min(gameData.scenarios.length - 1, circuitScenarioIndex + 1))}
+                    disabled={circuitScenarioIndex === gameData.scenarios.length - 1 || isSubmitted}
+                    className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    التالي
+                  </button>
+                </div>
+              )}
+            </div>
+          </LabTheme>
         )}
 
         {/* Game Area - Atom Builder (Enhanced with 4 stages) */}
         {gameData.type === "atom_builder" && (
-          <div className="card">
-            <AtomBuilderEnhanced
-              gameData={gameData}
-              currentScenarioIndex={atomScenarioIndex}
-              electronDistributions={electronDistributions}
-              onDistributionChange={handleDistributionChange}
-              isSubmitted={isSubmitted}
-              showFeedback={isSubmitted}
-            />
-            
-            {/* Navigation for multiple scenarios */}
-            {gameData.scenarios.length > 1 && (
-              <div className="mt-6 flex items-center justify-between">
-                <button
-                  onClick={() => setAtomScenarioIndex(Math.max(0, atomScenarioIndex - 1))}
-                  disabled={atomScenarioIndex === 0 || isSubmitted}
-                  className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  السابق
-                </button>
-                <span className="text-sm text-slate-600">
-                  السيناريو {atomScenarioIndex + 1} من {gameData.scenarios.length}
-                </span>
-                <button
-                  onClick={() => setAtomScenarioIndex(Math.min(gameData.scenarios.length - 1, atomScenarioIndex + 1))}
-                  disabled={atomScenarioIndex === gameData.scenarios.length - 1 || isSubmitted}
-                  className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  التالي
-                </button>
-              </div>
-            )}
-          </div>
+          <LabTheme>
+            <div className="card">
+              <AtomBuilderEnhanced
+                gameData={gameData}
+                currentScenarioIndex={atomScenarioIndex}
+                electronDistributions={electronDistributions}
+                onDistributionChange={handleDistributionChange}
+                isSubmitted={isSubmitted}
+                showFeedback={isSubmitted}
+              />
+              
+              {/* Navigation for multiple scenarios */}
+              {gameData.scenarios.length > 1 && (
+                <div className="mt-6 flex items-center justify-between">
+                  <button
+                    onClick={() => setAtomScenarioIndex(Math.max(0, atomScenarioIndex - 1))}
+                    disabled={atomScenarioIndex === 0 || isSubmitted}
+                    className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    السابق
+                  </button>
+                  <span className="text-sm text-slate-600">
+                    السيناريو {atomScenarioIndex + 1} من {gameData.scenarios.length}
+                  </span>
+                  <button
+                    onClick={() => setAtomScenarioIndex(Math.min(gameData.scenarios.length - 1, atomScenarioIndex + 1))}
+                    disabled={atomScenarioIndex === gameData.scenarios.length - 1 || isSubmitted}
+                    className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    التالي
+                  </button>
+                </div>
+              )}
+            </div>
+          </LabTheme>
         )}
 
         {/* Game Area - Periodic Family Comparison */}
         {gameData.type === "periodic_family_comparison" && (
-          <div className="card">
-            <PeriodicFamilyComparison
-              gameData={gameData}
-              currentElementIndex={periodicFamilyElementIndex}
-              electronDistributions={periodicFamilyDistributions}
-              onDistributionChange={handlePeriodicFamilyDistributionChange}
-              comparisonAnswers={periodicFamilyAnswers}
-              onComparisonAnswer={handlePeriodicFamilyAnswer}
-              isSubmitted={isSubmitted}
-              showFeedback={isSubmitted}
-            />
-            
-            {/* Navigation for multiple elements */}
-            {gameData.elements.length > 1 && (
-              <div className="mt-6 flex items-center justify-between">
-                <button
-                  onClick={() => setPeriodicFamilyElementIndex(Math.max(0, periodicFamilyElementIndex - 1))}
-                  disabled={periodicFamilyElementIndex === 0 || isSubmitted}
-                  className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  السابق
-                </button>
-                <span className="text-sm text-slate-600">
-                  العنصر {periodicFamilyElementIndex + 1} من {gameData.elements.length}
-                </span>
-                <button
-                  onClick={() => setPeriodicFamilyElementIndex(Math.min(gameData.elements.length - 1, periodicFamilyElementIndex + 1))}
-                  disabled={periodicFamilyElementIndex === gameData.elements.length - 1 || isSubmitted}
-                  className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  التالي
-                </button>
-              </div>
-            )}
-          </div>
+          <LabTheme>
+            <div className="card">
+              <PeriodicFamilyComparison
+                gameData={gameData}
+                currentElementIndex={periodicFamilyElementIndex}
+                electronDistributions={periodicFamilyDistributions}
+                onDistributionChange={handlePeriodicFamilyDistributionChange}
+                comparisonAnswers={periodicFamilyAnswers}
+                onComparisonAnswer={handlePeriodicFamilyAnswer}
+                isSubmitted={isSubmitted}
+                showFeedback={isSubmitted}
+              />
+              
+              {/* Navigation for multiple elements */}
+              {gameData.elements.length > 1 && (
+                <div className="mt-6 flex items-center justify-between">
+                  <button
+                    onClick={() => setPeriodicFamilyElementIndex(Math.max(0, periodicFamilyElementIndex - 1))}
+                    disabled={periodicFamilyElementIndex === 0 || isSubmitted}
+                    className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    السابق
+                  </button>
+                  <span className="text-sm text-slate-600">
+                    العنصر {periodicFamilyElementIndex + 1} من {gameData.elements.length}
+                  </span>
+                  <button
+                    onClick={() => setPeriodicFamilyElementIndex(Math.min(gameData.elements.length - 1, periodicFamilyElementIndex + 1))}
+                    disabled={periodicFamilyElementIndex === gameData.elements.length - 1 || isSubmitted}
+                    className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    التالي
+                  </button>
+                </div>
+              )}
+            </div>
+          </LabTheme>
         )}
 
         {/* Feedback Overlay */}
@@ -1405,7 +1466,7 @@ export default function GamePlayPage() {
         )}
 
         {/* Action Buttons - لا تظهر لألعاب متعددة المراحل التي تنتهي تلقائياً */}
-        {gameData.type !== "volcano_types" && gameData.type !== "geological_faults" && gameData.type !== "chemical_bond_lab" && gameData.type !== "valence_electron_patterns" && gameData.type !== "atom_electron_map" && gameData.type !== "smart_formula_lab" && gameData.type !== "chemical_reactions_energy_lab" && gameData.type !== "reaction_rates_lab" && gameData.type !== "plate_tectonics_journey" && gameData.type !== "science_method_journey" && gameData.type !== "science_skills_match" && (
+        {gameData.type !== "volcano_types" && gameData.type !== "geological_faults" && gameData.type !== "chemical_bond_lab" && gameData.type !== "valence_electron_patterns" && gameData.type !== "atom_electron_map" && gameData.type !== "smart_formula_lab" && gameData.type !== "chemical_reactions_energy_lab" && gameData.type !== "reaction_rates_lab" && gameData.type !== "plate_tectonics_journey" && gameData.type !== "science_method_journey" && gameData.type !== "science_skills_match" && gameData.type !== "classifier_game" && (
         <div className="card">
           <div className="flex gap-3">
             <button

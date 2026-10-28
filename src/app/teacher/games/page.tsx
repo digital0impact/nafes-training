@@ -8,6 +8,7 @@ import { SectionHeader } from "@/components/ui/section-header"
 import { PageBackground } from "@/components/layout/page-background"
 import { gamesData } from "@/data/games-data"
 import InteractiveCircuit from "@/components/games/InteractiveCircuit"
+import LabTheme from "@/components/games/LabTheme"
 import AtomBuilder from "@/components/games/AtomBuilder"
 import VolcanoTypesGame from "@/components/games/VolcanoTypesGame"
 import GeologicalFaultsGame from "@/components/games/GeologicalFaultsGame"
@@ -20,6 +21,7 @@ import ReactionRatesLab from "@/components/games/ReactionRatesLab"
 import PlateTectonicsJourney from "@/components/games/PlateTectonicsJourney"
 import ScienceMethodJourney from "@/components/games/ScienceMethodJourney"
 import ScienceSkillsMatch from "@/components/games/ScienceSkillsMatch"
+import ClassifierGame from "@/components/games/classifier/ClassifierGame"
 
 type EducationalGame = {
   game_id: string
@@ -559,20 +561,22 @@ export default function TeacherGamesPage() {
                           </button>
                         </div>
                       ) : (
-                        <VolcanoTypesGame
-                          gameData={previewData}
-                          game={{
-                            game_id: selectedGame.game_id,
-                            title: selectedGame.title,
-                            chapter: selectedGame.chapter,
-                            objective: selectedGame.objective,
-                            points: selectedGame.points,
-                          }}
-                          onComplete={(result) => {
-                            setScore(result.score)
-                            setSubmitted(true)
-                          }}
-                        />
+                        <LabTheme>
+                          <VolcanoTypesGame
+                            gameData={previewData}
+                            game={{
+                              game_id: selectedGame.game_id,
+                              title: selectedGame.title,
+                              chapter: selectedGame.chapter,
+                              objective: selectedGame.objective,
+                              points: selectedGame.points,
+                            }}
+                            onComplete={(result) => {
+                              setScore(result.score)
+                              setSubmitted(true)
+                            }}
+                          />
+                        </LabTheme>
                       )
                     ) : previewData.type === "geological_faults" ? (
                       submitted ? (
@@ -587,20 +591,22 @@ export default function TeacherGamesPage() {
                           </button>
                         </div>
                       ) : (
-                        <GeologicalFaultsGame
-                          gameData={previewData}
-                          game={{
-                            game_id: selectedGame.game_id,
-                            title: selectedGame.title,
-                            chapter: selectedGame.chapter,
-                            objective: selectedGame.objective,
-                            points: selectedGame.points,
-                          }}
-                          onComplete={(result) => {
-                            setScore(result.score)
-                            setSubmitted(true)
-                          }}
-                        />
+                        <LabTheme>
+                          <GeologicalFaultsGame
+                            gameData={previewData}
+                            game={{
+                              game_id: selectedGame.game_id,
+                              title: selectedGame.title,
+                              chapter: selectedGame.chapter,
+                              objective: selectedGame.objective,
+                              points: selectedGame.points,
+                            }}
+                            onComplete={(result) => {
+                              setScore(result.score)
+                              setSubmitted(true)
+                            }}
+                          />
+                        </LabTheme>
                       )
                     ) : previewData.type === "chemical_bond_lab" ? (
                       submitted ? (
@@ -615,20 +621,22 @@ export default function TeacherGamesPage() {
                           </button>
                         </div>
                       ) : (
-                        <ChemicalBondLab
-                          gameData={previewData}
-                          game={{
-                            game_id: selectedGame.game_id,
-                            title: selectedGame.title,
-                            chapter: selectedGame.chapter,
-                            objective: selectedGame.objective,
-                            points: selectedGame.points,
-                          }}
-                          onComplete={(result) => {
-                            setScore(result.score)
-                            setSubmitted(true)
-                          }}
-                        />
+                        <LabTheme>
+                          <ChemicalBondLab
+                            gameData={previewData}
+                            game={{
+                              game_id: selectedGame.game_id,
+                              title: selectedGame.title,
+                              chapter: selectedGame.chapter,
+                              objective: selectedGame.objective,
+                              points: selectedGame.points,
+                            }}
+                            onComplete={(result) => {
+                              setScore(result.score)
+                              setSubmitted(true)
+                            }}
+                          />
+                        </LabTheme>
                       )
                     ) : previewData.type === "valence_electron_patterns" ? (
                       submitted ? (
@@ -643,20 +651,22 @@ export default function TeacherGamesPage() {
                           </button>
                         </div>
                       ) : (
-                        <ValenceElectronPatterns
-                          gameData={previewData}
-                          game={{
-                            game_id: selectedGame.game_id,
-                            title: selectedGame.title,
-                            chapter: selectedGame.chapter,
-                            objective: selectedGame.objective,
-                            points: selectedGame.points,
-                          }}
-                          onComplete={(result) => {
-                            setScore(result.score)
-                            setSubmitted(true)
-                          }}
-                        />
+                        <LabTheme>
+                          <ValenceElectronPatterns
+                            gameData={previewData}
+                            game={{
+                              game_id: selectedGame.game_id,
+                              title: selectedGame.title,
+                              chapter: selectedGame.chapter,
+                              objective: selectedGame.objective,
+                              points: selectedGame.points,
+                            }}
+                            onComplete={(result) => {
+                              setScore(result.score)
+                              setSubmitted(true)
+                            }}
+                          />
+                        </LabTheme>
                       )
                     ) : previewData.type === "atom_electron_map" ? (
                       submitted ? (
@@ -671,20 +681,22 @@ export default function TeacherGamesPage() {
                           </button>
                         </div>
                       ) : (
-                        <AtomElectronMap
-                          gameData={previewData}
-                          game={{
-                            game_id: selectedGame.game_id,
-                            title: selectedGame.title,
-                            chapter: selectedGame.chapter,
-                            objective: selectedGame.objective,
-                            points: selectedGame.points,
-                          }}
-                          onComplete={(result) => {
-                            setScore(result.score)
-                            setSubmitted(true)
-                          }}
-                        />
+                        <LabTheme>
+                          <AtomElectronMap
+                            gameData={previewData}
+                            game={{
+                              game_id: selectedGame.game_id,
+                              title: selectedGame.title,
+                              chapter: selectedGame.chapter,
+                              objective: selectedGame.objective,
+                              points: selectedGame.points,
+                            }}
+                            onComplete={(result) => {
+                              setScore(result.score)
+                              setSubmitted(true)
+                            }}
+                          />
+                        </LabTheme>
                       )
                     ) : previewData.type === "smart_formula_lab" ? (
                       submitted ? (
@@ -699,20 +711,22 @@ export default function TeacherGamesPage() {
                           </button>
                         </div>
                       ) : (
-                        <SmartFormulaLab
-                          gameData={previewData}
-                          game={{
-                            game_id: selectedGame.game_id,
-                            title: selectedGame.title,
-                            chapter: selectedGame.chapter,
-                            objective: selectedGame.objective,
-                            points: selectedGame.points,
-                          }}
-                          onComplete={(result) => {
-                            setScore(result.score)
-                            setSubmitted(true)
-                          }}
-                        />
+                        <LabTheme>
+                          <SmartFormulaLab
+                            gameData={previewData}
+                            game={{
+                              game_id: selectedGame.game_id,
+                              title: selectedGame.title,
+                              chapter: selectedGame.chapter,
+                              objective: selectedGame.objective,
+                              points: selectedGame.points,
+                            }}
+                            onComplete={(result) => {
+                              setScore(result.score)
+                              setSubmitted(true)
+                            }}
+                          />
+                        </LabTheme>
                       )
                     ) : previewData.type === "chemical_reactions_energy_lab" ? (
                       submitted ? (
@@ -727,20 +741,22 @@ export default function TeacherGamesPage() {
                           </button>
                         </div>
                       ) : (
-                        <ChemicalReactionsEnergyLab
-                          gameData={previewData}
-                          game={{
-                            game_id: selectedGame.game_id,
-                            title: selectedGame.title,
-                            chapter: selectedGame.chapter,
-                            objective: selectedGame.objective,
-                            points: selectedGame.points,
-                          }}
-                          onComplete={(result) => {
-                            setScore(result.score)
-                            setSubmitted(true)
-                          }}
-                        />
+                        <LabTheme>
+                          <ChemicalReactionsEnergyLab
+                            gameData={previewData}
+                            game={{
+                              game_id: selectedGame.game_id,
+                              title: selectedGame.title,
+                              chapter: selectedGame.chapter,
+                              objective: selectedGame.objective,
+                              points: selectedGame.points,
+                            }}
+                            onComplete={(result) => {
+                              setScore(result.score)
+                              setSubmitted(true)
+                            }}
+                          />
+                        </LabTheme>
                       )
                     ) : previewData.type === "reaction_rates_lab" ? (
                       submitted ? (
@@ -755,20 +771,22 @@ export default function TeacherGamesPage() {
                           </button>
                         </div>
                       ) : (
-                        <ReactionRatesLab
-                          gameData={previewData}
-                          game={{
-                            game_id: selectedGame.game_id,
-                            title: selectedGame.title,
-                            chapter: selectedGame.chapter,
-                            objective: selectedGame.objective,
-                            points: selectedGame.points,
-                          }}
-                          onComplete={(result) => {
-                            setScore(result.score)
-                            setSubmitted(true)
-                          }}
-                        />
+                        <LabTheme>
+                          <ReactionRatesLab
+                            gameData={previewData}
+                            game={{
+                              game_id: selectedGame.game_id,
+                              title: selectedGame.title,
+                              chapter: selectedGame.chapter,
+                              objective: selectedGame.objective,
+                              points: selectedGame.points,
+                            }}
+                            onComplete={(result) => {
+                              setScore(result.score)
+                              setSubmitted(true)
+                            }}
+                          />
+                        </LabTheme>
                       )
                     ) : previewData.type === "plate_tectonics_journey" ? (
                       submitted ? (
@@ -783,7 +801,37 @@ export default function TeacherGamesPage() {
                           </button>
                         </div>
                       ) : (
-                        <PlateTectonicsJourney
+                        <LabTheme>
+                          <PlateTectonicsJourney
+                            gameData={previewData}
+                            game={{
+                              game_id: selectedGame.game_id,
+                              title: selectedGame.title,
+                              chapter: selectedGame.chapter,
+                              objective: selectedGame.objective,
+                              points: selectedGame.points,
+                            }}
+                            onComplete={(result) => {
+                              setScore(result.score)
+                              setSubmitted(true)
+                            }}
+                          />
+                        </LabTheme>
+                      )
+                    ) : previewData.type === "classifier_game" ? (
+                      submitted ? (
+                        <div className="rounded-xl border-2 border-emerald-200 p-6 text-center bg-emerald-50">
+                          <p className="font-semibold text-emerald-900">انتهيت من المعاينة</p>
+                          <p className="text-lg font-bold text-emerald-800 mt-2">النتيجة: {score}%</p>
+                          <button
+                            onClick={closePreview}
+                            className="mt-4 px-6 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700"
+                          >
+                            إغلاق
+                          </button>
+                        </div>
+                      ) : (
+                        <ClassifierGame
                           gameData={previewData}
                           game={{
                             game_id: selectedGame.game_id,
@@ -811,20 +859,22 @@ export default function TeacherGamesPage() {
                           </button>
                         </div>
                       ) : (
-                        <ScienceMethodJourney
-                          gameData={previewData}
-                          game={{
-                            game_id: selectedGame.game_id,
-                            title: selectedGame.title,
-                            chapter: selectedGame.chapter,
-                            objective: selectedGame.objective,
-                            points: selectedGame.points,
-                          }}
-                          onComplete={(result) => {
-                            setScore(result.score)
-                            setSubmitted(true)
-                          }}
-                        />
+                        <LabTheme>
+                          <ScienceMethodJourney
+                            gameData={previewData}
+                            game={{
+                              game_id: selectedGame.game_id,
+                              title: selectedGame.title,
+                              chapter: selectedGame.chapter,
+                              objective: selectedGame.objective,
+                              points: selectedGame.points,
+                            }}
+                            onComplete={(result) => {
+                              setScore(result.score)
+                              setSubmitted(true)
+                            }}
+                          />
+                        </LabTheme>
                       )
                     ) : previewData.type === "science_skills_match" ? (
                       submitted ? (
@@ -839,20 +889,22 @@ export default function TeacherGamesPage() {
                           </button>
                         </div>
                       ) : (
-                        <ScienceSkillsMatch
-                          gameData={previewData}
-                          game={{
-                            game_id: selectedGame.game_id,
-                            title: selectedGame.title,
-                            chapter: selectedGame.chapter,
-                            objective: selectedGame.objective,
-                            points: selectedGame.points,
-                          }}
-                          onComplete={(result) => {
-                            setScore(result.score)
-                            setSubmitted(true)
-                          }}
-                        />
+                        <LabTheme>
+                          <ScienceSkillsMatch
+                            gameData={previewData}
+                            game={{
+                              game_id: selectedGame.game_id,
+                              title: selectedGame.title,
+                              chapter: selectedGame.chapter,
+                              objective: selectedGame.objective,
+                              points: selectedGame.points,
+                            }}
+                            onComplete={(result) => {
+                              setScore(result.score)
+                              setSubmitted(true)
+                            }}
+                          />
+                        </LabTheme>
                       )
                     ) : (
                       <>
@@ -1068,14 +1120,16 @@ export default function TeacherGamesPage() {
 
                         {previewData.type === "interactive_circuit" && (
                           <div className="rounded-xl border-2 border-purple-200 p-4">
-                            <InteractiveCircuit
-                              gameData={previewData}
-                              currentScenarioIndex={circuitScenarioIndex}
-                              circuitStates={circuitStates}
-                              onStateChange={handleCircuitStateChange}
-                              isSubmitted={submitted}
-                              showFeedback={submitted}
-                            />
+                            <LabTheme>
+                              <InteractiveCircuit
+                                gameData={previewData}
+                                currentScenarioIndex={circuitScenarioIndex}
+                                circuitStates={circuitStates}
+                                onStateChange={handleCircuitStateChange}
+                                isSubmitted={submitted}
+                                showFeedback={submitted}
+                              />
+                            </LabTheme>
                             
                             {previewData.scenarios.length > 1 && (
                               <div className="mt-4 flex items-center justify-between">
@@ -1103,14 +1157,16 @@ export default function TeacherGamesPage() {
 
                         {previewData.type === "atom_builder" && (
                           <div className="rounded-xl border-2 border-purple-200 p-4">
-                            <AtomBuilder
-                              gameData={previewData}
-                              currentScenarioIndex={atomScenarioIndex}
-                              electronDistributions={electronDistributions}
-                              onDistributionChange={handleDistributionChange}
-                              isSubmitted={submitted}
-                              showFeedback={submitted}
-                            />
+                            <LabTheme>
+                              <AtomBuilder
+                                gameData={previewData}
+                                currentScenarioIndex={atomScenarioIndex}
+                                electronDistributions={electronDistributions}
+                                onDistributionChange={handleDistributionChange}
+                                isSubmitted={submitted}
+                                showFeedback={submitted}
+                              />
+                            </LabTheme>
                             
                             {previewData.scenarios.length > 1 && (
                               <div className="mt-4 flex items-center justify-between">
