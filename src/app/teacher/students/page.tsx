@@ -203,6 +203,18 @@ export default function StudentsPage() {
     }
   }
 
+  // تستخرج الاسم من أول خلية غير فارغة في الصف، بدل افتراض أنه بالعمود الأول -
+  // بعض الملفات (خصوصاً عند لصق قائمة مُرقّمة/نقطية من Word) تضع النص في عمود
+  // لاحق وتترك الأول فارغاً. تُزال أيضاً شرطة أو نقطة تعداد بداية النص إن وُجدت.
+  function extractNameFromRow(row: unknown[]): string {
+    for (const cell of row) {
+      if (cell === undefined || cell === null) continue
+      const text = String(cell).trim()
+      if (text) return text.replace(/^[-•*]+\s*/, "")
+    }
+    return ""
+  }
+
   async function handleFileImport(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
     if (!file) return
@@ -226,11 +238,9 @@ export default function StudentsPage() {
       const sheet = workbook.Sheets[workbook.SheetNames[0]]
       const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, blankrows: false })
 
-      const firstCell = rows[0]?.[0]
+      const firstRowText = rows[0] ? extractNameFromRow(rows[0]) : ""
       const dataRows =
-        typeof firstCell === "string" && (firstCell.includes("اسم") || firstCell.includes("الصف"))
-          ? rows.slice(1)
-          : rows
+        firstRowText.includes("اسم") || firstRowText.includes("الصف") ? rows.slice(1) : rows
 
       const defaultPassword = "1234"
       let importedCount = 0
@@ -239,7 +249,7 @@ export default function StudentsPage() {
       // كل الطالبات المستوردات يُنسبن للفصل المحدد أعلاه - الملف يحتاج عمود
       // الاسم فقط (أي أعمدة أخرى كصف أو رمز فصل، إن وُجدت، تُتجاهل).
       for (const row of dataRows) {
-        const name = String(row[0] ?? "").trim()
+        const name = extractNameFromRow(row)
         if (!name) continue
 
         const grade = selectedClass.grade
