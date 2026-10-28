@@ -45,7 +45,7 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 2 - علوم الحياة
   {
     code: "9-5-1-1-3",
-    week: "الفترة الأولى - الأسبوع 2",
+    week: "الفترة الأولى - الأسبوع 1",
     period: "الفترة الأولى",
     lesson: "تكامل أجهزة جسم الإنسان",
     domain: "علوم الحياة",
@@ -61,7 +61,7 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 3 - علوم الحياة
   {
     code: "9-5-1-2-1",
-    week: "الفترة الأولى - الأسبوع 3",
+    week: "الفترة الأولى - الأسبوع 2",
     period: "الفترة الأولى",
     lesson: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث",
     domain: "علوم الحياة",
@@ -95,7 +95,7 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 5 - العلوم الفيزيائية
   {
     code: "9-5-2-1-2",
-    week: "الفترة الأولى - الأسبوع 4",
+    week: "الفترة الأولى - الأسبوع 2",
     period: "الفترة الأولى",
     lesson: "المركبات والمخاليط",
     domain: "العلوم الفيزيائية",
@@ -111,7 +111,7 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 6 - العلوم الفيزيائية
   {
     code: "9-5-2-1-3",
-    week: "الفترة الأولى - الأسبوع 5",
+    week: "الفترة الأولى - الأسبوع 2",
     period: "الفترة الأولى",
     lesson: "الذائبية ومعدل الذوبان",
     domain: "العلوم الفيزيائية",
@@ -125,7 +125,7 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-2-1-4",
-    week: "الفترة الأولى - الأسبوع 6",
+    week: "الفترة الأولى - الأسبوع 3",
     period: "الفترة الأولى",
     lesson: "خصائص السوائل والمواد الصلبة",
     domain: "العلوم الفيزيائية",
@@ -141,7 +141,7 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 7 - العلوم الفيزيائية
   {
     code: "9-5-2-1-5",
-    week: "الفترة الأولى - الأسبوع 7",
+    week: "الفترة الأولى - الأسبوع 3",
     period: "الفترة الأولى",
     lesson: "الجدول الدوري",
     domain: "العلوم الفيزيائية",
@@ -159,7 +159,7 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 8 - العلوم الفيزيائية
   {
     code: "9-5-2-1-6",
-    week: "الفترة الأولى - الأسبوع 8",
+    week: "الفترة الأولى - الأسبوع 3",
     period: "الفترة الأولى",
     lesson: "الأحماض والقواعد",
     domain: "العلوم الفيزيائية",
@@ -177,8 +177,8 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 9 - العلوم الفيزيائية
   {
     code: "9-5-2-1-7",
-    week: "الفترة الثانية - الأسبوع 1",
-    period: "الفترة الثانية",
+    week: "الفترة الأولى - الأسبوع 4",
+    period: "الفترة الأولى",
     lesson: "الروابط الكيميائية",
     domain: "العلوم الفيزيائية",
     outcome:
@@ -195,8 +195,8 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 10 - العلوم الفيزيائية
   {
     code: "9-5-2-1-8",
-    week: "الفترة الثانية - الأسبوع 1",
-    period: "الفترة الثانية",
+    week: "الفترة الأولى - الأسبوع 4",
+    period: "الفترة الأولى",
     lesson: "التفاعلات الكيميائية",
     domain: "العلوم الفيزيائية",
     outcome:
@@ -212,8 +212,8 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 11 - العلوم الفيزيائية
   {
     code: "9-5-2-2-1",
-    week: "الفترة الثانية - الأسبوع 2",
-    period: "الفترة الثانية",
+    week: "الفترة الأولى - الأسبوع 5",
+    period: "الفترة الأولى",
     lesson: "الحركة",
     domain: "العلوم الفيزيائية",
     outcome:
@@ -227,8 +227,8 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-2-2-2",
-    week: "الفترة الثانية - الأسبوع 2",
-    period: "الفترة الثانية",
+    week: "الفترة الأولى - الأسبوع 5",
+    period: "الفترة الأولى",
     lesson: "الزخم",
     domain: "العلوم الفيزيائية",
     outcome:
@@ -243,8 +243,8 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 12 - العلوم الفيزيائية
   {
     code: "9-5-2-2-3",
-    week: "الفترة الثانية - الأسبوع 2",
-    period: "الفترة الثانية",
+    week: "الفترة الأولى - الأسبوع 5",
+    period: "الفترة الأولى",
     lesson: "قوة الاحتكاك",
     domain: "العلوم الفيزيائية",
     outcome:
@@ -257,8 +257,8 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-2-2-4",
-    week: "الفترة الثانية - الأسبوع 2",
-    period: "الفترة الثانية",
+    week: "الفترة الأولى - الأسبوع 6",
+    period: "الفترة الأولى",
     lesson: "القصور الذاتي",
     domain: "العلوم الفيزيائية",
     outcome:
@@ -270,8 +270,8 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-2-2-5",
-    week: "الفترة الثانية - الأسبوع 2",
-    period: "الفترة الثانية",
+    week: "الفترة الأولى - الأسبوع 6",
+    period: "الفترة الأولى",
     lesson: "قانون نيوتن الثاني",
     domain: "العلوم الفيزيائية",
     outcome:
@@ -286,8 +286,8 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-2-2-6",
-    week: "الفترة الثانية - الأسبوع 2",
-    period: "الفترة الثانية",
+    week: "الفترة الأولى - الأسبوع 6",
+    period: "الفترة الأولى",
     lesson: "قانون نيوتن الثالث",
     domain: "العلوم الفيزيائية",
     outcome:
@@ -302,8 +302,8 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 13 - علوم الأرض والفضاء
   {
     code: "9-5-3-2-6",
-    week: "الفترة الثانية - الأسبوع 3",
-    period: "الفترة الثانية",
+    week: "الفترة الأولى - الأسبوع 7",
+    period: "الفترة الأولى",
     lesson: "الزلازل والإجهادات في الصخور",
     domain: "علوم الأرض والفضاء",
     outcome:
@@ -317,8 +317,8 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-3-2-7",
-    week: "الفترة الثانية - الأسبوع 3",
-    period: "الفترة الثانية",
+    week: "الفترة الأولى - الأسبوع 7",
+    period: "الفترة الأولى",
     lesson: "الصفائح الأرضية وعلاقتها بالزلازل والبراكين",
     domain: "علوم الأرض والفضاء",
     outcome:
@@ -334,8 +334,8 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 14 - علوم الأرض والفضاء
   {
     code: "9-5-3-2-4",
-    week: "الفترة الثانية - الأسبوع 3",
-    period: "الفترة الثانية",
+    week: "الفترة الأولى - الأسبوع 7",
+    period: "الفترة الأولى",
     lesson: "الصخور والمعادن واستخداماتها",
     domain: "علوم الأرض والفضاء",
     outcome:
@@ -347,8 +347,8 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-3-2-5",
-    week: "الفترة الثانية - الأسبوع 3",
-    period: "الفترة الثانية",
+    week: "الفترة الأولى - الأسبوع 8",
+    period: "الفترة الأولى",
     lesson: "تصنيف الصخور ودورة تحولها",
     domain: "علوم الأرض والفضاء",
     outcome:
@@ -362,8 +362,8 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-3-2-1",
-    week: "الفترة الثانية - الأسبوع 4",
-    period: "الفترة الثانية",
+    week: "الفترة الأولى - الأسبوع 8",
+    period: "الفترة الأولى",
     lesson: "التغيرات المناخية",
     domain: "علوم الأرض والفضاء",
     outcome:
@@ -378,8 +378,8 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 15 - علوم الأرض والفضاء + علوم الحياة
   {
     code: "9-5-3-2-2",
-    week: "الفترة الثانية - الأسبوع 4",
-    period: "الفترة الثانية",
+    week: "الفترة الأولى - الأسبوع 8",
+    period: "الفترة الأولى",
     lesson: "دورة الكربون والظواهر المرتبطة بها",
     domain: "علوم الأرض والفضاء",
     outcome:
@@ -392,7 +392,7 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-3-2-3",
-    week: "الفترة الثانية - الأسبوع 4",
+    week: "الفترة الثانية - الأسبوع 1",
     period: "الفترة الثانية",
     lesson: "الدورات الطبيعية في البيئة",
     domain: "علوم الأرض والفضاء",
@@ -406,7 +406,7 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 15 - علوم الحياة (ناتج مضاف من وثيقة نواتج التعلم للاختبارات الوطنية 2026)
   {
     code: "9-5-1-3-1",
-    week: "الفترة الثانية - الأسبوع 5",
+    week: "الفترة الثانية - الأسبوع 2",
     period: "الفترة الثانية",
     lesson: "التنوع الحيوي وتكيف الأنواع",
     domain: "علوم الحياة",
@@ -422,7 +422,7 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 15 - علوم الحياة (ناتج مضاف من وثيقة نواتج التعلم للاختبارات الوطنية 2026)
   {
     code: "9-5-1-3-2",
-    week: "الفترة الثانية - الأسبوع 5",
+    week: "الفترة الثانية - الأسبوع 2",
     period: "الفترة الثانية",
     lesson: "الانقراض والسجل الأحفوري",
     domain: "علوم الحياة",
@@ -437,7 +437,7 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 15 - علوم الحياة (ناتج مضاف من وثيقة نواتج التعلم للاختبارات الوطنية 2026)
   {
     code: "9-5-1-3-3",
-    week: "الفترة الثانية - الأسبوع 5",
+    week: "الفترة الثانية - الأسبوع 2",
     period: "الفترة الثانية",
     lesson: "انتقال المادة والطاقة في النظام البيئي",
     domain: "علوم الحياة",
@@ -452,7 +452,7 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 15 - علوم الحياة (ناتج مضاف من وثيقة نواتج التعلم للاختبارات الوطنية 2026)
   {
     code: "9-5-1-3-4",
-    week: "الفترة الثانية - الأسبوع 5",
+    week: "الفترة الثانية - الأسبوع 3",
     period: "الفترة الثانية",
     lesson: "الأنظمة البيئية المائية واليابسة",
     domain: "علوم الحياة",
@@ -467,7 +467,7 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 15 - علوم الحياة (ناتج مضاف من وثيقة نواتج التعلم للاختبارات الوطنية 2026)
   {
     code: "9-5-1-3-5",
-    week: "الفترة الثانية - الأسبوع 5",
+    week: "الفترة الثانية - الأسبوع 3",
     period: "الفترة الثانية",
     lesson: "اتزان النظام البيئي",
     domain: "علوم الحياة",
@@ -484,7 +484,7 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 15 - علوم الحياة (ناتج مضاف من وثيقة نواتج التعلم للاختبارات الوطنية 2026)
   {
     code: "9-5-1-3-6",
-    week: "الفترة الثانية - الأسبوع 5",
+    week: "الفترة الثانية - الأسبوع 3",
     period: "الفترة الثانية",
     lesson: "الكتلة الحيوية والوقود الحيوي",
     domain: "علوم الحياة",
@@ -499,7 +499,7 @@ export const learningOutcomes: LearningOutcome[] = [
 
   {
     code: "9-5-1-4-2",
-    week: "الفترة الثانية - الأسبوع 6",
+    week: "الفترة الثانية - الأسبوع 4",
     period: "الفترة الثانية",
     lesson: "مادة الوراثة",
     domain: "علوم الحياة",
@@ -516,7 +516,7 @@ export const learningOutcomes: LearningOutcome[] = [
   // الأسبوع 16 - علوم الحياة + علوم الأرض والفضاء + العلوم الفيزيائية
   {
     code: "9-5-1-4-1",
-    week: "الفترة الثانية - الأسبوع 6",
+    week: "الفترة الثانية - الأسبوع 4",
     period: "الفترة الثانية",
     lesson: "علم الوراثة وقوانين مندل",
     domain: "علوم الحياة",
@@ -532,7 +532,7 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-3-1-1",
-    week: "الفترة الثانية - الأسبوع 6",
+    week: "الفترة الثانية - الأسبوع 4",
     period: "الفترة الثانية",
     lesson: "استكشاف الكون والأدوات المستخدمة",
     domain: "علوم الأرض والفضاء",
@@ -546,7 +546,7 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-3-1-2",
-    week: "الفترة الثانية - الأسبوع 6",
+    week: "الفترة الثانية - الأسبوع 5",
     period: "الفترة الثانية",
     lesson: "حركة الأجرام السماوية",
     domain: "علوم الأرض والفضاء",
@@ -560,7 +560,7 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-3-3-1",
-    week: "الفترة الثانية - الأسبوع 4",
+    week: "الفترة الثانية - الأسبوع 1",
     period: "الفترة الثانية",
     lesson: "تأثير النشاط البشري على الأرض",
     domain: "علوم الأرض والفضاء",
@@ -574,7 +574,7 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-3-3-2",
-    week: "الفترة الثانية - الأسبوع 4",
+    week: "الفترة الثانية - الأسبوع 1",
     period: "الفترة الثانية",
     lesson: "الموارد الطبيعية وسبل إدارتها",
     domain: "علوم الأرض والفضاء",
@@ -588,8 +588,8 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-2-1-1",
-    week: "الفترة الثانية - الأسبوع 1",
-    period: "الفترة الثانية",
+    week: "الفترة الأولى - الأسبوع 4",
+    period: "الفترة الأولى",
     lesson: "نماذج الذرة",
     domain: "العلوم الفيزيائية",
     outcome:
@@ -603,7 +603,7 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-2-3-1",
-    week: "الفترة الثانية - الأسبوع 7",
+    week: "الفترة الثانية - الأسبوع 5",
     period: "الفترة الثانية",
     lesson: "التيار الكهربائي",
     domain: "العلوم الفيزيائية",
@@ -617,7 +617,7 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-2-3-2",
-    week: "الفترة الثانية - الأسبوع 7",
+    week: "الفترة الثانية - الأسبوع 5",
     period: "الفترة الثانية",
     lesson: "المجال الكهربائي والمغناطيسي",
     domain: "العلوم الفيزيائية",
@@ -632,7 +632,7 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-2-3-3",
-    week: "الفترة الثانية - الأسبوع 7",
+    week: "الفترة الثانية - الأسبوع 6",
     period: "الفترة الثانية",
     lesson: "التوصيل الكهربائي",
     domain: "العلوم الفيزيائية",
@@ -645,7 +645,7 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-2-3-4",
-    week: "الفترة الثانية - الأسبوع 7",
+    week: "الفترة الثانية - الأسبوع 6",
     period: "الفترة الثانية",
     lesson: "المغناطيس والتيار الكهربائي",
     domain: "العلوم الفيزيائية",
@@ -660,7 +660,7 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-2-4-1",
-    week: "الفترة الثانية - الأسبوع 8",
+    week: "الفترة الثانية - الأسبوع 6",
     period: "الفترة الثانية",
     lesson: "الطاقة الحرارية",
     domain: "العلوم الفيزيائية",
@@ -673,7 +673,7 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-2-4-2",
-    week: "الفترة الثانية - الأسبوع 8",
+    week: "الفترة الثانية - الأسبوع 7",
     period: "الفترة الثانية",
     lesson: "انتقال وتوصيل الحرارة",
     domain: "العلوم الفيزيائية",
@@ -688,7 +688,7 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-2-4-3",
-    week: "الفترة الثانية - الأسبوع 8",
+    week: "الفترة الثانية - الأسبوع 7",
     period: "الفترة الثانية",
     lesson: "الحرارة النوعية",
     domain: "العلوم الفيزيائية",
@@ -701,7 +701,7 @@ export const learningOutcomes: LearningOutcome[] = [
   },
   {
     code: "9-5-2-4-4",
-    week: "الفترة الثانية - الأسبوع 8",
+    week: "الفترة الثانية - الأسبوع 7",
     period: "الفترة الثانية",
     lesson: "الطاقة الحركية والكامنة",
     domain: "العلوم الفيزيائية",

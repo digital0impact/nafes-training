@@ -11,6 +11,64 @@ import { TeacherHeader } from "@/features/classes/components/teacher-header"
 
 type TabType = "view" | "edit" | "outcomes"
 
+// مفاتيح الخطة المخصصة؛ تُحفظ في حساب المعلمة، وفي المتصفح فقط إن تعذر الوصول إلى الحساب
+const PLAN_KEYS = ["weekOrder", "topicOrder", "periodChanges", "weekCounts", "weekAssignments"] as const
+type PlanKey = (typeof PLAN_KEYS)[number]
+type SavedPlan = Partial<Record<PlanKey, unknown>>
+const DEFAULT_WEEK_COUNTS: Record<string, number> = { "الفترة الأولى": 8, "الفترة الثانية": 8 }
+
+function readLocalPlan(): SavedPlan | null {
+  const plan: SavedPlan = {}
+  let found = false
+  for (const key of PLAN_KEYS) {
+    try {
+      const raw = localStorage.getItem(key)
+      if (raw) {
+        plan[key] = JSON.parse(raw)
+        found = true
+      }
+    } catch {
+      // نتجاهل القيم التالفة
+    }
+  }
+  return found ? plan : null
+}
+
+function clearLocalPlan() {
+  for (const key of PLAN_KEYS) {
+    try {
+      localStorage.removeItem(key)
+    } catch {
+      // لا شيء
+    }
+  }
+}
+
+const isRecord = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v)
+
+// يحوّل الخطة المحفوظة إلى الصيغة الحالية (مفاتيح الدروس بعد تغيير الأسماء أو النصوص)
+function normalizePlan(saved: SavedPlan) {
+  const weekOrder = isRecord(saved.weekOrder) ? (saved.weekOrder as Record<string, string[]>) : {}
+  const topicOrder: Record<string, string[]> = {}
+  if (isRecord(saved.topicOrder)) {
+    for (const [week, keys] of Object.entries(saved.topicOrder)) {
+      if (!Array.isArray(keys)) continue
+      const next = keys.map((k) => migrateTopicKey(String(k)) ?? String(k))
+      topicOrder[week] = next.filter((k, i) => next.indexOf(k) === i)
+    }
+  }
+  const periodChanges = isRecord(saved.periodChanges)
+    ? migrateKeyedRecord(saved.periodChanges as Record<string, string>).result
+    : {}
+  const weekAssignments = isRecord(saved.weekAssignments)
+    ? migrateKeyedRecord(saved.weekAssignments as Record<string, string>).result
+    : {}
+  const weekCounts = isRecord(saved.weekCounts)
+    ? { ...DEFAULT_WEEK_COUNTS, ...(saved.weekCounts as Record<string, number>) }
+    : { ...DEFAULT_WEEK_COUNTS }
+  return { weekOrder, topicOrder, periodChanges, weekAssignments, weekCounts }
+}
+
 // يحوّل مفتاحًا محفوظًا بصيغة قديمة (كانت تتضمن نص الناتج أو اسم درس قديم) إلى المفتاح الحالي
 function migrateTopicKey(key: string): string | null {
   for (const item of learningOutcomes) {
@@ -45,10 +103,7 @@ export default function TeacherOutcomesPage() {
   const [weekOrder, setWeekOrder] = useState<Record<string, string[]>>({})
   const [topicOrder, setTopicOrder] = useState<Record<string, string[]>>({})
   const [periodChanges, setPeriodChanges] = useState<Record<string, string>>({})
-  const [weekCounts, setWeekCounts] = useState<Record<string, number>>({
-    "الفترة الأولى": 8,
-    "الفترة الثانية": 8,
-  })
+  const [weekCounts, setWeekCounts] = useState<Record<string, number>>(DEFAULT_WEEK_COUNTS)
   const [weekAssignments, setWeekAssignments] = useState<Record<string, string>>({})
   const [activeTab, setActiveTab] = useState<TabType>("outcomes")
   const [draggedItem, setDraggedItem] = useState<string | null>(null)
@@ -59,64 +114,128 @@ export default function TeacherOutcomesPage() {
     setIsEditMode(activeTab === "edit")
   }, [activeTab])
 
-  // تحميل الترتيب المحفوظ من localStorage
+  // الخطة المحفوظة: من حساب المعلمة، ومن يدخل أول مرة يرى الخطة الافتراضية
+  const planRef = useRef<SavedPlan>({})
+  const storageModeRef = useRef<"loading" | "server" | "local">("loading")
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [planLoaded, setPlanLoaded] = useState(false)
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle")
+
+  const applyPlan = (saved: SavedPlan) => {
+    const plan = normalizePlan(saved)
+    setWeekOrder(plan.weekOrder)
+    setTopicOrder(plan.topicOrder)
+    setPeriodChanges(plan.periodChanges)
+    setWeekAssignments(plan.weekAssignments)
+    setWeekCounts(plan.weekCounts)
+    planRef.current = plan
+  }
+
+  const savePlanNow = async (keepalive = false): Promise<boolean> => {
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current)
+      saveTimerRef.current = null
+    }
+    try {
+      const res = await fetch("/api/teacher/plan", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: planRef.current }),
+        keepalive,
+      })
+      setSaveStatus(res.ok ? "saved" : "error")
+      return res.ok
+    } catch {
+      setSaveStatus("error")
+      return false
+    }
+  }
+
+  // حفظ جزء من الخطة بعد كل تعديل (في الحساب مع تأخير بسيط لجمع التعديلات المتتالية)
+  const persist = (key: PlanKey, value: unknown) => {
+    planRef.current = { ...planRef.current, [key]: value }
+    if (storageModeRef.current === "local") {
+      try {
+        localStorage.setItem(key, JSON.stringify(value))
+      } catch {
+        // لا شيء
+      }
+      return
+    }
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    setSaveStatus("saving")
+    saveTimerRef.current = setTimeout(() => {
+      void savePlanNow()
+    }, 700)
+  }
+
+  const resetPlan = async () => {
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current)
+      saveTimerRef.current = null
+    }
+    setPeriodChanges({})
+    setWeekOrder({})
+    setTopicOrder({})
+    setWeekAssignments({})
+    setWeekCounts(DEFAULT_WEEK_COUNTS)
+    planRef.current = {}
+    if (storageModeRef.current === "local") {
+      clearLocalPlan()
+      return
+    }
+    setSaveStatus("saving")
+    try {
+      const res = await fetch("/api/teacher/plan", { method: "DELETE" })
+      setSaveStatus(res.ok ? "saved" : "error")
+    } catch {
+      setSaveStatus("error")
+    }
+  }
+
   useEffect(() => {
-    const savedWeekOrder = localStorage.getItem("weekOrder")
-    if (savedWeekOrder) {
+    let cancelled = false
+    ;(async () => {
+      const local = readLocalPlan()
       try {
-        setWeekOrder(JSON.parse(savedWeekOrder))
-      } catch (e) {
-        console.error("خطأ في تحميل ترتيب الأسابيع", e)
-      }
-    }
-
-    const savedTopicOrder = localStorage.getItem("topicOrder")
-    if (savedTopicOrder) {
-      try {
-        const parsed = JSON.parse(savedTopicOrder) as Record<string, string[]>
-        const migrated: Record<string, string[]> = {}
-        let changed = false
-        for (const [week, keys] of Object.entries(parsed)) {
-          const next = keys.map((k) => migrateTopicKey(k) ?? k)
-          if (next.some((k, i) => k !== keys[i])) changed = true
-          migrated[week] = next.filter((k, i) => next.indexOf(k) === i)
+        const res = await fetch("/api/teacher/plan", { cache: "no-store" })
+        if (res.ok) {
+          const { plan } = (await res.json()) as { plan: SavedPlan | null }
+          if (cancelled) return
+          storageModeRef.current = "server"
+          if (isRecord(plan)) {
+            applyPlan(plan)
+            clearLocalPlan()
+          } else if (local) {
+            // نقل ترتيب كان محفوظًا في هذا المتصفح سابقًا إلى حساب المعلمة
+            applyPlan(local)
+            if (await savePlanNow()) clearLocalPlan()
+          }
+          return
         }
-        setTopicOrder(migrated)
-        if (changed) localStorage.setItem("topicOrder", JSON.stringify(migrated))
-      } catch (e) {
-        console.error("خطأ في تحميل ترتيب الموضوعات", e)
+      } catch {
+        // نكمل بالحفظ في المتصفح
+      } finally {
+        if (!cancelled) setPlanLoaded(true)
       }
+      if (cancelled) return
+      storageModeRef.current = "local"
+      if (local) applyPlan(local)
+    })()
+    return () => {
+      cancelled = true
     }
+  }, [])
 
-    const savedPeriodChanges = localStorage.getItem("periodChanges")
-    if (savedPeriodChanges) {
-      try {
-        const { result, changed } = migrateKeyedRecord(JSON.parse(savedPeriodChanges) as Record<string, string>)
-        setPeriodChanges(result)
-        if (changed) localStorage.setItem("periodChanges", JSON.stringify(result))
-      } catch (e) {
-        console.error("خطأ في تحميل تغييرات الفترات", e)
-      }
+  // لا تضيع آخر التعديلات إذا غادرت المعلمة الصفحة قبل اكتمال الحفظ
+  useEffect(() => {
+    const flush = () => {
+      if (saveTimerRef.current) void savePlanNow(true)
     }
-
-    const savedWeekCounts = localStorage.getItem("weekCounts")
-    if (savedWeekCounts) {
-      try {
-        setWeekCounts(JSON.parse(savedWeekCounts))
-      } catch (e) {
-        console.error("خطأ في تحميل عدد الأسابيع", e)
-      }
-    }
-
-    const savedWeekAssignments = localStorage.getItem("weekAssignments")
-    if (savedWeekAssignments) {
-      try {
-        const { result, changed } = migrateKeyedRecord(JSON.parse(savedWeekAssignments) as Record<string, string>)
-        setWeekAssignments(result)
-        if (changed) localStorage.setItem("weekAssignments", JSON.stringify(result))
-      } catch (e) {
-        console.error("خطأ في تحميل توزيع الأسابيع", e)
-      }
+    window.addEventListener("pagehide", flush)
+    return () => {
+      window.removeEventListener("pagehide", flush)
+      flush()
     }
   }, [])
 
@@ -169,7 +288,7 @@ export default function TeacherOutcomesPage() {
       [period]: count,
     }
     setWeekCounts(newCounts)
-    localStorage.setItem("weekCounts", JSON.stringify(newCounts))
+    persist("weekCounts", newCounts)
 
     const periodTopics = modifiedOutcomes.filter((item) => {
       const topicKey = getTopicKey(item)
@@ -190,7 +309,7 @@ export default function TeacherOutcomesPage() {
     })
 
     setWeekAssignments(newAssignments)
-    localStorage.setItem("weekAssignments", JSON.stringify(newAssignments))
+    persist("weekAssignments", newAssignments)
   }
 
   const periods = Array.from(
@@ -247,7 +366,7 @@ export default function TeacherOutcomesPage() {
     }
 
     setWeekOrder(updatedOrder)
-    localStorage.setItem("weekOrder", JSON.stringify(updatedOrder))
+    persist("weekOrder", updatedOrder)
   }
 
   const getOrderedWeeks = (period: string, weeks: string[]) => {
@@ -299,7 +418,7 @@ export default function TeacherOutcomesPage() {
     }
 
     setTopicOrder(updatedOrder)
-    localStorage.setItem("topicOrder", JSON.stringify(updatedOrder))
+    persist("topicOrder", updatedOrder)
   }
 
   const getOrderedTopics = (
@@ -338,13 +457,13 @@ export default function TeacherOutcomesPage() {
     }
 
     setPeriodChanges(updatedChanges)
-    localStorage.setItem("periodChanges", JSON.stringify(updatedChanges))
+    persist("periodChanges", updatedChanges)
     
     // إعادة تعيين الأسبوع عند تغيير الفترة
     const newAssignments = { ...weekAssignments }
     delete newAssignments[topicKey]
     setWeekAssignments(newAssignments)
-    localStorage.setItem("weekAssignments", JSON.stringify(newAssignments))
+    persist("weekAssignments", newAssignments)
   }
 
   const changeTopicWeek = (topicKey: string, newWeek: string) => {
@@ -354,7 +473,7 @@ export default function TeacherOutcomesPage() {
     }
 
     setWeekAssignments(newAssignments)
-    localStorage.setItem("weekAssignments", JSON.stringify(newAssignments))
+    persist("weekAssignments", newAssignments)
   }
 
   // دوال السحب والإفلات
@@ -555,29 +674,31 @@ export default function TeacherOutcomesPage() {
         )}
 
         {/* فلاتر البحث + التحكم في الأسابيع */}
-        {activeTab === "edit" && (
+        {activeTab === "edit" && planLoaded && (
           <section className="card space-y-4 p-4 sm:p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <SectionHeader
                 title="تعديل وتخصيص الخطة"
                 subtitle="أعيدي ترتيب الفترات والأسابيع ونواتج التعلم حسب احتياج صفك"
               />
-              <div className="flex gap-2 flex-shrink-0">
+              <div className="flex items-center gap-3 flex-shrink-0">
+                {storageModeRef.current === "server" && saveStatus !== "idle" && (
+                  <span
+                    className={`text-xs font-medium ${
+                      saveStatus === "error" ? "text-rose-600" : saveStatus === "saving" ? "text-slate-500" : "text-emerald-700"
+                    }`}
+                  >
+                    {saveStatus === "saving" ? "جارٍ الحفظ…" : saveStatus === "saved" ? "✓ حُفظت الخطة في حسابك" : "تعذر الحفظ، تحققي من الاتصال"}
+                  </span>
+                )}
                 <button
                   onClick={() => {
-                    if (confirm("هل أنت متأكدة من إعادة تعيين جميع التغييرات؟")) {
-                      setPeriodChanges({})
-                      setWeekOrder({})
-                      setTopicOrder({})
-                      setWeekAssignments({})
-                      localStorage.removeItem("periodChanges")
-                      localStorage.removeItem("weekOrder")
-                      localStorage.removeItem("topicOrder")
-                      localStorage.removeItem("weekAssignments")
+                    if (confirm("هل تريدين العودة إلى الخطة الافتراضية؟ ستُلغى جميع تغييراتك على الخطة.")) {
+                      void resetPlan()
                     }
                   }}
                   className="rounded-2xl bg-rose-100 px-4 py-2.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-200"
-                  title="إعادة تعيين جميع التغييرات"
+                  title="العودة إلى الخطة الافتراضية"
                 >
                   ↺ إعادة تعيين
                 </button>
@@ -665,8 +786,14 @@ export default function TeacherOutcomesPage() {
           </section>
         )}
 
+        {(activeTab === "view" || activeTab === "edit") && !planLoaded && (
+          <section className="card p-8 text-center text-sm text-slate-500" dir="rtl">
+            جارٍ تحميل خطتك…
+          </section>
+        )}
+
         {/* عرض الخطة — جدول أسابيع للعرض فقط */}
-        {activeTab === "view" && (
+        {activeTab === "view" && planLoaded && (
           <section className="card overflow-hidden p-0" dir="rtl">
             <div className="rounded-t-2xl bg-amber-100 border-b border-amber-200 px-4 py-3">
               <h2 className="text-center text-lg font-bold text-amber-900">الأسابيع</h2>
@@ -740,12 +867,12 @@ export default function TeacherOutcomesPage() {
         )}
 
         {/* تصميم الخطة: شبكة أسابيع مع سحب وإفلات */}
-        {activeTab === "edit" && (
+        {activeTab === "edit" && planLoaded && (
           <section className="card overflow-hidden p-0" dir="rtl">
             {/* تلميح */}
             <div className="p-3 bg-amber-50 border-b border-amber-200">
               <p className="text-sm text-amber-800">
-                <span className="font-semibold">💡</span> النواتج موزعة افتراضيًا على الأسابيع. لتغيير موقع ناتج اسحبي بطاقته من أسبوعه وأفلتيها في أسبوع آخر، ويُحفظ اختيارك تلقائيًا. كل بطاقة تظهر في أسبوع واحد فقط، ويمكنك العودة إلى التوزيع الافتراضي بزر إعادة التعيين.
+                <span className="font-semibold">💡</span> النواتج موزعة افتراضيًا على الأسابيع. لتغيير موقع ناتج اسحبي بطاقته من أسبوعه وأفلتيها في أسبوع آخر، ويُحفظ اختيارك في حسابك تلقائيًا فيظهر لك من أي جهاز. كل بطاقة تظهر في أسبوع واحد فقط، ويمكنك العودة إلى الخطة الافتراضية بزر إعادة التعيين.
               </p>
             </div>
 
