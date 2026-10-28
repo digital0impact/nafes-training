@@ -1,4 +1,6 @@
 import type { ClassifierConfig } from "../types"
+import { balance } from "./balance"
+import { ecosystem } from "./ecosystem"
 import { lifecycle } from "./lifecycle"
 import { membrane } from "./membrane"
 import { light } from "./light"
@@ -34,6 +36,8 @@ import { plates } from "./plates"
 /** سجل ألعاب التصنيف: المفتاح هو قيمة config في بيانات اللعبة (games-data.ts) */
 export const CLASSIFIER_CONFIGS: Record<string, ClassifierConfig> = {
   plates,
+  balance,
+  ecosystem,
   lifecycle,
   membrane,
   light,
