@@ -257,7 +257,7 @@ export default function VisitorDashboard() {
               <ul className="space-y-4">
                 {outcomes.outcomes.slice(0, 30).map((o, i) => (
                   <li key={i} className="rounded-lg border border-slate-100 p-4">
-                    <p className="font-semibold text-slate-800">{o.week} {o.period && `- ${o.period}`}</p>
+                    <p className="font-semibold text-slate-800">{o.week}{o.period && !o.week?.includes(o.period) && ` - ${o.period}`}</p>
                     <p className="text-slate-600">{o.lesson} • {o.domain}</p>
                     <p className="mt-1 text-sm text-slate-700">{o.outcome}</p>
                   </li>
