@@ -1,5 +1,5 @@
 import { findQuestionById, type SimulationQuestion } from "./simulation-questions";
-import { learningOutcomes, type LearningOutcome } from "./data";
+import { learningOutcomes, resolveLessonName, type LearningOutcome } from "./data";
 import prebuiltTestModels from "@/data/prebuilt-test-models.json";
 import prebuiltDiagnosticTests from "@/data/prebuilt-diagnostic-tests.json";
 
@@ -152,6 +152,7 @@ export function getQuestionsForModel(modelId: string): SimulationQuestion[] {
     .filter((q): q is SimulationQuestion => q !== undefined)
     .map((q, index) => ({
       ...q,
+      relatedOutcome: resolveLessonName(q.relatedOutcome),
       number: index + 1
     }));
 
@@ -174,7 +175,7 @@ export function getQuestionsFromIds(questionIds: string[]): SimulationQuestion[]
       return findQuestionById(id);
     })
     .filter((q): q is SimulationQuestion => q !== undefined)
-    .map((q, index) => ({ ...q, number: index + 1 }));
+    .map((q, index) => ({ ...q, relatedOutcome: resolveLessonName(q.relatedOutcome), number: index + 1 }));
 }
 
 // دالة للحصول على نواتج التعلم المرتبطة بنموذج
@@ -202,8 +203,7 @@ export function getRelatedOutcomes(modelId: string): LearningOutcome[] {
   
   if (!model) return [];
 
-  return learningOutcomes.filter((outcome) =>
-    model.relatedOutcomes.includes(outcome.lesson)
-  );
+  const names = new Set(model.relatedOutcomes.map((name) => resolveLessonName(name)));
+  return learningOutcomes.filter((outcome) => names.has(outcome.lesson));
 }
 

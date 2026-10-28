@@ -6,10 +6,37 @@ import { useState, useEffect, useRef } from "react"
 import { SectionHeader } from "@/components/ui/section-header"
 import { LearningOutcomeCard } from "@/components/ui/learning-outcome-card"
 import { PageBackground } from "@/components/layout/page-background"
-import { learningOutcomes } from "@/lib/data"
+import { learningOutcomes, LEGACY_LESSON_NAMES } from "@/lib/data"
 import { TeacherHeader } from "@/features/classes/components/teacher-header"
 
 type TabType = "view" | "edit" | "outcomes"
+
+// يحوّل مفتاحًا محفوظًا بصيغة قديمة (كانت تتضمن نص الناتج أو اسم درس قديم) إلى المفتاح الحالي
+function migrateTopicKey(key: string): string | null {
+  for (const item of learningOutcomes) {
+    const names = [item.lesson, ...Object.keys(LEGACY_LESSON_NAMES).filter((old) => LEGACY_LESSON_NAMES[old] === item.lesson)]
+    for (const name of names) {
+      const base = `${item.domain}-${name}`
+      if (key === base || key.startsWith(`${base}-`)) return `${item.domain}-${item.lesson}`
+    }
+  }
+  return null
+}
+
+function migrateKeyedRecord(saved: Record<string, string>): { result: Record<string, string>; changed: boolean } {
+  const result: Record<string, string> = {}
+  let changed = false
+  for (const [key, value] of Object.entries(saved)) {
+    const next = migrateTopicKey(key)
+    if (next === null) {
+      result[key] = value // نُبقي ما لم نتعرف عليه بدل حذفه
+      continue
+    }
+    if (next !== key) changed = true
+    result[next] = value
+  }
+  return { result, changed }
+}
 
 export default function TeacherOutcomesPage() {
   const [selectedPeriod, setSelectedPeriod] = useState<string>("all")
@@ -46,7 +73,16 @@ export default function TeacherOutcomesPage() {
     const savedTopicOrder = localStorage.getItem("topicOrder")
     if (savedTopicOrder) {
       try {
-        setTopicOrder(JSON.parse(savedTopicOrder))
+        const parsed = JSON.parse(savedTopicOrder) as Record<string, string[]>
+        const migrated: Record<string, string[]> = {}
+        let changed = false
+        for (const [week, keys] of Object.entries(parsed)) {
+          const next = keys.map((k) => migrateTopicKey(k) ?? k)
+          if (next.some((k, i) => k !== keys[i])) changed = true
+          migrated[week] = next.filter((k, i) => next.indexOf(k) === i)
+        }
+        setTopicOrder(migrated)
+        if (changed) localStorage.setItem("topicOrder", JSON.stringify(migrated))
       } catch (e) {
         console.error("خطأ في تحميل ترتيب الموضوعات", e)
       }
@@ -55,7 +91,9 @@ export default function TeacherOutcomesPage() {
     const savedPeriodChanges = localStorage.getItem("periodChanges")
     if (savedPeriodChanges) {
       try {
-        setPeriodChanges(JSON.parse(savedPeriodChanges))
+        const { result, changed } = migrateKeyedRecord(JSON.parse(savedPeriodChanges) as Record<string, string>)
+        setPeriodChanges(result)
+        if (changed) localStorage.setItem("periodChanges", JSON.stringify(result))
       } catch (e) {
         console.error("خطأ في تحميل تغييرات الفترات", e)
       }
@@ -73,44 +111,18 @@ export default function TeacherOutcomesPage() {
     const savedWeekAssignments = localStorage.getItem("weekAssignments")
     if (savedWeekAssignments) {
       try {
-        const parsed = JSON.parse(savedWeekAssignments) as Record<string, string>
-        // ترحيل المفاتيح القديمة (أول 30 حرفاً) إلى المفتاح الفريد (ناتج كامل) لظهور كل البطاقات
-        const migrated: Record<string, string> = {}
-        let needsSave = false
-        for (const [key, week] of Object.entries(parsed)) {
-          const isNewKey = learningOutcomes.some(
-            (item) => getTopicKey(item) === key
-          )
-          if (isNewKey) {
-            migrated[key] = week
-          } else {
-            needsSave = true
-            const matches = learningOutcomes.filter(
-              (item) => getTopicKeyLegacy(item) === key
-            )
-            matches.forEach((item) => {
-              migrated[getTopicKey(item)] = week
-            })
-          }
-        }
-        setWeekAssignments(Object.keys(migrated).length ? migrated : parsed)
-        if (needsSave && Object.keys(migrated).length > 0) {
-          localStorage.setItem("weekAssignments", JSON.stringify(migrated))
-        }
+        const { result, changed } = migrateKeyedRecord(JSON.parse(savedWeekAssignments) as Record<string, string>)
+        setWeekAssignments(result)
+        if (changed) localStorage.setItem("weekAssignments", JSON.stringify(result))
       } catch (e) {
         console.error("خطأ في تحميل توزيع الأسابيع", e)
       }
     }
   }, [])
 
-  // دالة مساعدة للحصول على مفتاح فريد للموضوع (ناتج كامل لتفادي تكرار المفتاح واختفاء البطاقات)
+  // مفتاح ثابت للموضوع: المجال واسم الدرس فقط، حتى لا يضيع الترتيب المحفوظ إذا تغيّر نص الناتج
   const getTopicKey = (item: (typeof learningOutcomes)[0]): string => {
-    return `${item.domain}-${item.lesson}-${item.outcome}`
-  }
-
-  // المفتاح القديم (أول 30 حرفاً) للترحيل من التخزين المحلي
-  const getTopicKeyLegacy = (item: (typeof learningOutcomes)[0]): string => {
-    return `${item.domain}-${item.lesson}-${item.outcome.substring(0, 30)}`
+    return `${item.domain}-${item.lesson}`
   }
 
   // دالة لتوليد أسماء الأسابيع بناءً على العدد

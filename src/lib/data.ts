@@ -8,6 +8,20 @@ export type LearningOutcome = {
   indicators: string[];
 };
 
+/**
+ * أسماء دروس قديمة تغيّرت. تبقى هنا لربط ما حُفظ سابقًا (اختبارات المعلمة وأسئلتها والترتيب المحفوظ) بالاسم الجديد.
+ */
+export const LEGACY_LESSON_NAMES: Record<string, string> = {
+  "تصنيف المخلوقات الحية بنظام لينيوس": "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث",
+};
+
+/** يعيد اسم الدرس الحالي لاسم قديم أو حالي */
+export function resolveLessonName(name: string): string;
+export function resolveLessonName(name: string | undefined): string | undefined;
+export function resolveLessonName(name: string | undefined): string | undefined {
+  return name === undefined ? undefined : LEGACY_LESSON_NAMES[name] ?? name;
+}
+
 export const learningOutcomes: LearningOutcome[] = [
   // ========== الفترة الأولى (الأسبوع 1-8) ==========
   
@@ -49,7 +63,7 @@ export const learningOutcomes: LearningOutcome[] = [
     code: "9-5-1-2-1",
     week: "الأسبوع 3",
     period: "الفترة الأولى",
-    lesson: "تصنيف المخلوقات الحية بنظام لينيوس",
+    lesson: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث",
     domain: "علوم الحياة",
     outcome:
       "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث اعتمادا على صفاتها وخصائصها.",
