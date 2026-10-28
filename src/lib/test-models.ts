@@ -1,4 +1,4 @@
-import { simulationQuestions, type SimulationQuestion } from "./simulation-questions";
+import { findQuestionById, type SimulationQuestion } from "./simulation-questions";
 import { learningOutcomes, type LearningOutcome } from "./data";
 import prebuiltTestModels from "@/data/prebuilt-test-models.json";
 import prebuiltDiagnosticTests from "@/data/prebuilt-diagnostic-tests.json";
@@ -147,7 +147,7 @@ export function getQuestionsForModel(modelId: string): SimulationQuestion[] {
       if (customQ) return customQ;
       
       // ثم البحث في الأسئلة العادية
-      return simulationQuestions.find((q) => q.id === id);
+      return findQuestionById(id);
     })
     .filter((q): q is SimulationQuestion => q !== undefined)
     .map((q, index) => ({
@@ -171,7 +171,7 @@ export function getQuestionsFromIds(questionIds: string[]): SimulationQuestion[]
     .map((id) => {
       const customQ = customQuestions.find((q) => q.id === id);
       if (customQ) return customQ;
-      return simulationQuestions.find((q) => q.id === id);
+      return findQuestionById(id);
     })
     .filter((q): q is SimulationQuestion => q !== undefined)
     .map((q, index) => ({ ...q, number: index + 1 }));
