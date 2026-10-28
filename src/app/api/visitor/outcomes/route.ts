@@ -6,16 +6,21 @@ import { prisma } from '@/lib/prisma'
 const weekNumber = (week: string) => parseInt(week.replace(/\D/g, '')) || 0
 const periodRank = (period?: string) => (period === 'الفترة الثانية' ? 2 : period === 'الفترة الأولى' ? 1 : 3)
 
+type SavedPlan = { periodChanges?: Record<string, string>; weekAssignments?: Record<string, string> }
+
+async function readPlan(teacherId: string): Promise<SavedPlan | null> {
+  try {
+    const rows = await prisma.$queryRaw<{ data: SavedPlan | null }[]>`
+      SELECT "data" FROM "teacher_plans" WHERE "userId" = ${teacherId}`
+    return rows[0]?.data ?? null
+  } catch {
+    return null // الجدول لم يُنشأ بعد: لا توجد خطط محفوظة
+  }
+}
+
 /** خطة نافس كما رتبتها المعلمة؛ إن لم تحفظ خطة تظهر الخطة الافتراضية */
 async function getTeacherOutcomes(teacherId: string) {
-  let plan: { periodChanges?: Record<string, string>; weekAssignments?: Record<string, string> } | null = null
-  try {
-    const rows = await prisma.$queryRaw<{ data: typeof plan }[]>`
-      SELECT "data" FROM "teacher_plans" WHERE "userId" = ${teacherId}`
-    plan = rows[0]?.data ?? null
-  } catch {
-    plan = null // الجدول لم يُنشأ بعد: لا توجد خطط محفوظة
-  }
+  const plan = await readPlan(teacherId)
   const outcomes = learningOutcomes.map((item) => {
     const key = `${item.domain}-${item.lesson}`
     return {
