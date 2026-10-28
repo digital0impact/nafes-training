@@ -153,6 +153,15 @@ export default function TeacherOutcomesPage() {
 
   const modifiedOutcomes = getModifiedOutcomes()
 
+  // هل الناتج موضوع في أحد أسابيع فترته (بالتوزيع الافتراضي أو بتعيين المعلمة)؟
+  const isPlacedInWeek = (item: (typeof learningOutcomes)[0]) => {
+    const period = item.period || ""
+    if (!period || !item.week) return false
+    const slots = generateWeekNames(period, weekCounts[period] || 8)
+    return slots.includes(item.week) || slots.includes(`${period} - ${item.week}`)
+  }
+  const unplacedOutcomes = modifiedOutcomes.filter((item) => !isPlacedInWeek(item))
+
   // دالة لتحديث عدد الأسابيع لفترة معينة
   const updateWeekCount = (period: string, count: number) => {
     const newCounts = {
@@ -736,16 +745,20 @@ export default function TeacherOutcomesPage() {
             {/* تلميح */}
             <div className="p-3 bg-amber-50 border-b border-amber-200">
               <p className="text-sm text-amber-800">
-                <span className="font-semibold">💡</span> اسحبي بطاقات نواتج التعلم من القائمة أدناه وأفلتيها داخل مربع الأسبوع المناسب. يمكنك وضع أكثر من بطاقة في الأسبوع الواحد. كل بطاقة نافس تظهر في أسبوع واحد فقط — بعد تعيينها تختفي من القائمة ولا يمكن تكرارها في أسبوع آخر.
+                <span className="font-semibold">💡</span> النواتج موزعة افتراضيًا على الأسابيع. لتغيير موقع ناتج اسحبي بطاقته من أسبوعه وأفلتيها في أسبوع آخر، ويُحفظ اختيارك تلقائيًا. كل بطاقة تظهر في أسبوع واحد فقط، ويمكنك العودة إلى التوزيع الافتراضي بزر إعادة التعيين.
               </p>
             </div>
 
             {/* بطاقات نواتج التعلم — تظهر هنا لسحبها وإفلاتها (فقط غير المعيّنة لأسبوع حتى لا تُكرَّر في أكثر من أسبوع) */}
             <div className="p-4 bg-slate-50 border-b border-slate-200">
-              <h3 className="text-sm font-bold text-slate-800 mb-3">بطاقات نواتج التعلم — اسحبي وأفلتي في الأسابيع (كل بطاقة في أسبوع واحد فقط)</h3>
+              <h3 className="text-sm font-bold text-slate-800 mb-3">نواتج غير موزعة — اسحبيها إلى الأسبوع المناسب</h3>
               <div className="flex flex-wrap gap-3 overflow-x-auto pb-2 min-h-[88px]">
-                {modifiedOutcomes
-                  .filter((item) => !weekAssignments[getTopicKey(item)])
+                {unplacedOutcomes.length === 0 && (
+                  <p className="text-xs text-slate-500 self-center">
+                    جميع النواتج موزعة على الأسابيع. لتغيير موقع ناتج اسحبي بطاقته من أسبوعه وأفلتيها في الأسبوع الذي تريدين.
+                  </p>
+                )}
+                {unplacedOutcomes
                   .map((item) => {
                   const topicKey = getTopicKey(item)
                   const isDragging = draggedItem === topicKey
