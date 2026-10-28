@@ -266,6 +266,16 @@ const baseGamesData: Record<string, GameData> = {
     config: "lifecycle",
   } as GameData,
 
+  game_life_web: {
+    type: "classifier_game",
+    config: "ecosystem",
+  } as GameData,
+
+  game_eco_balance: {
+    type: "classifier_game",
+    config: "balance",
+  } as GameData,
+
   game_plate_boundaries_explorer: {
     type: "classifier_game",
     config: "plates",
