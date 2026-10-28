@@ -593,7 +593,7 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "التركيز ودرجة الحرارة والمحفزات",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "سرعة التفاعلات الكيميائية"
+    relatedOutcome: "التفاعلات الكيميائية"
   },
   {
     id: "q40",
@@ -1363,7 +1363,7 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "مادة تسرع التفاعل الكيميائي دون أن تستهلك",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "سرعة التفاعلات الكيميائية"
+    relatedOutcome: "التفاعلات الكيميائية"
   },
   {
     id: "q92",
@@ -1468,7 +1468,7 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "التركيز ودرجة الحرارة والمحفزات",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "سرعة التفاعلات الكيميائية"
+    relatedOutcome: "التفاعلات الكيميائية"
   },
   {
     id: "q100",
@@ -1830,7 +1830,7 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تسريع التفاعل دون أن يستهلك",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "سرعة التفاعلات الكيميائية"
+    relatedOutcome: "التفاعلات الكيميائية"
   },
   {
     id: "q124",
