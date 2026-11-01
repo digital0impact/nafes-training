@@ -7,6 +7,7 @@ export type SimulationQuestion = {
   skill: string;
   points: number;
   relatedOutcome?: string; // عنوان الدرس المرتبط
+  indicator?: number; // رقم المؤشر داخل الناتج (حسب ترتيب المؤشرات في وثيقة نواتج التعلم 2026)
 };
 
 export const simulationQuestions: SimulationQuestion[] = [
@@ -23,7 +24,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "التكاثر",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 4
   },
   {
     id: "q2",
@@ -38,7 +40,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الخلية",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 1
   },
   {
     id: "q3",
@@ -53,7 +56,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الجدار الخلوي",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 2
   },
   {
     id: "q4",
@@ -68,7 +72,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "إنتاج الطاقة",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 2
   },
   {
     id: "q5",
@@ -83,7 +88,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "DNA",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 2
   },
   {
     id: "q6",
@@ -98,7 +104,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المركب له خصائص ثابتة والمخلوط متغير",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "المركبات والمخاليط"
+    relatedOutcome: "المركبات والمخاليط",
+    indicator: 1
   },
   {
     id: "q7",
@@ -113,7 +120,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الماء",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "المركبات والمخاليط"
+    relatedOutcome: "المركبات والمخاليط",
+    indicator: 3
   },
   {
     id: "q8",
@@ -128,7 +136,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "درجة الحرارة والتحريك ومساحة السطح",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الذائبية ومعدل الذوبان"
+    relatedOutcome: "الذائبية ومعدل الذوبان",
+    indicator: 3
   },
   {
     id: "q9",
@@ -143,7 +152,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "أكبر من 7",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الأحماض والقواعد"
+    relatedOutcome: "الأحماض والقواعد",
+    indicator: 2
   },
   {
     id: "q10",
@@ -158,7 +168,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الجسم الساكن يبقى ساكناً والجسم المتحرك يبقى متحركاً",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "القصور الذاتي"
+    relatedOutcome: "قوة الاحتكاك",
+    indicator: 1
   },
   {
     id: "q11",
@@ -173,7 +184,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "النارية والرسوبية والمتحولة",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الصخور والمعادن واستخداماتها"
+    relatedOutcome: "الصخور والمعادن واستخداماتها",
+    indicator: 1
   },
   {
     id: "q12",
@@ -188,7 +200,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "من ترسب وضغط الرواسب",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "تصنيف الصخور ودورة تحولها"
+    relatedOutcome: "تصنيف الصخور ودورة تحولها",
+    indicator: 3
   },
   {
     id: "q13",
@@ -203,7 +216,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "حركة الصفائح التكتونية",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الزلازل والإجهادات في الصخور"
+    relatedOutcome: "الزلازل والإجهادات في الصخور",
+    indicator: 3
   },
   {
     id: "q14",
@@ -218,7 +232,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تدل على البيئات القديمة",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "تصنيف الصخور ودورة تحولها"
+    relatedOutcome: "تصنيف الصخور ودورة تحولها",
+    indicator: 3
   },
   {
     id: "q15",
@@ -233,7 +248,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الكونجلوميرات",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "تصنيف الصخور ودورة تحولها"
+    relatedOutcome: "تصنيف الصخور ودورة تحولها",
+    indicator: 3
   },
   {
     id: "q16",
@@ -248,7 +264,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "التحول النهائي للرواسب إلى صخور",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "تصنيف الصخور ودورة تحولها"
+    relatedOutcome: "تصنيف الصخور ودورة تحولها",
+    indicator: 3
   },
   {
     id: "q17",
@@ -263,7 +280,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "التجوية",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "تصنيف الصخور ودورة تحولها"
+    relatedOutcome: "تصنيف الصخور ودورة تحولها",
+    indicator: 3
   },
   {
     id: "q18",
@@ -278,7 +296,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "هضم الطعام وامتصاصه",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تكامل أجهزة جسم الإنسان"
+    relatedOutcome: "تكامل أجهزة جسم الإنسان",
+    indicator: 1
   },
   {
     id: "q19",
@@ -293,7 +312,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تبادل الأكسجين وثاني أكسيد الكربون",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تكامل أجهزة جسم الإنسان"
+    relatedOutcome: "تكامل أجهزة جسم الإنسان",
+    indicator: 1
   },
   {
     id: "q20",
@@ -308,7 +328,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الكتلة لا تفنى ولا تستحدث",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "التفاعلات الكيميائية"
+    relatedOutcome: "التفاعلات الكيميائية",
+    indicator: 2
   },
   {
     id: "q21",
@@ -323,7 +344,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الانقسام المتساوي ينتج خليتين والمنصف ينتج أربع خلايا",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "انقسام الخلية وتكاثرها"
+    relatedOutcome: "انقسام الخلية وتكاثرها",
+    indicator: 5
   },
   {
     id: "q22",
@@ -338,7 +360,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المرحلة البينية ومرحلة الانقسام الخلوي",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "انقسام الخلية وتكاثرها"
+    relatedOutcome: "انقسام الخلية وتكاثرها",
+    indicator: 1
   },
   {
     id: "q23",
@@ -353,7 +376,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "نظام السلم التصنيفي المتدرج",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث"
+    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث",
+    indicator: 1
   },
   {
     id: "q24",
@@ -368,7 +392,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "البدائيات القديمة والبكتيريا والطلائعيات والفطريات والنباتات والحيوانات",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث"
+    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث",
+    indicator: 1
   },
   {
     id: "q25",
@@ -383,7 +408,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الجهاز الدوري",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تكامل أجهزة جسم الإنسان"
+    relatedOutcome: "تكامل أجهزة جسم الإنسان",
+    indicator: 1
   },
   {
     id: "q26",
@@ -398,7 +424,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تتفاعل وتتكامل معاً في المحافظة على صحة وسلامة اتزان الجسم",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تكامل أجهزة جسم الإنسان"
+    relatedOutcome: "تكامل أجهزة جسم الإنسان",
+    indicator: 2
   },
   {
     id: "q27",
@@ -413,7 +440,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "غير المتجانسة يمكن رؤية مكوناتها والمتجانسة لا",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "المركبات والمخاليط"
+    relatedOutcome: "المركبات والمخاليط",
+    indicator: 2
   },
   {
     id: "q28",
@@ -428,7 +456,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الترشيح",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "المركبات والمخاليط"
+    relatedOutcome: "المركبات والمخاليط",
+    indicator: 2
   },
   {
     id: "q29",
@@ -443,7 +472,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "اللزوجة والتوتر السطحي",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "خصائص السوائل والمواد الصلبة"
+    relatedOutcome: "خصائص السوائل والمواد الصلبة",
+    indicator: 1
   },
   {
     id: "q30",
@@ -458,7 +488,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "البلورية منظمة الجزيئات وغير البلورية غير منظمة",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "خصائص السوائل والمواد الصلبة"
+    relatedOutcome: "خصائص السوائل والمواد الصلبة",
+    indicator: 2
   },
   {
     id: "q31",
@@ -473,7 +504,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "مندليف",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الجدول الدوري"
+    relatedOutcome: "الجدول الدوري",
+    indicator: 1
   },
   {
     id: "q32",
@@ -488,7 +520,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الرمز الكيميائي والعدد الذري والعدد الكتلي",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الجدول الدوري"
+    relatedOutcome: "الجدول الدوري",
+    indicator: 3
   },
   {
     id: "q33",
@@ -503,7 +536,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الفلزات موصلة جيدة للكهرباء واللافلزات رديئة التوصيل",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الجدول الدوري"
+    relatedOutcome: "الجدول الدوري",
+    indicator: 3
   },
   {
     id: "q34",
@@ -518,7 +552,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تفاعل الحمض مع القاعدة",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الأحماض والقواعد"
+    relatedOutcome: "الأحماض والقواعد",
+    indicator: 2
   },
   {
     id: "q35",
@@ -533,7 +568,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الأيونية والتساهمية والفلزية",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الروابط الكيميائية"
+    relatedOutcome: "الروابط الكيميائية",
+    indicator: 4
   },
   {
     id: "q36",
@@ -548,7 +584,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الأيون مشحون والجزيء متعادل",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الروابط الكيميائية"
+    relatedOutcome: "الروابط الكيميائية",
+    indicator: 5
   },
   {
     id: "q37",
@@ -563,7 +600,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "كتلة المواد المتفاعلة = كتلة المواد الناتجة",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "التفاعلات الكيميائية"
+    relatedOutcome: "التفاعلات الكيميائية",
+    indicator: 2
   },
   {
     id: "q38",
@@ -578,7 +616,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الماص يمتص الطاقة والطارد يطلق الطاقة",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "التفاعلات الكيميائية"
+    relatedOutcome: "التفاعلات الكيميائية",
+    indicator: 4
   },
   {
     id: "q39",
@@ -608,7 +647,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "F = ma",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "قانون نيوتن الثاني"
+    relatedOutcome: "قانون نيوتن الثاني",
+    indicator: 1
   },
   {
     id: "q41",
@@ -623,7 +663,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "لكل فعل رد فعل مساوٍ له في المقدار ومعاكس في الاتجاه",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "قانون نيوتن الثالث"
+    relatedOutcome: "قانون نيوتن الثالث",
+    indicator: 2
   },
   {
     id: "q42",
@@ -638,7 +679,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "السكوني والانزلاقي والتدحرجي",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "قوة الاحتكاك"
+    relatedOutcome: "قوة الاحتكاك",
+    indicator: 3
   },
   {
     id: "q43",
@@ -653,7 +695,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "مقاومة الجسم لتغيير حالته من السكون أو الحركة",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "القصور الذاتي"
+    relatedOutcome: "القصور الذاتي",
+    indicator: 1
   },
   {
     id: "q44",
@@ -668,7 +711,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "حدود التقارب والتباعد والجانبية",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الصفائح الأرضية وعلاقتها بالزلازل والبراكين"
+    relatedOutcome: "الصفائح الأرضية وعلاقتها بالزلازل والبراكين",
+    indicator: 2
   },
   {
     id: "q45",
@@ -683,7 +727,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الطبقة الخارجية الصلبة للأرض",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الصفائح الأرضية وعلاقتها بالزلازل والبراكين"
+    relatedOutcome: "الصفائح الأرضية وعلاقتها بالزلازل والبراكين",
+    indicator: 1
   },
   {
     id: "q46",
@@ -698,7 +743,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "من تبريد وتصلب الصهارة",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "تصنيف الصخور ودورة تحولها"
+    relatedOutcome: "تصنيف الصخور ودورة تحولها",
+    indicator: 1
   },
   {
     id: "q47",
@@ -713,7 +759,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "من تحول الصخور الأخرى بالحرارة والضغط",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "تصنيف الصخور ودورة تحولها"
+    relatedOutcome: "تصنيف الصخور ودورة تحولها",
+    indicator: 2
   },
   {
     id: "q48",
@@ -728,7 +775,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الدرعية والمخروطية والمركبة",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الزلازل والإجهادات في الصخور"
+    relatedOutcome: "الزلازل والإجهادات في الصخور",
+    indicator: 4
   },
   {
     id: "q49",
@@ -743,7 +791,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "البؤرة في باطن الأرض والمركز السطحي على السطح",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الزلازل والإجهادات في الصخور"
+    relatedOutcome: "الزلازل والإجهادات في الصخور",
+    indicator: 2
   },
   {
     id: "q50",
@@ -758,7 +807,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "دور مهم في حياة المخلوقات بعد موتها",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "دورة الكربون والظواهر المرتبطة بها"
+    relatedOutcome: "دورة الكربون والظواهر المرتبطة بها",
+    indicator: 3
   },
   {
     id: "q51",
@@ -773,7 +823,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الخلايا تنتج من خلايا موجودة",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 1
   },
   {
     id: "q52",
@@ -788,7 +839,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "خلية → نسيج → عضو → كائن حي",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 3
   },
   {
     id: "q53",
@@ -803,7 +855,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "روبرت هوك",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 1
   },
   {
     id: "q54",
@@ -818,7 +871,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "ضوئي مركب",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 1
   },
   {
     id: "q55",
@@ -833,7 +887,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "البراميسيوم",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 3
   },
   {
     id: "q56",
@@ -848,7 +903,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الخميرة",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 3
   },
   {
     id: "q57",
@@ -863,7 +919,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "من الخلية (د) إلى الخلية (أ)",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 4
   },
   {
     id: "q58",
@@ -878,7 +935,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "النقل النشط",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 4
   },
   {
     id: "q59",
@@ -893,7 +951,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "البلاستيدات",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 2
   },
   {
     id: "q60",
@@ -908,7 +967,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "انتشار جزيئات الماء عبر الغشاء الخلوي",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 4
   },
   // أسئلة إضافية - علوم الحياة
   {
@@ -924,7 +984,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الجهاز البولي",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تكامل أجهزة جسم الإنسان"
+    relatedOutcome: "تكامل أجهزة جسم الإنسان",
+    indicator: 1
   },
   {
     id: "q62",
@@ -939,7 +1000,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الجهاز الهرموني",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تكامل أجهزة جسم الإنسان"
+    relatedOutcome: "تكامل أجهزة جسم الإنسان",
+    indicator: 1
   },
   {
     id: "q63",
@@ -954,7 +1016,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الشعبة",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث"
+    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث",
+    indicator: 1
   },
   {
     id: "q64",
@@ -969,7 +1032,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الطور الاستوائي",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "انقسام الخلية وتكاثرها"
+    relatedOutcome: "انقسام الخلية وتكاثرها",
+    indicator: 3
   },
   {
     id: "q65",
@@ -984,7 +1048,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "أربع خلايا",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "انقسام الخلية وتكاثرها"
+    relatedOutcome: "انقسام الخلية وتكاثرها",
+    indicator: 4
   },
   // أسئلة إضافية - العلوم الفيزيائية
   {
@@ -1000,7 +1065,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المشبع يحتوي على أكبر كمية من المذاب، وغير المشبع يحتوي على كمية أقل",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الذائبية ومعدل الذوبان"
+    relatedOutcome: "الذائبية ومعدل الذوبان",
+    indicator: 1
   },
   {
     id: "q67",
@@ -1015,7 +1081,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "7",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الأحماض والقواعد"
+    relatedOutcome: "الأحماض والقواعد",
+    indicator: 2
   },
   {
     id: "q68",
@@ -1030,7 +1097,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "18",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الجدول الدوري"
+    relatedOutcome: "الجدول الدوري",
+    indicator: 2
   },
   {
     id: "q69",
@@ -1045,7 +1113,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "7",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الجدول الدوري"
+    relatedOutcome: "الجدول الدوري",
+    indicator: 2
   },
   {
     id: "q70",
@@ -1060,7 +1129,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "رابطة تساهمية",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الروابط الكيميائية"
+    relatedOutcome: "الروابط الكيميائية",
+    indicator: 4
   },
   {
     id: "q71",
@@ -1075,7 +1145,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "ماء وملح",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الأحماض والقواعد"
+    relatedOutcome: "الأحماض والقواعد",
+    indicator: 3
   },
   {
     id: "q72",
@@ -1090,7 +1161,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "متر/ثانية",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الحركة"
+    relatedOutcome: "الحركة",
+    indicator: 1
   },
   {
     id: "q73",
@@ -1105,7 +1177,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "معدل تغير السرعة مع الزمن",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الحركة"
+    relatedOutcome: "الحركة",
+    indicator: 2
   },
   {
     id: "q74",
@@ -1120,7 +1193,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "حاصل ضرب الكتلة في السرعة",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الزخم"
+    relatedOutcome: "الزخم",
+    indicator: 1
   },
   {
     id: "q75",
@@ -1135,7 +1209,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الاحتكاك السكوني",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "قوة الاحتكاك"
+    relatedOutcome: "قوة الاحتكاك",
+    indicator: 3
   },
   // أسئلة إضافية - علوم الأرض والفضاء
   {
@@ -1151,7 +1226,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الموجات الأولية والثانوية",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الزلازل والإجهادات في الصخور"
+    relatedOutcome: "الزلازل والإجهادات في الصخور",
+    indicator: 2
   },
   {
     id: "q77",
@@ -1166,7 +1242,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الصخور الرسوبية",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الصخور والمعادن واستخداماتها"
+    relatedOutcome: "الصخور والمعادن واستخداماتها",
+    indicator: 1
   },
   {
     id: "q78",
@@ -1181,7 +1258,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "دورة الصخور",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "تصنيف الصخور ودورة تحولها"
+    relatedOutcome: "تصنيف الصخور ودورة تحولها",
+    indicator: 4
   },
   {
     id: "q79",
@@ -1196,7 +1274,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "ثاني أكسيد الكربون",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "التغيرات المناخية"
+    relatedOutcome: "التغيرات المناخية",
+    indicator: 3
   },
   {
     id: "q80",
@@ -1211,7 +1290,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "امتصاص ثاني أكسيد الكربون من الجو",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "دورة الكربون والظواهر المرتبطة بها"
+    relatedOutcome: "دورة الكربون والظواهر المرتبطة بها",
+    indicator: 1
   },
   {
     id: "q81",
@@ -1226,7 +1306,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "حدود التقارب",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الصفائح الأرضية وعلاقتها بالزلازل والبراكين"
+    relatedOutcome: "الصفائح الأرضية وعلاقتها بالزلازل والبراكين",
+    indicator: 3
   },
   {
     id: "q82",
@@ -1241,7 +1322,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الغلاف الصخري",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الصفائح الأرضية وعلاقتها بالزلازل والبراكين"
+    relatedOutcome: "الصفائح الأرضية وعلاقتها بالزلازل والبراكين",
+    indicator: 1
   },
   {
     id: "q83",
@@ -1256,7 +1338,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "السيليكا",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الصخور والمعادن واستخداماتها"
+    relatedOutcome: "الصخور والمعادن واستخداماتها",
+    indicator: 1
   },
   {
     id: "q84",
@@ -1271,7 +1354,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "البركان الدرعي",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الزلازل والإجهادات في الصخور"
+    relatedOutcome: "الزلازل والإجهادات في الصخور",
+    indicator: 4
   },
   {
     id: "q85",
@@ -1286,7 +1370,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "التجوية",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الصخور والمعادن واستخداماتها"
+    relatedOutcome: "الصخور والمعادن واستخداماتها",
+    indicator: 1
   },
   // أسئلة إضافية - علوم الحياة (مكملة)
   {
@@ -1302,7 +1387,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الجهاز الدوري",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تكامل أجهزة جسم الإنسان"
+    relatedOutcome: "تكامل أجهزة جسم الإنسان",
+    indicator: 2
   },
   {
     id: "q87",
@@ -1317,7 +1403,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "النوع",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث"
+    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث",
+    indicator: 1
   },
   {
     id: "q88",
@@ -1332,7 +1419,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المرحلة البينية",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "انقسام الخلية وتكاثرها"
+    relatedOutcome: "انقسام الخلية وتكاثرها",
+    indicator: 2
   },
   {
     id: "q89",
@@ -1347,7 +1435,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "23",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "انقسام الخلية وتكاثرها"
+    relatedOutcome: "انقسام الخلية وتكاثرها",
+    indicator: 4
   },
   // أسئلة إضافية - العلوم الفيزيائية (مكملة)
   {
@@ -1363,7 +1452,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "مادة تسرع التفاعل الكيميائي دون أن تستهلك",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "التفاعلات الكيميائية"
+    relatedOutcome: "الجدول الدوري",
+    indicator: 5
   },
   {
     id: "q92",
@@ -1378,7 +1468,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الزخم الكلي للأجسام قبل التصادم يساوي الزخم الكلي بعد التصادم",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الزخم"
+    relatedOutcome: "الزخم",
+    indicator: 2
   },
   {
     id: "q93",
@@ -1393,7 +1484,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المركب له خصائص ثابتة والمخلوط متغير",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "المركبات والمخاليط"
+    relatedOutcome: "المركبات والمخاليط",
+    indicator: 1
   },
   {
     id: "q94",
@@ -1408,7 +1500,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "أقل من 7",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الأحماض والقواعد"
+    relatedOutcome: "الأحماض والقواعد",
+    indicator: 2
   },
   {
     id: "q95",
@@ -1423,7 +1516,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الغازات النبيلة",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الجدول الدوري"
+    relatedOutcome: "الجدول الدوري",
+    indicator: 2
   },
   {
     id: "q96",
@@ -1438,7 +1532,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "رابطة أيونية",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الروابط الكيميائية"
+    relatedOutcome: "الروابط الكيميائية",
+    indicator: 4
   },
   {
     id: "q97",
@@ -1453,7 +1548,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "التفاعل الطارد للحرارة",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "التفاعلات الكيميائية"
+    relatedOutcome: "التفاعلات الكيميائية",
+    indicator: 3
   },
   {
     id: "q98",
@@ -1483,7 +1579,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الجسم الساكن يبقى ساكناً والجسم المتحرك يبقى متحركاً ما لم تؤثر عليه قوة",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "القصور الذاتي"
+    relatedOutcome: "القصور الذاتي",
+    indicator: 2
   },
   // المزيد من الأسئلة - علوم الحياة
   {
@@ -1499,7 +1596,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "46",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "مادة الوراثة"
+    relatedOutcome: "مادة الوراثة",
+    indicator: 4
   },
   {
     id: "q102",
@@ -1514,7 +1612,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "DNA يحتوي على السكر ديوكسيريبوز وRNA يحتوي على الريبوز",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "مادة الوراثة"
+    relatedOutcome: "مادة الوراثة",
+    indicator: 3
   },
   {
     id: "q103",
@@ -1529,7 +1628,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "جزء من DNA يحمل معلومات وراثية لصفة معينة",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "مادة الوراثة"
+    relatedOutcome: "مادة الوراثة",
+    indicator: 1
   },
   {
     id: "q104",
@@ -1544,7 +1644,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "مندل",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "علم الوراثة وقوانين مندل"
+    relatedOutcome: "علم الوراثة وقوانين مندل",
+    indicator: 1
   },
   {
     id: "q105",
@@ -1559,7 +1660,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "قانون انعزال الصفات",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "علم الوراثة وقوانين مندل"
+    relatedOutcome: "علم الوراثة وقوانين مندل",
+    indicator: 2
   },
   {
     id: "q106",
@@ -1574,7 +1676,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المتماثلة لها نفس الصفة وغير المتماثلة لها صفات مختلفة",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "علم الوراثة وقوانين مندل"
+    relatedOutcome: "علم الوراثة وقوانين مندل",
+    indicator: 4
   },
   {
     id: "q107",
@@ -1589,7 +1692,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الجهاز الهرموني (الغدد الصماء)",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تكامل أجهزة جسم الإنسان"
+    relatedOutcome: "تكامل أجهزة جسم الإنسان",
+    indicator: 1
   },
   {
     id: "q108",
@@ -1604,7 +1708,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الدفاع عن الجسم ضد الأمراض",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تكامل أجهزة جسم الإنسان"
+    relatedOutcome: "تكامل أجهزة جسم الإنسان",
+    indicator: 1
   },
   {
     id: "q109",
@@ -1619,7 +1724,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المملكة",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث"
+    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث",
+    indicator: 1
   },
   {
     id: "q110",
@@ -1634,7 +1740,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الخلية النباتية تحتوي على جدار خلوي وبلاستيدات",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 2
   },
   // المزيد من الأسئلة - العلوم الفيزيائية
   {
@@ -1650,7 +1757,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المتجانس لا يمكن رؤية مكوناته وغير المتجانس يمكن رؤية مكوناته",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "المركبات والمخاليط"
+    relatedOutcome: "المركبات والمخاليط",
+    indicator: 2
   },
   {
     id: "q112",
@@ -1665,7 +1773,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "التقطير",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "المركبات والمخاليط"
+    relatedOutcome: "المركبات والمخاليط",
+    indicator: 2
   },
   {
     id: "q113",
@@ -1680,7 +1789,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تزيد سرعة الذوبان",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الذائبية ومعدل الذوبان"
+    relatedOutcome: "الذائبية ومعدل الذوبان",
+    indicator: 3
   },
   {
     id: "q114",
@@ -1695,7 +1805,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "اللزوجة والتوتر السطحي",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "خصائص السوائل والمواد الصلبة"
+    relatedOutcome: "خصائص السوائل والمواد الصلبة",
+    indicator: 1
   },
   {
     id: "q115",
@@ -1710,7 +1821,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الفلزات موصلة جيدة وأشباه الفلزات موصلة جزئية",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الجدول الدوري"
+    relatedOutcome: "الجدول الدوري",
+    indicator: 3
   },
   {
     id: "q116",
@@ -1725,7 +1837,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "Na",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الجدول الدوري"
+    relatedOutcome: "الجدول الدوري",
+    indicator: 3
   },
   {
     id: "q117",
@@ -1740,7 +1853,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "Fe",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الجدول الدوري"
+    relatedOutcome: "الجدول الدوري",
+    indicator: 3
   },
   {
     id: "q118",
@@ -1755,7 +1869,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تفاعل حمض الهيدروكلوريك مع هيدروكسيد الصوديوم",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الأحماض والقواعد"
+    relatedOutcome: "الأحماض والقواعد",
+    indicator: 2
   },
   {
     id: "q119",
@@ -1770,7 +1885,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "رابطة تساهمية",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الروابط الكيميائية"
+    relatedOutcome: "الروابط الكيميائية",
+    indicator: 4
   },
   {
     id: "q120",
@@ -1785,7 +1901,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الموجب فقد إلكترونات والسالب كسب إلكترونات",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الروابط الكيميائية"
+    relatedOutcome: "الروابط الكيميائية",
+    indicator: 5
   },
   {
     id: "q121",
@@ -1800,7 +1917,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المعادلة التي تتساوى فيها أعداد ذرات كل عنصر في طرفيها",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "التفاعلات الكيميائية"
+    relatedOutcome: "التفاعلات الكيميائية",
+    indicator: 2
   },
   {
     id: "q122",
@@ -1815,7 +1933,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "احتراق الخشب",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "التفاعلات الكيميائية"
+    relatedOutcome: "التفاعلات الكيميائية",
+    indicator: 4
   },
   {
     id: "q123",
@@ -1830,7 +1949,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تسريع التفاعل دون أن يستهلك",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "التفاعلات الكيميائية"
+    relatedOutcome: "الجدول الدوري",
+    indicator: 5
   },
   {
     id: "q124",
@@ -1845,7 +1965,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "متر/ثانية²",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الحركة"
+    relatedOutcome: "الحركة",
+    indicator: 2
   },
   {
     id: "q125",
@@ -1860,7 +1981,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "التسارع الذي يزيد من سرعة الجسم",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الحركة"
+    relatedOutcome: "الحركة",
+    indicator: 2
   },
   {
     id: "q127",
@@ -1875,7 +1997,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الاحتكاك الانزلاقي",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "قوة الاحتكاك"
+    relatedOutcome: "قوة الاحتكاك",
+    indicator: 3
   },
   {
     id: "q128",
@@ -1890,7 +2013,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "F = ma (القوة = الكتلة × التسارع)",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "قانون نيوتن الثاني"
+    relatedOutcome: "قانون نيوتن الثاني",
+    indicator: 1
   },
   {
     id: "q129",
@@ -1905,7 +2029,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "لكل فعل رد فعل مساوٍ له في المقدار ومعاكس في الاتجاه",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "قانون نيوتن الثالث"
+    relatedOutcome: "قانون نيوتن الثالث",
+    indicator: 2
   },
   {
     id: "q130",
@@ -1920,7 +2045,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "انحناء الجسم للأمام عند توقف السيارة فجأة",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "القصور الذاتي"
+    relatedOutcome: "القصور الذاتي",
+    indicator: 1
   },
   // المزيد من الأسئلة - علوم الأرض والفضاء
   {
@@ -1936,7 +2062,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "العادي والعكسي والجانبي",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الزلازل والإجهادات في الصخور"
+    relatedOutcome: "الزلازل والإجهادات في الصخور",
+    indicator: 1
   },
   {
     id: "q132",
@@ -1951,7 +2078,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الموجات السطحية",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الزلازل والإجهادات في الصخور"
+    relatedOutcome: "الزلازل والإجهادات في الصخور",
+    indicator: 2
   },
   {
     id: "q135",
@@ -1966,7 +2094,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الطبقة السائلة تحت الغلاف الصخري",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الصفائح الأرضية وعلاقتها بالزلازل والبراكين"
+    relatedOutcome: "الصفائح الأرضية وعلاقتها بالزلازل والبراكين",
+    indicator: 1
   },
   {
     id: "q136",
@@ -1981,7 +2110,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "النارية الجوفية والنارية السطحية",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "تصنيف الصخور ودورة تحولها"
+    relatedOutcome: "تصنيف الصخور ودورة تحولها",
+    indicator: 1
   },
   {
     id: "q137",
@@ -1996,7 +2126,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الصخور الرسوبية",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الصخور والمعادن واستخداماتها"
+    relatedOutcome: "الصخور والمعادن واستخداماتها",
+    indicator: 1
   },
   {
     id: "q138",
@@ -2011,7 +2142,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "التجوية والترسيب",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "تصنيف الصخور ودورة تحولها"
+    relatedOutcome: "تصنيف الصخور ودورة تحولها",
+    indicator: 4
   },
   {
     id: "q139",
@@ -2026,7 +2158,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "زيادة غازات الدفيئة في الغلاف الجوي",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "التغيرات المناخية"
+    relatedOutcome: "التغيرات المناخية",
+    indicator: 1
   },
   {
     id: "q141",
@@ -2041,7 +2174,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الكربون الموجود في الكائنات الحية",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "دورة الكربون والظواهر المرتبطة بها"
+    relatedOutcome: "دورة الكربون والظواهر المرتبطة بها",
+    indicator: 3
   },
   {
     id: "q142",
@@ -2056,7 +2190,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الفلزية واللافلزية",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الصخور والمعادن واستخداماتها"
+    relatedOutcome: "الصخور والمعادن واستخداماتها",
+    indicator: 2
   },
   {
     id: "q143",
@@ -2071,7 +2206,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "صناعة الزجاج",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الصخور والمعادن واستخداماتها"
+    relatedOutcome: "الصخور والمعادن واستخداماتها",
+    indicator: 1
   },
   {
     id: "q144",
@@ -2086,7 +2222,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "البركان المخروطي",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الزلازل والإجهادات في الصخور"
+    relatedOutcome: "الزلازل والإجهادات في الصخور",
+    indicator: 4
   },
   {
     id: "q145",
@@ -2101,7 +2238,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الحرارة والضغط",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "تصنيف الصخور ودورة تحولها"
+    relatedOutcome: "تصنيف الصخور ودورة تحولها",
+    indicator: 4
   },
   {
     id: "q146",
@@ -2116,7 +2254,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "إطلاق ثاني أكسيد الكربون عند التنفس",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "دورة الكربون والظواهر المرتبطة بها"
+    relatedOutcome: "دورة الكربون والظواهر المرتبطة بها",
+    indicator: 1
   },
   {
     id: "q147",
@@ -2131,7 +2270,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الصخور النارية",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الصخور والمعادن واستخداماتها"
+    relatedOutcome: "الصخور والمعادن واستخداماتها",
+    indicator: 1
   },
   {
     id: "q148",
@@ -2146,7 +2286,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المحيطية أرق والقارية أكثر سماكة",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الصفائح الأرضية وعلاقتها بالزلازل والبراكين"
+    relatedOutcome: "الصفائح الأرضية وعلاقتها بالزلازل والبراكين",
+    indicator: 1
   },
   {
     id: "q149",
@@ -2161,7 +2302,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تشكل قشرة جديدة",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الصفائح الأرضية وعلاقتها بالزلازل والبراكين"
+    relatedOutcome: "الصفائح الأرضية وعلاقتها بالزلازل والبراكين",
+    indicator: 3
   },
   {
     id: "q150",
@@ -2176,7 +2318,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "ارتفاع درجة حرارة الأرض وذوبان الجليد",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "التغيرات المناخية"
+    relatedOutcome: "التغيرات المناخية",
+    indicator: 3
   },
   // أسئلة إضافية من نماذج السنوات السابقة
   {
@@ -2192,7 +2335,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الخلية النباتية تحتوي على بلاستيدات والخلية الحيوانية لا",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 2
   },
   {
     id: "q152",
@@ -2207,7 +2351,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "إنتاج البروتينات",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية"
+    relatedOutcome: "الخلايا ووحدة بناء المخلوقات الحية",
+    indicator: 2
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - الدورات الطبيعية في البيئة
   {
@@ -2223,7 +2368,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "النيتروجين",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الدورات الطبيعية في البيئة"
+    relatedOutcome: "الدورات الطبيعية في البيئة",
+    indicator: 1
   },
   {
     id: "q182",
@@ -2238,7 +2384,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "البرق وأنواع من البكتيريا في التربة",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الدورات الطبيعية في البيئة"
+    relatedOutcome: "الدورات الطبيعية في البيئة",
+    indicator: 1
   },
   {
     id: "q183",
@@ -2253,7 +2400,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "النترات",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الدورات الطبيعية في البيئة"
+    relatedOutcome: "الدورات الطبيعية في البيئة",
+    indicator: 1
   },
   {
     id: "q184",
@@ -2268,7 +2416,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "زراعة البقوليات",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الدورات الطبيعية في البيئة"
+    relatedOutcome: "الدورات الطبيعية في البيئة",
+    indicator: 2
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - التنوع الحيوي وتكيف الأنواع
   {
@@ -2284,7 +2433,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "قد يتعرض للانقراض",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "التنوع الحيوي وتكيف الأنواع"
+    relatedOutcome: "التنوع الحيوي وتكيف الأنواع",
+    indicator: 2
   },
   {
     id: "q186",
@@ -2299,7 +2449,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المها العربي",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "التنوع الحيوي وتكيف الأنواع"
+    relatedOutcome: "التنوع الحيوي وتكيف الأنواع",
+    indicator: 3
   },
   {
     id: "q187",
@@ -2314,7 +2465,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الهجرة والتكيف",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "التنوع الحيوي وتكيف الأنواع"
+    relatedOutcome: "التنوع الحيوي وتكيف الأنواع",
+    indicator: 2
   },
   {
     id: "q188",
@@ -2329,7 +2481,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "معرضة لخطر نقص أعدادها الشديد",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "التنوع الحيوي وتكيف الأنواع"
+    relatedOutcome: "التنوع الحيوي وتكيف الأنواع",
+    indicator: 3
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - الانقراض والسجل الأحفوري
   {
@@ -2345,7 +2498,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "بقايا حيوانات أو نباتات كانت تعيش في الماضي",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الانقراض والسجل الأحفوري"
+    relatedOutcome: "الانقراض والسجل الأحفوري",
+    indicator: 1
   },
   {
     id: "q190",
@@ -2360,7 +2514,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الرسوبية",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الانقراض والسجل الأحفوري"
+    relatedOutcome: "الانقراض والسجل الأحفوري",
+    indicator: 1
   },
   {
     id: "q191",
@@ -2375,7 +2530,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "العمر التقريبي لبعض الأحافير",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الانقراض والسجل الأحفوري"
+    relatedOutcome: "الانقراض والسجل الأحفوري",
+    indicator: 1
   },
   {
     id: "q192",
@@ -2390,7 +2546,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الديناصورات",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الانقراض والسجل الأحفوري"
+    relatedOutcome: "الانقراض والسجل الأحفوري",
+    indicator: 2
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - انتقال المادة والطاقة في النظام البيئي
   {
@@ -2406,7 +2563,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المنتجات",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "انتقال المادة والطاقة في النظام البيئي"
+    relatedOutcome: "انتقال المادة والطاقة في النظام البيئي",
+    indicator: 1
   },
   {
     id: "q194",
@@ -2421,7 +2579,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الشبكة الغذائية تتكون من مجموعة من السلاسل الغذائية المتداخلة",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "انتقال المادة والطاقة في النظام البيئي"
+    relatedOutcome: "انتقال المادة والطاقة في النظام البيئي",
+    indicator: 1
   },
   {
     id: "q195",
@@ -2436,7 +2595,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الفطريات والبكتيريا",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "انتقال المادة والطاقة في النظام البيئي"
+    relatedOutcome: "انتقال المادة والطاقة في النظام البيئي",
+    indicator: 1
   },
   {
     id: "q196",
@@ -2451,7 +2611,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "العشب",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "انتقال المادة والطاقة في النظام البيئي"
+    relatedOutcome: "انتقال المادة والطاقة في النظام البيئي",
+    indicator: 1
   },
   {
     id: "q197",
@@ -2466,7 +2627,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "لا تتغير وإنما يعاد تدويرها باستمرار",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "انتقال المادة والطاقة في النظام البيئي"
+    relatedOutcome: "انتقال المادة والطاقة في النظام البيئي",
+    indicator: 2
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - الأنظمة البيئية المائية واليابسة
   {
@@ -2482,7 +2644,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "التطفل",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الأنظمة البيئية المائية واليابسة"
+    relatedOutcome: "الأنظمة البيئية المائية واليابسة",
+    indicator: 2
   },
   {
     id: "q199",
@@ -2497,7 +2660,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تبادل المنفعة",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الأنظمة البيئية المائية واليابسة"
+    relatedOutcome: "الأنظمة البيئية المائية واليابسة",
+    indicator: 2
   },
   {
     id: "q200",
@@ -2512,7 +2676,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الجماعة الحيوية",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الأنظمة البيئية المائية واليابسة"
+    relatedOutcome: "الأنظمة البيئية المائية واليابسة",
+    indicator: 1
   },
   {
     id: "q201",
@@ -2527,7 +2692,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "التعايش",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الأنظمة البيئية المائية واليابسة"
+    relatedOutcome: "الأنظمة البيئية المائية واليابسة",
+    indicator: 2
   },
   {
     id: "q202",
@@ -2542,7 +2708,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "درجة الحرارة",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "الأنظمة البيئية المائية واليابسة"
+    relatedOutcome: "الأنظمة البيئية المائية واليابسة",
+    indicator: 1
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - اتزان النظام البيئي
   {
@@ -2558,7 +2725,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "عندما تكون العوامل الحيوية واللاحيوية متوازنة",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "اتزان النظام البيئي"
+    relatedOutcome: "اتزان النظام البيئي",
+    indicator: 1
   },
   {
     id: "q204",
@@ -2573,7 +2741,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "إدخال مخلوقات جديدة إلى بيئة معينة",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "اتزان النظام البيئي"
+    relatedOutcome: "اتزان النظام البيئي",
+    indicator: 2
   },
   {
     id: "q205",
@@ -2588,7 +2757,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "للتأكد من أن الإنشاءات لا تؤثر سلبًا على النظام البيئي",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "اتزان النظام البيئي"
+    relatedOutcome: "اتزان النظام البيئي",
+    indicator: 4
   },
   {
     id: "q206",
@@ -2603,7 +2773,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الجفاف والأعاصير",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "اتزان النظام البيئي"
+    relatedOutcome: "اتزان النظام البيئي",
+    indicator: 2
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - استكشاف الكون والأدوات المستخدمة
   {
@@ -2619,7 +2790,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "عدسة محدبة",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "استكشاف الكون والأدوات المستخدمة"
+    relatedOutcome: "استكشاف الكون والأدوات المستخدمة",
+    indicator: 2
   },
   {
     id: "q208",
@@ -2634,7 +2806,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "لأن الموجات الراديوية لا تتأثر بالظروف الجوية",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "استكشاف الكون والأدوات المستخدمة"
+    relatedOutcome: "استكشاف الكون والأدوات المستخدمة",
+    indicator: 2
   },
   {
     id: "q209",
@@ -2649,7 +2822,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "لتجنب تأثير الغلاف الجوي الذي يسبب تشويشًا في الرؤية",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "استكشاف الكون والأدوات المستخدمة"
+    relatedOutcome: "استكشاف الكون والأدوات المستخدمة",
+    indicator: 1
   },
   {
     id: "q210",
@@ -2664,7 +2838,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "حلزونية",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "استكشاف الكون والأدوات المستخدمة"
+    relatedOutcome: "استكشاف الكون والأدوات المستخدمة",
+    indicator: 3
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - حركة الأجرام السماوية
   {
@@ -2680,7 +2855,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الليل والنهار",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "حركة الأجرام السماوية"
+    relatedOutcome: "حركة الأجرام السماوية",
+    indicator: 2
   },
   {
     id: "q212",
@@ -2695,7 +2871,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "ميل محور الأرض أثناء دورانها حول الشمس",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "حركة الأجرام السماوية"
+    relatedOutcome: "حركة الأجرام السماوية",
+    indicator: 2
   },
   {
     id: "q213",
@@ -2710,7 +2887,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "يقع القمر بين الشمس والأرض",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "حركة الأجرام السماوية"
+    relatedOutcome: "حركة الأجرام السماوية",
+    indicator: 2
   },
   {
     id: "q214",
@@ -2725,7 +2903,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "على خط مستقيم",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "حركة الأجرام السماوية"
+    relatedOutcome: "حركة الأجرام السماوية",
+    indicator: 2
   },
   {
     id: "q215",
@@ -2740,7 +2919,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المشتري",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "حركة الأجرام السماوية"
+    relatedOutcome: "حركة الأجرام السماوية",
+    indicator: 1
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - تأثير النشاط البشري على الأرض
   {
@@ -2756,7 +2936,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "يتفاعل ضوء الشمس مع الملوثات الناتجة عن احتراق الوقود",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "تأثير النشاط البشري على الأرض"
+    relatedOutcome: "تأثير النشاط البشري على الأرض",
+    indicator: 1
   },
   {
     id: "q217",
@@ -2771,7 +2952,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "مركبات الكلوروفلوروكربون (CFC)",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "تأثير النشاط البشري على الأرض"
+    relatedOutcome: "تأثير النشاط البشري على الأرض",
+    indicator: 1
   },
   {
     id: "q218",
@@ -2786,7 +2968,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "أقل من ٥٫٦",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "تأثير النشاط البشري على الأرض"
+    relatedOutcome: "تأثير النشاط البشري على الأرض",
+    indicator: 1
   },
   {
     id: "q219",
@@ -2801,7 +2984,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "السيارات والمصانع",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "تأثير النشاط البشري على الأرض"
+    relatedOutcome: "تأثير النشاط البشري على الأرض",
+    indicator: 1
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - الموارد الطبيعية وسبل إدارتها
   {
@@ -2817,7 +3001,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "النفط",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الموارد الطبيعية وسبل إدارتها"
+    relatedOutcome: "الموارد الطبيعية وسبل إدارتها",
+    indicator: 2
   },
   {
     id: "q221",
@@ -2832,7 +3017,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "إعادة الاستخدام",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الموارد الطبيعية وسبل إدارتها"
+    relatedOutcome: "الموارد الطبيعية وسبل إدارتها",
+    indicator: 3
   },
   {
     id: "q222",
@@ -2847,7 +3033,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تنتج فضلات مشعة يصعب التخلص منها",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الموارد الطبيعية وسبل إدارتها"
+    relatedOutcome: "الموارد الطبيعية وسبل إدارتها",
+    indicator: 2
   },
   {
     id: "q223",
@@ -2862,7 +3049,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "ضوء الشمس إلى طاقة كهربائية",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الموارد الطبيعية وسبل إدارتها"
+    relatedOutcome: "الموارد الطبيعية وسبل إدارتها",
+    indicator: 3
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - نماذج الذرة
   {
@@ -2878,7 +3066,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "طومسون",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "نماذج الذرة"
+    relatedOutcome: "نماذج الذرة",
+    indicator: 1
   },
   {
     id: "q225",
@@ -2893,7 +3082,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "أن معظم حجم الذرة فراغ",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "نماذج الذرة"
+    relatedOutcome: "نماذج الذرة",
+    indicator: 1
   },
   {
     id: "q226",
@@ -2908,7 +3098,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "العدد الذري",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "نماذج الذرة"
+    relatedOutcome: "نماذج الذرة",
+    indicator: 2
   },
   {
     id: "q227",
@@ -2923,7 +3114,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "النيوترونات",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "نماذج الذرة"
+    relatedOutcome: "نماذج الذرة",
+    indicator: 3
   },
   {
     id: "q228",
@@ -2938,7 +3130,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "مجال حول النواة يكون احتمال وجود الإلكترون فيه أكبر",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "نماذج الذرة"
+    relatedOutcome: "نماذج الذرة",
+    indicator: 2
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - التيار الكهربائي
   {
@@ -2954,7 +3147,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الأمبير",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "التيار الكهربائي"
+    relatedOutcome: "التيار الكهربائي",
+    indicator: 1
   },
   {
     id: "q230",
@@ -2969,7 +3163,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "شدة التيار × المقاومة",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "التيار الكهربائي"
+    relatedOutcome: "التيار الكهربائي",
+    indicator: 2
   },
   {
     id: "q231",
@@ -2984,7 +3179,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "٠٫٢ أمبير",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "التيار الكهربائي"
+    relatedOutcome: "التيار الكهربائي",
+    indicator: 2
   },
   {
     id: "q232",
@@ -2999,7 +3195,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "التيار المتردد",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "التيار الكهربائي"
+    relatedOutcome: "التيار الكهربائي",
+    indicator: 3
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - المجال الكهربائي والمغناطيسي
   {
@@ -3015,7 +3212,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تتنافران",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "المجال الكهربائي والمغناطيسي"
+    relatedOutcome: "المجال الكهربائي والمغناطيسي",
+    indicator: 1
   },
   {
     id: "q234",
@@ -3030,7 +3228,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "ليعمل كل جهاز بشكل مستقل ولا يتأثر بتعطل غيره",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "المجال الكهربائي والمغناطيسي"
+    relatedOutcome: "المجال الكهربائي والمغناطيسي",
+    indicator: 4
   },
   {
     id: "q235",
@@ -3045,7 +3244,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تتوقف بقية المصابيح",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "المجال الكهربائي والمغناطيسي"
+    relatedOutcome: "المجال الكهربائي والمغناطيسي",
+    indicator: 4
   },
   {
     id: "q236",
@@ -3060,7 +3260,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "من القطب الشمالي إلى القطب الجنوبي",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "المجال الكهربائي والمغناطيسي"
+    relatedOutcome: "المجال الكهربائي والمغناطيسي",
+    indicator: 2
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - التوصيل الكهربائي
   {
@@ -3076,7 +3277,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "النحاس",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "التوصيل الكهربائي"
+    relatedOutcome: "التوصيل الكهربائي",
+    indicator: 1
   },
   {
     id: "q238",
@@ -3091,7 +3293,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "أشباه الموصلات",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "التوصيل الكهربائي"
+    relatedOutcome: "التوصيل الكهربائي",
+    indicator: 1
   },
   {
     id: "q239",
@@ -3106,7 +3309,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "لانخفاض مقاومته",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "التوصيل الكهربائي"
+    relatedOutcome: "التوصيل الكهربائي",
+    indicator: 1
   },
   {
     id: "q240",
@@ -3121,7 +3325,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "السيليكون والجرمانيوم",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "التوصيل الكهربائي"
+    relatedOutcome: "التوصيل الكهربائي",
+    indicator: 1
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - المغناطيس والتيار الكهربائي
   {
@@ -3137,7 +3342,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المحرك الكهربائي",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "المغناطيس والتيار الكهربائي"
+    relatedOutcome: "المغناطيس والتيار الكهربائي",
+    indicator: 4
   },
   {
     id: "q242",
@@ -3152,7 +3358,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المولد الكهربائي",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "المغناطيس والتيار الكهربائي"
+    relatedOutcome: "المغناطيس والتيار الكهربائي",
+    indicator: 4
   },
   {
     id: "q243",
@@ -3167,7 +3374,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "عدد اللفات وشدة التيار",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "المغناطيس والتيار الكهربائي"
+    relatedOutcome: "المغناطيس والتيار الكهربائي",
+    indicator: 1
   },
   {
     id: "q244",
@@ -3182,7 +3390,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "أجهزة القياس مثل الأميتر والفولتميتر",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "المغناطيس والتيار الكهربائي"
+    relatedOutcome: "المغناطيس والتيار الكهربائي",
+    indicator: 2
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - الطاقة الحرارية
   {
@@ -3198,7 +3407,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تزداد سرعتها وتتباعد عن بعضها",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الطاقة الحرارية"
+    relatedOutcome: "الطاقة الحرارية",
+    indicator: 2
   },
   {
     id: "q246",
@@ -3213,7 +3423,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "مجموع الطاقة الحركية وطاقة الوضع لجزيئات الجسم",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الطاقة الحرارية"
+    relatedOutcome: "الطاقة الحرارية",
+    indicator: 1
   },
   {
     id: "q247",
@@ -3228,7 +3439,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "من الجسم الأسخن إلى الجسم الأبرد",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الطاقة الحرارية"
+    relatedOutcome: "انتقال وتوصيل الحرارة",
+    indicator: 1
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - انتقال وتوصيل الحرارة
   {
@@ -3244,7 +3456,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الإشعاع",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "انتقال وتوصيل الحرارة"
+    relatedOutcome: "انتقال وتوصيل الحرارة",
+    indicator: 2
   },
   {
     id: "q249",
@@ -3259,7 +3472,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الحمل",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "انتقال وتوصيل الحرارة"
+    relatedOutcome: "انتقال وتوصيل الحرارة",
+    indicator: 2
   },
   {
     id: "q250",
@@ -3274,7 +3488,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الزجاج",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "انتقال وتوصيل الحرارة"
+    relatedOutcome: "انتقال وتوصيل الحرارة",
+    indicator: 3
   },
   {
     id: "q251",
@@ -3289,7 +3504,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "لأن إلكتروناتها ضعيفة الارتباط مع النواة فتكون حرة الحركة",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "انتقال وتوصيل الحرارة"
+    relatedOutcome: "انتقال وتوصيل الحرارة",
+    indicator: 3
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - الحرارة النوعية
   {
@@ -3305,7 +3521,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "١ كجم من المادة درجة سلزيوس واحدة",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الحرارة النوعية"
+    relatedOutcome: "الحرارة النوعية",
+    indicator: 1
   },
   {
     id: "q253",
@@ -3320,7 +3537,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "لأن الحرارة النوعية للماء أكبر من الحرارة النوعية للرمال",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الحرارة النوعية"
+    relatedOutcome: "الحرارة النوعية",
+    indicator: 2
   },
   {
     id: "q254",
@@ -3335,7 +3553,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تحتاج إلى طاقة حرارية أكبر لتغير درجة حرارتها",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الحرارة النوعية"
+    relatedOutcome: "الحرارة النوعية",
+    indicator: 1
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - الطاقة الحركية والكامنة
   {
@@ -3351,7 +3570,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "سرعته وكتلته",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الطاقة الحركية والكامنة"
+    relatedOutcome: "الطاقة الحركية والكامنة",
+    indicator: 2
   },
   {
     id: "q256",
@@ -3366,7 +3586,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الطاقة الكامنة",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الطاقة الحركية والكامنة"
+    relatedOutcome: "الطاقة الحركية والكامنة",
+    indicator: 1
   },
   {
     id: "q257",
@@ -3381,7 +3602,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "كتاب على رف مرتفع",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الطاقة الحركية والكامنة"
+    relatedOutcome: "الطاقة الحركية والكامنة",
+    indicator: 4
   },
   {
     id: "q258",
@@ -3396,7 +3618,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "حركية",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الطاقة الحركية والكامنة"
+    relatedOutcome: "الطاقة الحركية والكامنة",
+    indicator: 1
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - تحولات الطاقة
   {
@@ -3412,7 +3635,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "لا تفنى ولا تستحدث وإنما تتحول من شكل لآخر",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "تحولات الطاقة"
+    relatedOutcome: "تحولات الطاقة",
+    indicator: 2
   },
   {
     id: "q260",
@@ -3427,7 +3651,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "حركية وجزء منها حرارية",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "تحولات الطاقة"
+    relatedOutcome: "تحولات الطاقة",
+    indicator: 1
   },
   {
     id: "q261",
@@ -3442,7 +3667,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الكيميائية إلى طاقة حركية",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "تحولات الطاقة"
+    relatedOutcome: "تحولات الطاقة",
+    indicator: 1
   },
   {
     id: "q262",
@@ -3457,7 +3683,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الكيميائية",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "تحولات الطاقة"
+    relatedOutcome: "تحولات الطاقة",
+    indicator: 1
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - الموجات الصوتية
   {
@@ -3473,7 +3700,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "ميكانيكية طولية",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الموجات الصوتية"
+    relatedOutcome: "الموجات الصوتية",
+    indicator: 1
   },
   {
     id: "q264",
@@ -3488,7 +3716,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "لأن الصوت لا ينتقل إلا في وسط مادي",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الموجات الصوتية"
+    relatedOutcome: "الموجات الصوتية",
+    indicator: 1
   },
   {
     id: "q265",
@@ -3503,7 +3732,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تردد موجاته",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الموجات الصوتية"
+    relatedOutcome: "الموجات الصوتية",
+    indicator: 2
   },
   {
     id: "q266",
@@ -3518,7 +3748,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الديسيبل",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الموجات الصوتية"
+    relatedOutcome: "الموجات الصوتية",
+    indicator: 2
   },
   {
     id: "q267",
@@ -3533,7 +3764,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "٢١ م/ث",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الموجات الصوتية"
+    relatedOutcome: "الموجات الصوتية",
+    indicator: 1
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - الموجات الضوئية
   {
@@ -3549,7 +3781,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "أشعة جاما",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الموجات الضوئية"
+    relatedOutcome: "الموجات الضوئية",
+    indicator: 3
   },
   {
     id: "q269",
@@ -3564,7 +3797,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تكفي لاختراق أنسجة الجسم اللينة ولا تخترق العظام",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الموجات الضوئية"
+    relatedOutcome: "الموجات الضوئية",
+    indicator: 3
   },
   {
     id: "q270",
@@ -3579,7 +3813,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "قبل الشبكية",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الموجات الضوئية"
+    relatedOutcome: "الموجات الضوئية",
+    indicator: 4
   },
   {
     id: "q271",
@@ -3594,7 +3829,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الأشعة تحت الحمراء",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الموجات الضوئية"
+    relatedOutcome: "الموجات الضوئية",
+    indicator: 3
   },
   {
     id: "q272",
@@ -3609,7 +3845,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الانكسار",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "الموجات الضوئية"
+    relatedOutcome: "الموجات الضوئية",
+    indicator: 4
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - خصائص السوائل والمواد الصلبة
   {
@@ -3625,7 +3862,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "اللزوجة",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "خصائص السوائل والمواد الصلبة"
+    relatedOutcome: "خصائص السوائل والمواد الصلبة",
+    indicator: 1
   },
   {
     id: "q274",
@@ -3640,7 +3878,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الزجاج",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "خصائص السوائل والمواد الصلبة"
+    relatedOutcome: "خصائص السوائل والمواد الصلبة",
+    indicator: 2
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - قانون نيوتن الثاني
   {
@@ -3656,7 +3895,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "٤ م/ث²",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "قانون نيوتن الثاني"
+    relatedOutcome: "قانون نيوتن الثاني",
+    indicator: 3
   },
   {
     id: "q276",
@@ -3671,7 +3911,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "القوة المحصلة",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "قانون نيوتن الثاني"
+    relatedOutcome: "قانون نيوتن الثاني",
+    indicator: 2
   },
   // أسئلة جديدة لتغطية نواتج وثيقة ٢٠٢٦ - قانون نيوتن الثالث
   {
@@ -3687,7 +3928,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "انطلاق الصواريخ",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "قانون نيوتن الثالث"
+    relatedOutcome: "قانون نيوتن الثالث",
+    indicator: 2
   },
   {
     id: "q278",
@@ -3702,7 +3944,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "لأنهما تؤثران في جسمين مختلفين",
     skill: "العلوم الفيزيائية",
     points: 1,
-    relatedOutcome: "قانون نيوتن الثالث"
+    relatedOutcome: "قانون نيوتن الثالث",
+    indicator: 1
   },
   {
     id: "q279",
@@ -3717,7 +3960,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المظهر والسلوك",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث"
+    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث",
+    indicator: 1
   },
   {
     id: "q280",
@@ -3732,7 +3976,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تحليل DNA",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث"
+    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث",
+    indicator: 1
   },
   {
     id: "q281",
@@ -3747,7 +3992,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "البكتيريا",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث"
+    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث",
+    indicator: 2
   },
   {
     id: "q282",
@@ -3762,7 +4008,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "بتحليل المواد العضوية (رمية أو طفيلية)",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث"
+    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث",
+    indicator: 2
   },
   {
     id: "q283",
@@ -3777,7 +4024,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الجنس والنوع",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث"
+    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث",
+    indicator: 1
   },
   {
     id: "q284",
@@ -3792,7 +4040,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الشعبة (الحبليات)",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث"
+    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث",
+    indicator: 3
   },
   {
     id: "q285",
@@ -3807,7 +4056,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "المفصليات",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث"
+    relatedOutcome: "تصنيف المخلوقات الحية وفق نظام التصنيف الحديث",
+    indicator: 3
   },
   {
     id: "q286",
@@ -3822,7 +4072,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "البازلاء",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "علم الوراثة وقوانين مندل"
+    relatedOutcome: "علم الوراثة وقوانين مندل",
+    indicator: 1
   },
   {
     id: "q287",
@@ -3837,7 +4088,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "السائدة",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "علم الوراثة وقوانين مندل"
+    relatedOutcome: "علم الوراثة وقوانين مندل",
+    indicator: 3
   },
   {
     id: "q288",
@@ -3852,7 +4104,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "rr",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "علم الوراثة وقوانين مندل"
+    relatedOutcome: "علم الوراثة وقوانين مندل",
+    indicator: 4
   },
   {
     id: "q289",
@@ -3867,7 +4120,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "مربع بانيت",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "علم الوراثة وقوانين مندل"
+    relatedOutcome: "علم الوراثة وقوانين مندل",
+    indicator: 5
   },
   {
     id: "q290",
@@ -3882,7 +4136,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الثايمين",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "مادة الوراثة"
+    relatedOutcome: "مادة الوراثة",
+    indicator: 3
   },
   {
     id: "q291",
@@ -3897,7 +4152,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "اليوراسيل",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "مادة الوراثة"
+    relatedOutcome: "مادة الوراثة",
+    indicator: 3
   },
   {
     id: "q292",
@@ -3912,7 +4168,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "واطسون وكريك",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "مادة الوراثة"
+    relatedOutcome: "مادة الوراثة",
+    indicator: 3
   },
   {
     id: "q293",
@@ -3927,7 +4184,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "الأشعة السينية",
     skill: "علوم الحياة",
     points: 1,
-    relatedOutcome: "مادة الوراثة"
+    relatedOutcome: "مادة الوراثة",
+    indicator: 1
   },
   {
     id: "q294",
@@ -3942,7 +4200,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "العاكس",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "استكشاف الكون والأدوات المستخدمة"
+    relatedOutcome: "استكشاف الكون والأدوات المستخدمة",
+    indicator: 2
   },
   {
     id: "q295",
@@ -3957,7 +4216,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "السنة الضوئية",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "استكشاف الكون والأدوات المستخدمة"
+    relatedOutcome: "استكشاف الكون والأدوات المستخدمة",
+    indicator: 3
   },
   {
     id: "q296",
@@ -3972,7 +4232,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تقع الأرض بين الشمس والقمر",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "حركة الأجرام السماوية"
+    relatedOutcome: "حركة الأجرام السماوية",
+    indicator: 2
   },
   {
     id: "q297",
@@ -3987,7 +4248,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "لأن مدة دورانه حول محوره تساوي مدة دورانه حول الأرض",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "حركة الأجرام السماوية"
+    relatedOutcome: "حركة الأجرام السماوية",
+    indicator: 2
   },
   {
     id: "q298",
@@ -4002,7 +4264,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "تختلط الغازات الناتجة عن حرق الوقود ببخار الماء في الهواء",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "تأثير النشاط البشري على الأرض"
+    relatedOutcome: "تأثير النشاط البشري على الأرض",
+    indicator: 1
   },
   {
     id: "q299",
@@ -4017,7 +4280,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "مكب النفايات",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "تأثير النشاط البشري على الأرض"
+    relatedOutcome: "تأثير النشاط البشري على الأرض",
+    indicator: 1
   },
   {
     id: "q300",
@@ -4032,7 +4296,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "100 عام أو أقل",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الموارد الطبيعية وسبل إدارتها"
+    relatedOutcome: "الموارد الطبيعية وسبل إدارتها",
+    indicator: 3
   },
   {
     id: "q301",
@@ -4047,7 +4312,8 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "النفط والفحم الحجري والغاز الطبيعي",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الموارد الطبيعية وسبل إدارتها"
+    relatedOutcome: "الموارد الطبيعية وسبل إدارتها",
+    indicator: 2
   },
   {
     id: "q302",
@@ -4062,7 +4328,584 @@ export const simulationQuestions: SimulationQuestion[] = [
     correctAnswer: "إعادة التدوير",
     skill: "علوم الأرض والفضاء",
     points: 1,
-    relatedOutcome: "الموارد الطبيعية وسبل إدارتها"
+    relatedOutcome: "الموارد الطبيعية وسبل إدارتها",
+    indicator: 3
+  },
+  {
+    id: "q303",
+    number: 303,
+    text: "من طرق الوقاية من أمراض القلب والأوعية الدموية:",
+    choices: [
+      "الإكثار من الأطعمة الدهنية",
+      "قلة الحركة",
+      "التغذية الصحية وممارسة الرياضة وتجنب التدخين",
+      "الإكثار من الملح"
+    ],
+    correctAnswer: "التغذية الصحية وممارسة الرياضة وتجنب التدخين",
+    skill: "علوم الحياة",
+    points: 1,
+    relatedOutcome: "تكامل أجهزة جسم الإنسان",
+    indicator: 3
+  },
+  {
+    id: "q304",
+    number: 304,
+    text: "لماذا يؤثر تدمير الغابات المطرية سلبًا على البيئة والإنسان؟",
+    choices: [
+      "لأنها موطن لأعداد كبيرة من أنواع النباتات والطيور، وتُستخلص من بعض نباتاتها أدوية",
+      "لأنها تزيد من سقوط الأمطار الحمضية",
+      "لأنها خالية من المخلوقات الحية",
+      "لأنها مصدر النفط الوحيد"
+    ],
+    correctAnswer: "لأنها موطن لأعداد كبيرة من أنواع النباتات والطيور، وتُستخلص من بعض نباتاتها أدوية",
+    skill: "علوم الحياة",
+    points: 1,
+    relatedOutcome: "التنوع الحيوي وتكيف الأنواع",
+    indicator: 1
+  },
+  {
+    id: "q305",
+    number: 305,
+    text: "الأشياء التي تحدد حجم الجماعة الحيوية في النظام البيئي، مثل كمية الأمطار والغذاء والمأوى، تسمى:",
+    choices: [
+      "العوامل المحددة",
+      "المحللات",
+      "المنتجات",
+      "الهباء الجوي"
+    ],
+    correctAnswer: "العوامل المحددة",
+    skill: "علوم الحياة",
+    points: 1,
+    relatedOutcome: "اتزان النظام البيئي",
+    indicator: 3
+  },
+  {
+    id: "q306",
+    number: 306,
+    text: "من الأمثلة على المتلازمات الناتجة عن الخلل في الانقسام المنصف:",
+    choices: [
+      "فقر الدم بسبب نقص الحديد",
+      "متلازمة داون",
+      "السكري من النوع الثاني",
+      "الزكام"
+    ],
+    correctAnswer: "متلازمة داون",
+    skill: "علوم الحياة",
+    points: 1,
+    relatedOutcome: "مادة الوراثة",
+    indicator: 2
+  },
+  {
+    id: "q307",
+    number: 307,
+    text: "الزمن اللازم لتحلل نصف كمية العنصر المشع يسمى:",
+    choices: [
+      "عمر النصف",
+      "العدد الكتلي",
+      "التحول",
+      "السحابة الإلكترونية"
+    ],
+    correctAnswer: "عمر النصف",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "نماذج الذرة",
+    indicator: 4
+  },
+  {
+    id: "q308",
+    number: 308,
+    text: "ماذا يحدث لذائبية الغازات في الماء عند زيادة درجة الحرارة؟",
+    choices: [
+      "تزداد",
+      "تقل",
+      "لا تتغير",
+      "تتضاعف دائمًا"
+    ],
+    correctAnswer: "تقل",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "الذائبية ومعدل الذوبان",
+    indicator: 2
+  },
+  {
+    id: "q309",
+    number: 309,
+    text: "تترتب الجسيمات في المواد الصلبة البلورية مثل ملح الطعام:",
+    choices: [
+      "بشكل عشوائي",
+      "بشكل منتظم ومتكرر ثلاثي الأبعاد",
+      "على شكل طبقات سائلة",
+      "متباعدة جدًا بلا تجاذب"
+    ],
+    correctAnswer: "بشكل منتظم ومتكرر ثلاثي الأبعاد",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "خصائص السوائل والمواد الصلبة",
+    indicator: 3
+  },
+  {
+    id: "q310",
+    number: 310,
+    text: "تسمى سلسلتا اللانثانيدات والأكتنيدات في الجدول الدوري:",
+    choices: [
+      "الغازات النبيلة",
+      "الفلزات القلوية",
+      "العناصر الانتقالية الداخلية",
+      "الهالوجينات"
+    ],
+    correctAnswer: "العناصر الانتقالية الداخلية",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "الجدول الدوري",
+    indicator: 4
+  },
+  {
+    id: "q311",
+    number: 311,
+    text: "من خصائص القواعد:",
+    choices: [
+      "طعمها لاذع وتتفاعل بشدة مع الفلزات",
+      "طعمها مر وملمسها زلق",
+      "لا توصل الكهرباء",
+      "رقمها الهيدروجيني أقل من 7"
+    ],
+    correctAnswer: "طعمها مر وملمسها زلق",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "الأحماض والقواعد",
+    indicator: 1
+  },
+  {
+    id: "q312",
+    number: 312,
+    text: "ما الحد الأقصى من الإلكترونات التي يتسع لها مستوى الطاقة الأول (الأقرب إلى النواة)؟",
+    choices: [
+      "إلكترونان",
+      "8 إلكترونات",
+      "18 إلكترونًا",
+      "إلكترون واحد"
+    ],
+    correctAnswer: "إلكترونان",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "الروابط الكيميائية",
+    indicator: 1
+  },
+  {
+    id: "q313",
+    number: 313,
+    text: "لماذا تكون الغازات النبيلة غير نشطة كيميائيًا؟",
+    choices: [
+      "لأنها فلزات",
+      "لأن مستوى الطاقة الأخير فيها ممتلئ بالإلكترونات",
+      "لأنها لا تحتوي على إلكترونات",
+      "لأن نواتها غير مستقرة"
+    ],
+    correctAnswer: "لأن مستوى الطاقة الأخير فيها ممتلئ بالإلكترونات",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "الروابط الكيميائية",
+    indicator: 2
+  },
+  {
+    id: "q314",
+    number: 314,
+    text: "التمثيل النقطي للإلكترونات هو:",
+    choices: [
+      "رسم النواة وما فيها من بروتونات",
+      "رمز العنصر محاطًا بنقاط تمثل عدد الإلكترونات في مستوى الطاقة الخارجي",
+      "كتابة العدد الكتلي فوق الرمز",
+      "ترتيب العناصر حسب أعدادها الذرية"
+    ],
+    correctAnswer: "رمز العنصر محاطًا بنقاط تمثل عدد الإلكترونات في مستوى الطاقة الخارجي",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "الروابط الكيميائية",
+    indicator: 3
+  },
+  {
+    id: "q315",
+    number: 315,
+    text: "من دلائل حدوث التفاعل الكيميائي:",
+    choices: [
+      "تغير شكل المادة فقط",
+      "تمزق الورقة",
+      "تصاعد غاز أو تكون راسب",
+      "انصهار الجليد"
+    ],
+    correctAnswer: "تصاعد غاز أو تكون راسب",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "التفاعلات الكيميائية",
+    indicator: 1
+  },
+  {
+    id: "q316",
+    number: 316,
+    text: "عندما يكون اتجاه التسارع عكس اتجاه حركة الجسم فإن سرعته:",
+    choices: [
+      "تزداد",
+      "تتناقص",
+      "تبقى ثابتة",
+      "تنعدم فورًا"
+    ],
+    correctAnswer: "تتناقص",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "الحركة",
+    indicator: 3
+  },
+  {
+    id: "q317",
+    number: 317,
+    text: "الجسم الذي يتحرك في مسار دائري يتسارع باستمرار بسبب قوة محصلة تسمى:",
+    choices: [
+      "قوة الاحتكاك",
+      "القوة المركزية",
+      "قوة الطفو",
+      "قوة الشد"
+    ],
+    correctAnswer: "القوة المركزية",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "الحركة",
+    indicator: 4
+  },
+  {
+    id: "q318",
+    number: 318,
+    text: "عند اصطدام جسم متحرك بجسم ساكن أكبر منه كتلة، يمكن التنبؤ اعتمادًا على حفظ الزخم بأن:",
+    choices: [
+      "الجسم الأصغر يرتد ويتحرك الجسم الأكبر بسرعة أقل",
+      "الجسمين يتوقفان تمامًا",
+      "الجسم الأكبر يتحرك بسرعة أكبر من الأصغر",
+      "الجسم الأصغر يتحرك بسرعته نفسها دون تغير"
+    ],
+    correctAnswer: "الجسم الأصغر يرتد ويتحرك الجسم الأكبر بسرعة أقل",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "الزخم",
+    indicator: 3
+  },
+  {
+    id: "q319",
+    number: 319,
+    text: "اتجاه قوة الاحتكاك المؤثرة في جسم متحرك يكون دائمًا:",
+    choices: [
+      "في اتجاه الحركة",
+      "عكس اتجاه الحركة",
+      "إلى أعلى",
+      "عموديًا على السطح"
+    ],
+    correctAnswer: "عكس اتجاه الحركة",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "قوة الاحتكاك",
+    indicator: 2
+  },
+  {
+    id: "q320",
+    number: 320,
+    text: "ماذا يحدث لسرعة جسم يسقط من ارتفاع بسبب الجاذبية الأرضية؟",
+    choices: [
+      "تقل باستمرار",
+      "تبقى صفرًا",
+      "تزداد",
+      "تتغير اتجاهها إلى أعلى"
+    ],
+    correctAnswer: "تزداد",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "قانون نيوتن الثاني",
+    indicator: 4
+  },
+  {
+    id: "q321",
+    number: 321,
+    text: "يختلف الوزن عن الكتلة في أن الوزن:",
+    choices: [
+      "يقاس بالكيلوجرام",
+      "يبقى ثابتًا في كل مكان",
+      "يتغير بتغير المكان ويقاس بالنيوتن",
+      "هو مقدار ما يحتويه الجسم من مادة"
+    ],
+    correctAnswer: "يتغير بتغير المكان ويقاس بالنيوتن",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "قانون نيوتن الثاني",
+    indicator: 5
+  },
+  {
+    id: "q322",
+    number: 322,
+    text: "تعتمد قوة التجاذب بين جسمين على:",
+    choices: [
+      "كتلتي الجسمين والبعد بينهما",
+      "لوني الجسمين",
+      "درجة حرارة الجسمين فقط",
+      "شكل الجسمين فقط"
+    ],
+    correctAnswer: "كتلتي الجسمين والبعد بينهما",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "قانون نيوتن الثالث",
+    indicator: 3
+  },
+  {
+    id: "q323",
+    number: 323,
+    text: "المسار المغلق الذي تتحرك فيه الشحنات الكهربائية يسمى:",
+    choices: [
+      "المجال المغناطيسي",
+      "الدائرة الكهربائية",
+      "العازل",
+      "التفريغ الكهربائي"
+    ],
+    correctAnswer: "الدائرة الكهربائية",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "المجال الكهربائي والمغناطيسي",
+    indicator: 3
+  },
+  {
+    id: "q324",
+    number: 324,
+    text: "الموصلات فائقة التوصيل مواد:",
+    choices: [
+      "تزداد مقاومتها عند تبريدها",
+      "لا توصل الكهرباء أبدًا",
+      "تصبح مقاومتها الكهربائية صفرًا عند تبريدها إلى درجة حرارة منخفضة جدًا",
+      "تستخدم عوازل في التمديدات المنزلية"
+    ],
+    correctAnswer: "تصبح مقاومتها الكهربائية صفرًا عند تبريدها إلى درجة حرارة منخفضة جدًا",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "التوصيل الكهربائي",
+    indicator: 2
+  },
+  {
+    id: "q325",
+    number: 325,
+    text: "تصبح المادة مغناطيسًا عندما تكون مناطقها المغناطيسية:",
+    choices: [
+      "ذات اتجاهات عشوائية",
+      "مرتبة وتشير إلى الاتجاه نفسه",
+      "غير موجودة",
+      "مشحونة بشحنة موجبة"
+    ],
+    correctAnswer: "مرتبة وتشير إلى الاتجاه نفسه",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "المغناطيس والتيار الكهربائي",
+    indicator: 3
+  },
+  {
+    id: "q326",
+    number: 326,
+    text: "يعتمد عمل مقياس الحرارة الزئبقي على:",
+    choices: [
+      "تمدد السائل وتقلصه مع تغير درجة الحرارة",
+      "تغير لون السائل",
+      "تبخر الزئبق",
+      "مرور تيار كهربائي في الزئبق"
+    ],
+    correctAnswer: "تمدد السائل وتقلصه مع تغير درجة الحرارة",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "انتقال وتوصيل الحرارة",
+    indicator: 4
+  },
+  {
+    id: "q327",
+    number: 327,
+    text: "عندما يسقط جسم من ارتفاع تتحول طاقته:",
+    choices: [
+      "من حركية إلى وضع",
+      "من وضع إلى حركية",
+      "من كهربائية إلى كيميائية",
+      "من ضوئية إلى نووية"
+    ],
+    correctAnswer: "من وضع إلى حركية",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "الطاقة الحركية والكامنة",
+    indicator: 3
+  },
+  {
+    id: "q328",
+    number: 328,
+    text: "في محطات توليد الكهرباء التي تعمل بالوقود الأحفوري، يُستخدم بخار الماء الناتج عن حرق الوقود في:",
+    choices: [
+      "تبريد المولد",
+      "تدوير التوربين المتصل بالمولد",
+      "صنع الوقود من جديد",
+      "تخزين الكهرباء"
+    ],
+    correctAnswer: "تدوير التوربين المتصل بالمولد",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "تحولات الطاقة",
+    indicator: 3
+  },
+  {
+    id: "q329",
+    number: 329,
+    text: "يستفاد من الصدى في:",
+    choices: [
+      "تحديد مواقع الأجسام التي تعترض مسار الموجات",
+      "زيادة سرعة الصوت",
+      "توليد الكهرباء",
+      "تسخين الماء"
+    ],
+    correctAnswer: "تحديد مواقع الأجسام التي تعترض مسار الموجات",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "الموجات الصوتية",
+    indicator: 3
+  },
+  {
+    id: "q330",
+    number: 330,
+    text: "موجات الضوء موجات كهرومغناطيسية من النوع:",
+    choices: [
+      "الطولي",
+      "المستعرض",
+      "الميكانيكي",
+      "الصوتي"
+    ],
+    correctAnswer: "المستعرض",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "الموجات الضوئية",
+    indicator: 1
+  },
+  {
+    id: "q331",
+    number: 331,
+    text: "يتركب الضوء الأبيض مثل ضوء الشمس من:",
+    choices: [
+      "لون واحد فقط",
+      "عدة ألوان مختلفة",
+      "أشعة سينية فقط",
+      "موجات صوتية"
+    ],
+    correctAnswer: "عدة ألوان مختلفة",
+    skill: "العلوم الفيزيائية",
+    points: 1,
+    relatedOutcome: "الموجات الضوئية",
+    indicator: 2
+  },
+  {
+    id: "q332",
+    number: 332,
+    text: "من العوامل التي تجعل الحياة ممكنة على كوكب الأرض:",
+    choices: [
+      "خلوه من الغلاف الجوي",
+      "وجود الماء بحالاته الثلاث وغلاف جوي يسمح باستمرار الحياة",
+      "قربه الشديد من الشمس",
+      "كثرة الفوهات على سطحه"
+    ],
+    correctAnswer: "وجود الماء بحالاته الثلاث وغلاف جوي يسمح باستمرار الحياة",
+    skill: "علوم الأرض والفضاء",
+    points: 1,
+    relatedOutcome: "حركة الأجرام السماوية",
+    indicator: 3
+  },
+  {
+    id: "q333",
+    number: 333,
+    text: "لماذا ترتفع درجة الحرارة في المناطق الاستوائية مقارنة بالمناطق القطبية؟",
+    choices: [
+      "لأن أشعة الشمس تسقط عليها بشكل عمودي",
+      "لأنها أبعد عن الشمس",
+      "لأن الرياح فيها أقوى",
+      "لأنها مغطاة بالجليد"
+    ],
+    correctAnswer: "لأن أشعة الشمس تسقط عليها بشكل عمودي",
+    skill: "علوم الأرض والفضاء",
+    points: 1,
+    relatedOutcome: "التغيرات المناخية",
+    indicator: 2
+  },
+  {
+    id: "q334",
+    number: 334,
+    text: "يسهم حمض الكربونيك في تكوين:",
+    choices: [
+      "البراكين",
+      "الكهوف",
+      "الصفائح الأرضية",
+      "الكثبان الرملية"
+    ],
+    correctAnswer: "الكهوف",
+    skill: "علوم الأرض والفضاء",
+    points: 1,
+    relatedOutcome: "دورة الكربون والظواهر المرتبطة بها",
+    indicator: 2
+  },
+  {
+    id: "q335",
+    number: 335,
+    text: "من الفرضيات التي تفسر سبب حركة الصفائح الأرضية:",
+    choices: [
+      "تيارات الحمل في الستار (الوشاح)",
+      "جاذبية القمر",
+      "دوران الرياح",
+      "ذوبان الجليد"
+    ],
+    correctAnswer: "تيارات الحمل في الستار (الوشاح)",
+    skill: "علوم الأرض والفضاء",
+    points: 1,
+    relatedOutcome: "الصفائح الأرضية وعلاقتها بالزلازل والبراكين",
+    indicator: 4
+  },
+  {
+    id: "q336",
+    number: 336,
+    text: "الجهاز الذي يُستخدم لتسجيل الموجات الزلزالية هو:",
+    choices: [
+      "البارومتر",
+      "السيزموجراف",
+      "الأنيمومتر",
+      "الثرمومتر"
+    ],
+    correctAnswer: "السيزموجراف",
+    skill: "علوم الأرض والفضاء",
+    points: 1,
+    relatedOutcome: "تأثير النشاط البشري على الأرض",
+    indicator: 2
+  },
+  {
+    id: "q337",
+    number: 337,
+    text: "من وسائل الحماية من أخطار الزلازل:",
+    choices: [
+      "وضع الأجسام الثقيلة على الرفوف العالية",
+      "تشييد المباني المرتفعة على دعائم مطاطية وفولاذية",
+      "استخدام أنابيب غاز صلبة لا تنثني",
+      "الوقوف بجانب النوافذ"
+    ],
+    correctAnswer: "تشييد المباني المرتفعة على دعائم مطاطية وفولاذية",
+    skill: "علوم الأرض والفضاء",
+    points: 1,
+    relatedOutcome: "تأثير النشاط البشري على الأرض",
+    indicator: 3
+  },
+  {
+    id: "q338",
+    number: 338,
+    text: "على الرغم من أن الماء مورد متجدد، إلا أنه قد ينفد في بعض المناطق بسبب:",
+    choices: [
+      "كثرة الأمطار",
+      "الجفاف وقلة تعويضه",
+      "انخفاض درجة الحرارة",
+      "زيادة الغطاء النباتي"
+    ],
+    correctAnswer: "الجفاف وقلة تعويضه",
+    skill: "علوم الأرض والفضاء",
+    points: 1,
+    relatedOutcome: "الموارد الطبيعية وسبل إدارتها",
+    indicator: 1
   }
 ];
 
