@@ -14,6 +14,7 @@ export type TestModel = {
   duration: number; // بالدقائق
   skill: string;
   testType?: "normal" | "diagnostic"; // نوع الاختبار
+  group?: string; // رمز مجموعة النواتج في وثيقة 2026 (للاختبارات التشخيصية حسب المجموعات)
   year?: string; // السنة الدراسية (للنماذج الجاهزة)
   source?: string; // المصدر (للنماذج الجاهزة)
 };

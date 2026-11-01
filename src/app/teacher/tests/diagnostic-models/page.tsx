@@ -288,8 +288,33 @@ export default function DiagnosticModelsPage() {
         {/* Models Grid */}
         {activeTab === "prebuilt" ? (
           diagnosticModels.length > 0 ? (
+            <div className="space-y-10">
+              {[
+                {
+                  key: "groups",
+                  title: "اختبارات تشخيصية حسب مجموعات النواتج",
+                  hint: "اختبار لكل مجموعة من مجموعات النواتج المترابطة في وثيقة نواتج التعلم، لتشخيص مستوى الطالبات قبل تدريس المجموعة.",
+                  models: diagnosticModels.filter((m) => m.group),
+                },
+                {
+                  key: "general",
+                  title: "اختبارات تشخيصية شاملة",
+                  hint: "اختبارات تغطي مجالًا كاملًا أو جميع المجالات.",
+                  models: diagnosticModels.filter((m) => !m.group),
+                },
+              ]
+                .filter((section) => section.models.length > 0)
+                .map((section) => (
+              <div key={section.key} className="space-y-4">
+                <div className="border-r-4 border-purple-400 pr-3">
+                  <h2 className="text-lg font-bold text-slate-900">
+                    {section.title}
+                    <span className="mr-2 text-sm font-medium text-slate-500">({section.models.length})</span>
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-600">{section.hint}</p>
+                </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {diagnosticModels.map((model) => {
+              {section.models.map((model) => {
               const skillColor = skillColors[model.skill] || "bg-slate-50 text-slate-700 border-slate-200";
               const questionsCount = getQuestionsForModel(model.id).length || model.questionIds.length;
               const relatedOutcomes = getRelatedOutcomes(model.id);
@@ -392,6 +417,9 @@ export default function DiagnosticModelsPage() {
                 </div>
               );
             })}
+            </div>
+              </div>
+                ))}
             </div>
           ) : (
             <div className="card text-center">
