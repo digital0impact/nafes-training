@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react"
 import { SectionHeader } from "@/components/ui/section-header"
 import { LearningOutcomeCard } from "@/components/ui/learning-outcome-card"
 import { PageBackground } from "@/components/layout/page-background"
-import { learningOutcomes, LEGACY_LESSON_NAMES } from "@/lib/data"
+import { learningOutcomes, LEGACY_LESSON_NAMES, OUTCOME_GROUPS, getOutcomeGroup } from "@/lib/data"
 import { TeacherHeader } from "@/features/classes/components/teacher-header"
 
 type TabType = "view" | "edit" | "outcomes"
@@ -267,7 +267,7 @@ export default function TeacherOutcomesPage() {
       }
 
       return modifiedItem
-    })
+    }).sort((a, b) => (a.code || "").localeCompare(b.code || "", undefined, { numeric: true }))
   }
 
   const modifiedOutcomes = getModifiedOutcomes()
@@ -611,7 +611,7 @@ export default function TeacherOutcomesPage() {
             <div className="rounded-2xl bg-violet-50 border border-violet-200 p-4">
               <h2 className="text-lg font-bold text-violet-900">جميع نواتج التعلم</h2>
               <p className="mt-1 text-sm text-violet-700">
-                استعراض كامل لنواتج التعلم والمؤشرات حسب المجال والفترة والأسبوع
+                استعراض كامل لنواتج التعلم والمؤشرات حسب المجال، مقسّمة إلى مجموعات النواتج المترابطة كما في وثيقة نواتج التعلم
               </p>
             </div>
 
@@ -653,20 +653,45 @@ export default function TeacherOutcomesPage() {
                             : "text-amber-700"
                       }`}
                     >
-                      {items.length} ناتج تعلم
+                      {items.length} ناتج تعلم في {OUTCOME_GROUPS.filter((g) => g.domain === domain).length} مجموعات
                     </p>
                   </div>
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {items.map((item, index) => {
-                      const topicKey = getTopicKey(item);
-                      return (
-                        <LearningOutcomeCard
-                          key={`${topicKey}-${index}`}
-                          item={item}
-                        />
-                      );
-                    })}
-                  </div>
+                  {OUTCOME_GROUPS.filter((group) => group.domain === domain).map((group) => {
+                    const groupItems = items
+                      .filter((item) => getOutcomeGroup(item.code)?.code === group.code)
+                      .sort((a, b) => (a.code || "").localeCompare(b.code || "", undefined, { numeric: true }));
+                    if (groupItems.length === 0) return null;
+                    return (
+                      <div key={group.code} className="space-y-3 pt-2">
+                        <h4
+                          className={`flex items-center gap-2 border-r-4 pr-3 text-base font-bold text-slate-800 ${
+                            color === "emerald"
+                              ? "border-emerald-400"
+                              : color === "blue"
+                                ? "border-blue-400"
+                                : "border-amber-400"
+                          }`}
+                        >
+                          {group.name}
+                          <span className="text-xs font-medium text-slate-500">({groupItems.length === 1 ? "ناتج واحد" : groupItems.length === 2 ? "ناتجان" : `${groupItems.length} نواتج`})</span>
+                        </h4>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                          {groupItems.map((item, index) => (
+                            <LearningOutcomeCard key={`${getTopicKey(item)}-${index}`} item={item} />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {items.filter((item) => !getOutcomeGroup(item.code)).length > 0 && (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {items
+                        .filter((item) => !getOutcomeGroup(item.code))
+                        .map((item, index) => (
+                          <LearningOutcomeCard key={`${getTopicKey(item)}-${index}`} item={item} />
+                        ))}
+                    </div>
+                  )}
                 </div>
               );
             })}

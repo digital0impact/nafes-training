@@ -29,7 +29,7 @@ async function getTeacherOutcomes(teacherId: string) {
       week: plan?.weekAssignments?.[key] || item.week,
     }
   })
-  return outcomes.sort((a, b) => periodRank(a.period) - periodRank(b.period) || weekNumber(a.week) - weekNumber(b.week))
+  return outcomes.sort((a, b) => periodRank(a.period) - periodRank(b.period) || weekNumber(a.week) - weekNumber(b.week) || (a.code || '').localeCompare(b.code || '', undefined, { numeric: true }))
 }
 
 /**
